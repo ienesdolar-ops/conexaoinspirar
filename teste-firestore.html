@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Firestore — Conexão Inspirar</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0d0d0d; color: #e0e0e0; padding: 40px; }
+    .status { padding: 16px; margin: 12px 0; border-radius: 8px; font-size: 14px; }
+    .ok { background: rgba(0,200,80,0.15); border: 1px solid rgba(0,200,80,0.4); color: #9be15d; }
+    .err { background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.4); color: #ff6b6b; }
+    .info { background: rgba(100,150,255,0.12); border: 1px solid rgba(100,150,255,0.3); color: #90b4ff; }
+    h1 { color: #9be15d; }
+    code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    button { background: #9be15d; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; margin: 8px 4px; }
+    button:hover { opacity: 0.9; }
+    #log { font-family: monospace; font-size: 12px; background: #111; padding: 16px; border-radius: 8px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>🔧 Diagnóstico Firestore — Conexão Inspirar</h1>
+  <p>Esta página testa se o Firestore está funcionando corretamente no seu navegador.</p>
+
+  <div id="results"></div>
+
+  <h3 style="margin-top:24px">Ações:</h3>
+  <button onclick="testarEscrita()">1. Testar Escrita no Firestore</button>
+  <button onclick="testarLeitura()">2. Testar Leitura do Firestore</button>
+  <button onclick="verPerfilSalvo()">3. Ver Perfil Salvo no Firestore</button>
+  <button onclick="verLocalStorage()">4. Ver LocalStorage</button>
+
+  <h3 style="margin-top:24px">Log:</h3>
+  <div id="log"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script>
+    var results = document.getElementById('results');
+    var logEl = document.getElementById('log');
+
+    function addStatus(msg, type) {
+      var div = document.createElement('div');
+      div.className = 'status ' + type;
+      div.innerHTML = msg;
+      results.appendChild(div);
+    }
+
+    function log(msg) {
+      logEl.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n';
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // Interceptar erros de console
+    var origError = console.error;
+    console.error = function() {
+      var args = Array.prototype.slice.call(arguments);
+      log('CONSOLE.ERROR: ' + args.join(' '));
+      origError.apply(console, arguments);
+    };
+
+    window.addEventListener('error', function(e) {
+      log('WINDOW.ERROR: ' + e.message);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      log('UNHANDLED REJECTION: ' + (e.reason ? (e.reason.message || e.reason) : e));
+    });
+
+    // 1. Testar Firebase Init
+    try {
+      firebase.initializeApp({
+        apiKey:            "AIzaSyBvo3kJJO4xgZXBFsV7YAfZ2CS2bsjB7Iw",
+        authDomain:        "conexao-carreiras-inspirar.firebaseapp.com",
+        projectId:         "conexao-carreiras-inspirar",
+        storageBucket:     "conexao-carreiras-inspirar.firebasestorage.app",
+        messagingSenderId: "303962933237",
+        appId:             "1:303962933237:web:935576e634aacb6065c2bc"
+      });
+      var db = firebase.firestore();
+      addStatus('✅ Firebase inicializado com sucesso! ProjectId: <code>conexao-carreiras-inspirar</code>', 'ok');
+      log('Firebase inicializado OK');
+    } catch(e) {
+      addStatus('❌ ERRO ao inicializar Firebase: ' + e.message, 'err');
+      log('ERRO Firebase init: ' + e.message);
+    }
+
+    // 2. Testar conexão Firestore com timeout explícito
+    log('Testando conexão com Firestore...');
+    var timerFirestore = setTimeout(function() {
+      addStatus('⏳ Firestore não respondeu em 5 segundos! Isso geralmente significa que o <strong>banco de dados Firestore ainda não foi criado</strong> no console do Firebase ou as regras de rede estão bloqueando.', 'err');
+      log('TIMEOUT: Firestore sem resposta após 5s');
+    }, 5000);
+
+    db.collection('perfis').limit(1).get().then(function(snapshot) {
+      clearTimeout(timerFirestore);
+      addStatus('✅ Firestore Conectado com sucesso! Coleção "perfis" acessível (total de documentos: ' + snapshot.size + ')', 'ok');
+      log('Firestore OK! Perfis encontrados: ' + snapshot.size);
+    }).catch(function(err) {
+      clearTimeout(timerFirestore);
+      if (err.code === 'permission-denied') {
+        addStatus('⚠️ PERMISSION_DENIED: O banco existe, mas as Regras de Segurança estão bloqueando leitura/escrita.<br><br><strong>Como resolver:</strong><br>Acesse <a href="https://console.firebase.google.com/project/conexao-carreiras-inspirar/firestore/rules" target="_blank" style="color:#9be15d">Console Firebase → Firestore Database → Regras</a> e publique:<br><pre style="background:#000;padding:10px;border-radius:6px;color:#9be15d">rules_version = \'2\';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}</pre>', 'err');
+        log('ERRO: permission-denied');
+      } else if (err.code === 'not-found' || (err.message && err.message.toLowerCase().includes('not found'))) {
+        addStatus('❌ BANCO DE DADOS NÃO ENCONTRADO (404)!<br><br><strong>O banco de dados Firestore ainda não foi criado no Firebase!</strong><br>Para criar (100% gratuito):<br>1. Acesse: <a href="https://console.firebase.google.com/project/conexao-carreiras-inspirar/firestore" target="_blank" style="color:#9be15d">https://console.firebase.google.com/project/conexao-carreiras-inspirar/firestore</a><br>2. Clique no botão <strong>"Criar banco de dados"</strong>.<br>3. Escolha <strong>Modo de teste</strong> (ou depois configure as regras como abertas).<br>4. Escolha qualquer localização (ex: nam5 ou southamerica-east1) e confirme.', 'err');
+        log('ERRO: not-found - banco não criado');
+      } else {
+        addStatus('❌ Erro no Firestore: ' + err.code + ' — ' + err.message, 'err');
+        log('ERRO Firestore: ' + err.code + ' - ' + err.message);
+      }
+    });
+
+    function testarEscrita() {
+      log('Tentando escrever no Firestore...');
+      db.collection('perfis').doc('teste-conexao').set({
+        timestamp: Date.now(),
+        mensagem: 'Teste de escrita OK'
+      }).then(function() {
+        addStatus('✅ ESCRITA no Firestore funcionou com sucesso!', 'ok');
+        log('Escrita OK!');
+      }).catch(function(err) {
+        addStatus('❌ FALHA na escrita: ' + err.code + ' — ' + err.message, 'err');
+        log('ERRO escrita: ' + err.code + ' - ' + err.message);
+      });
+    }
+
+    function testarLeitura() {
+      log('Tentando ler do Firestore...');
+      db.collection('perfis').get().then(function(snapshot) {
+        addStatus('✅ LEITURA OK! Total de perfis: ' + snapshot.size, 'ok');
+        log('Leitura OK: ' + snapshot.size + ' perfis');
+      }).catch(function(err) {
+        addStatus('❌ FALHA na leitura: ' + err.code + ' — ' + err.message, 'err');
+        log('ERRO leitura: ' + err.code + ' - ' + err.message);
+      });
+    }
+
+    function verPerfilSalvo() {
+      log('Buscando perfis salvos no Firestore...');
+      db.collection('perfis').get().then(function(snapshot) {
+        if (snapshot.empty) {
+          addStatus('ℹ️ Nenhum perfil salvo no Firestore ainda.', 'info');
+          log('Nenhum perfil no Firestore');
+        } else {
+          var html = '📋 <strong>Perfis encontrados no Firestore (' + snapshot.size + '):</strong><br>';
+          snapshot.forEach(function(doc) {
+            var d = doc.data();
+            html += '<br>• <strong>' + (d.nome || 'Sem nome') + '</strong> (' + doc.id + ')';
+            html += ' — foto: ' + (d.fotoUrl ? '✅ SIM (' + d.fotoUrl.substring(0,40) + '...)' : '❌ NÃO');
+            html += ' — currículo: ' + (d.curriculoNome ? '✅ ' + d.curriculoNome : '❌ NÃO');
+          });
+          addStatus(html, 'ok');
+          log('Encontrados ' + snapshot.size + ' perfis');
+        }
+      }).catch(function(err) {
+        addStatus('❌ FALHA ao buscar perfis: ' + err.message, 'err');
+        log('ERRO perfis: ' + err.code + ' - ' + err.message);
+      });
+    }
+
+    function verLocalStorage() {
+      var perfil = localStorage.getItem('ccin-perfil');
+      var logado = localStorage.getItem('ccin-logado');
+      var loginEmail = localStorage.getItem('ccin-login-email');
+      var html = '🗄️ <strong>LocalStorage:</strong><br>';
+      html += '• ccin-logado: <code>' + (logado || 'VAZIO') + '</code><br>';
+      html += '• ccin-login-email: <code>' + (loginEmail || 'VAZIO') + '</code><br>';
+      if (perfil) {
+        var p = JSON.parse(perfil);
+        html += '• ccin-perfil: <code>' + p.nome + ' (' + p.email + ')</code><br>';
+        html += '  — foto: ' + (p.fotoUrl ? '✅ SIM (' + p.fotoUrl.substring(0,50) + '...)' : '❌ NÃO') + '<br>';
+        html += '  — currículo: ' + (p.curriculoNome ? '✅ ' + p.curriculoNome : '❌ NÃO');
+      } else {
+        html += '• ccin-perfil: <code>VAZIO</code>';
+      }
+      addStatus(html, 'info');
+      log('LocalStorage verificado');
+    }
+  </script>
+</body>
+</html>

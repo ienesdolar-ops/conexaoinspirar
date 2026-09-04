@@ -246,8 +246,14 @@ var PDFStorage = {
 
 // 2. Repositório em Nuvem Gratuita (Cloud Firestore — sem necessidade de Storage Pago)
 var CloudPDFStorage = {
-  salvar: function(email, file, callback) {
-    if (typeof db === 'undefined' || !email || !file) {
+  salvar: function(email, fileOrBlob, nome, callback) {
+    if (typeof nome === 'function') {
+      callback = nome;
+      nome = (fileOrBlob && fileOrBlob.name) || 'Curriculo_Profissional.pdf';
+    }
+    nome = nome || (fileOrBlob && fileOrBlob.name) || 'Curriculo_Profissional.pdf';
+
+    if (typeof db === 'undefined' || !email || !fileOrBlob) {
       if (callback) callback(new Error('Firestore ou arquivo indisponível'));
       return;
     }
@@ -255,19 +261,22 @@ var CloudPDFStorage = {
     reader.onload = function(e) {
       var dataUri = e.target.result;
       var cleanEmail = email.toLowerCase().trim();
+      var sizeFormatted = formatFileSize(fileOrBlob.size || dataUri.length * 0.75);
 
       // PDFs padrão até 800 KB: salvos em documento único no Firestore (Gratuito!)
       if (dataUri.length < 900000) {
         db.collection('curriculos_pdf').doc(cleanEmail).set({
           email: cleanEmail,
-          nome: file.name,
-          tamanho: formatFileSize(file.size),
+          nome: nome,
+          tamanho: sizeFormatted,
           dataUri: dataUri,
           isChunked: false,
           updatedAt: Date.now()
         }).then(function() {
+          console.log('[CloudPDFStorage] ✅ PDF salvo com sucesso na nuvem para:', cleanEmail);
           if (callback) callback(null);
         }).catch(function(err) {
+          console.error('[CloudPDFStorage] ❌ Erro ao salvar PDF:', err);
           if (callback) callback(err);
         });
       } else {
@@ -281,8 +290,8 @@ var CloudPDFStorage = {
         var mainRef = db.collection('curriculos_pdf').doc(cleanEmail);
         batch.set(mainRef, {
           email: cleanEmail,
-          nome: file.name,
-          tamanho: formatFileSize(file.size),
+          nome: nome,
+          tamanho: sizeFormatted,
           totalChunks: chunks.length,
           isChunked: true,
           updatedAt: Date.now()
@@ -292,13 +301,18 @@ var CloudPDFStorage = {
           batch.set(partRef, { chunk: chunk, index: idx });
         });
         batch.commit().then(function() {
+          console.log('[CloudPDFStorage] ✅ PDF em partes salvo na nuvem para:', cleanEmail);
           if (callback) callback(null);
         }).catch(function(err) {
+          console.error('[CloudPDFStorage] ❌ Erro ao salvar PDF em partes:', err);
           if (callback) callback(err);
         });
       }
     };
-    reader.readAsDataURL(file);
+    reader.onerror = function(err) {
+      if (callback) callback(err);
+    };
+    reader.readAsDataURL(fileOrBlob);
   },
   obter: function(email, callback) {
     if (typeof db === 'undefined' || !email) {
@@ -678,11 +692,11 @@ var DEMO_USER = {
   instagram: '@anapaula.saude',
   site: '',
   fotoUrl: 'https://images.unsplash.com/photo-1594824813571-2b533411efa0?w=150&auto=format&fit=crop&q=80',
-  curriculoUrl: 'demo',
+  curriculoUrl: 'cloud:demo@inspirar.com',
   curriculoNome: 'Curriculo_Ana_Paula_Silva.pdf',
-  curriculoTamanho: '184 KB',
+  curriculoTamanho: '112 KB',
   contratadoPelaPlataforma: true,
-  updatedAt: 1000
+  updatedAt: 0
 };
 
 /* ─── UTILITÁRIOS & FIRESTORE OPERAÇÕES ──────────────────── */
@@ -748,21 +762,62 @@ function listenVagas(callback) {
 
 function getPerfilLocalOrFirestore(callback) {
   var saved = localStorage.getItem('ccin-perfil');
-  var perfilLocal = saved ? JSON.parse(saved) : DEMO_USER;
+  var perfilLocal = saved ? JSON.parse(saved) : null;
 
+  // Determinar o email do usuário: prioridade = login-email > perfil local > demo
+  var loginEmail = localStorage.getItem('ccin-login-email');
+  var emailParaBuscar = (loginEmail || (perfilLocal && perfilLocal.email) || DEMO_USER.email).toLowerCase().trim();
+
+  // Se não existe perfil local, usar DEMO_USER como fallback imediato
+  if (!perfilLocal) {
+    perfilLocal = Object.assign({}, DEMO_USER);
+    if (loginEmail && loginEmail !== DEMO_USER.email) {
+      perfilLocal.email = loginEmail;
+      perfilLocal.nome = 'Aluno Inspirar';
+      perfilLocal.fotoUrl = '';
+      perfilLocal.curriculoUrl = '';
+      perfilLocal.curriculoNome = '';
+    }
+    delete perfilLocal.updatedAt; // Garante que qualquer dado da nuvem substitua esse fallback
+  }
+
+  // Renderiza imediatamente com os dados locais para resposta rápida
   callback(perfilLocal);
 
-  if (typeof db !== 'undefined' && perfilLocal.email) {
-    db.collection('perfis').doc(perfilLocal.email).get().then(function(doc) {
+  // Busca assíncrona na nuvem Firestore para dados mais recentes
+  if (typeof db !== 'undefined' && emailParaBuscar) {
+    console.log('[Perfil] Buscando perfil na nuvem Firestore para:', emailParaBuscar);
+    db.collection('perfis').doc(emailParaBuscar).get().then(function(doc) {
       if (doc.exists) {
         var cloudData = doc.data();
-        if (cloudData.updatedAt && (!perfilLocal.updatedAt || cloudData.updatedAt > perfilLocal.updatedAt)) {
-          localStorage.setItem('ccin-perfil', JSON.stringify(cloudData));
-          callback(cloudData);
+        console.log('[Perfil] ✅ Dados encontrados na nuvem:', cloudData.nome, '| foto:', !!cloudData.fotoUrl, '| currículo:', cloudData.curriculoNome);
+
+        // A nuvem tem prioridade sobre dados vazios ou de sessão anônima
+        var deveAtualizar = false;
+        if (!saved) {
+          deveAtualizar = true; // Guia anônima / primeira vez no navegador
+        } else if (!perfilLocal.updatedAt) {
+          deveAtualizar = true;
+        } else if (cloudData.updatedAt && cloudData.updatedAt >= (perfilLocal.updatedAt || 0)) {
+          deveAtualizar = true;
+        } else if (cloudData.fotoUrl && !perfilLocal.fotoUrl) {
+          deveAtualizar = true;
+        } else if (cloudData.curriculoNome && !perfilLocal.curriculoNome) {
+          deveAtualizar = true;
+        } else if (!cloudData.updatedAt) {
+          deveAtualizar = true; // Documento da nuvem sem timestamp prévio
         }
+
+        if (deveAtualizar) {
+          var merged = Object.assign({}, perfilLocal, cloudData);
+          localStorage.setItem('ccin-perfil', JSON.stringify(merged));
+          callback(merged);
+        }
+      } else {
+        console.log('[Perfil] Nenhum perfil na nuvem para:', emailParaBuscar);
       }
     }).catch(function(e) {
-      console.log("Perfil cloud fallback gracioso:", e);
+      console.warn('[Perfil] ⚠️ Erro ao consultar nuvem:', e.message || e);
     });
   }
 }
@@ -879,15 +934,66 @@ function vagaCardHTML(vaga) {
       senha === DEMO_USER.senha;
 
     if (isDemo || identifier.length > 3) {
-      localStorage.setItem('ccin-logado', '1');
-      if (!localStorage.getItem('ccin-perfil')) {
-        localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
-      }
       var btn = form.querySelector('button[type="submit"]');
       btn.textContent = 'Entrando...';
       btn.disabled = true;
       btn.style.opacity = '0.75';
-      setTimeout(function () { window.location.href = 'painel.html'; }, 600);
+
+      // Salvar o email do login para identificar o usuário em qualquer contexto
+      var loginEmail = identifier.indexOf('@') > -1 ? identifier : DEMO_USER.email;
+      localStorage.setItem('ccin-logado', '1');
+      localStorage.setItem('ccin-login-email', loginEmail);
+
+      // Tentar buscar perfil do Firestore ANTES de redirecionar
+      var redirectTimeout = setTimeout(function() {
+        // Fallback: se Firestore não responder em 3s, redireciona com dados locais/demo
+        if (!localStorage.getItem('ccin-perfil')) {
+          if (isDemo) {
+            localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
+          } else {
+            var novoPerfil = Object.assign({}, DEMO_USER, { email: loginEmail, nome: 'Aluno Inspirar', fotoUrl: '', curriculoUrl: '', curriculoNome: '', updatedAt: 0 });
+            localStorage.setItem('ccin-perfil', JSON.stringify(novoPerfil));
+          }
+        }
+        window.location.href = 'painel.html';
+      }, 3000);
+
+      if (typeof db !== 'undefined') {
+        console.log('[Login] Buscando perfil no Firestore para:', loginEmail);
+        db.collection('perfis').doc(loginEmail).get().then(function(doc) {
+          clearTimeout(redirectTimeout);
+          if (doc.exists) {
+            var cloudPerfil = doc.data();
+            console.log('[Login] ✅ Perfil encontrado na nuvem:', cloudPerfil.nome, '— foto:', !!cloudPerfil.fotoUrl);
+            localStorage.setItem('ccin-perfil', JSON.stringify(cloudPerfil));
+          } else {
+            console.log('[Login] Perfil não encontrado na nuvem. Usando dados locais/demo.');
+            if (!localStorage.getItem('ccin-perfil')) {
+              if (isDemo) {
+                localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
+              } else {
+                var novoPerfil = Object.assign({}, DEMO_USER, { email: loginEmail, nome: 'Aluno Inspirar', fotoUrl: '', curriculoUrl: '', curriculoNome: '', updatedAt: 0 });
+                localStorage.setItem('ccin-perfil', JSON.stringify(novoPerfil));
+              }
+            }
+          }
+          window.location.href = 'painel.html';
+        }).catch(function(err) {
+          clearTimeout(redirectTimeout);
+          console.log('[Login] Firestore indisponível, usando fallback:', err.message || err);
+          if (!localStorage.getItem('ccin-perfil')) {
+            localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
+          }
+          window.location.href = 'painel.html';
+        });
+      } else {
+        // Sem Firestore, redireciona direto
+        clearTimeout(redirectTimeout);
+        if (!localStorage.getItem('ccin-perfil')) {
+          localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
+        }
+        window.location.href = 'painel.html';
+      }
     } else {
       if (errorMsg) {
         errorMsg.style.display = 'flex';
@@ -1289,75 +1395,85 @@ function renderVagasEmpresa() {
   if (!painel) return;
 
   if (!localStorage.getItem('ccin-logado')) {
+    // Auto-login para compatibilidade (acesso direto sem passar por login.html)
     localStorage.setItem('ccin-logado', '1');
-    if (!localStorage.getItem('ccin-perfil')) {
-      localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
-    }
+    console.log('[Painel] Auto-login ativado (acesso direto)');
   }
 
-  getPerfilLocalOrFirestore(function(perfil) {
+  var navItems = document.querySelectorAll('.painel__nav-item');
+  var sections = document.querySelectorAll('.painel__section');
+  var activePerfil = null;
+
+  function showSection(id) {
+    sections.forEach(function (s) {
+      s.classList.toggle('active', s.id === id);
+    });
+    navItems.forEach(function (n) {
+      n.classList.toggle('active', n.dataset.section === id);
+    });
+
+    if (activePerfil && id === 'sec-minhas-vagas') renderMinhasVagas(activePerfil);
+    if (id === 'sec-todas-vagas') renderTodasVagas();
+    if (id === 'sec-candidaturas') renderMinhasCandidaturas();
+    if (id === 'sec-vitrine-talentos') renderPainelVitrine();
+  }
+
+  // 1. Vinculação única de eventos de navegação
+  navItems.forEach(function (item) {
+    item.addEventListener('click', function () {
+      var section = item.dataset.section;
+      if (section === 'logout') {
+        localStorage.removeItem('ccin-logado');
+        localStorage.removeItem('ccin-login-email');
+        window.location.href = 'index.html';
+        return;
+      }
+      showSection(section);
+      var sidebar = document.getElementById('painelSidebar');
+      if (sidebar) sidebar.classList.remove('sidebar-open');
+    });
+  });
+
+  var sidebarUser = document.getElementById('sidebarUserCard');
+  if (sidebarUser) {
+    sidebarUser.addEventListener('click', function() {
+      showSection('sec-perfil');
+    });
+  }
+
+  var initialSection = 'sec-minhas-vagas';
+  if (window.location.hash && document.getElementById(window.location.hash.substring(1))) {
+    initialSection = window.location.hash.substring(1);
+  }
+  showSection(initialSection);
+
+  // 2. Atualização reativa de dados do usuário (na carga inicial e quando vier da nuvem)
+  function atualizarInfoUsuarioPainel(perfil) {
+    activePerfil = perfil;
     document.querySelectorAll('.painel__user-name').forEach(function (el) {
-      el.textContent = perfil.nome;
+      el.textContent = perfil.nome || 'Aluno Inspirar';
     });
     var espEl = document.querySelector('.painel__user-esp');
     if (espEl) {
       var prefix = (perfil.statusAcademico === 'Graduando') ? '🎓 Graduando(a) em ' : (perfil.statusAcademico === 'Pos-Graduado' ? '🏆 Especialista em ' : '🎓 Graduado(a) em ');
-      espEl.textContent = prefix + (perfil.especialidade || perfil.area);
+      espEl.textContent = prefix + (perfil.especialidade || perfil.area || 'Formação');
     }
     var cidEl = document.querySelector('.painel__user-cidade');
-    if (cidEl) cidEl.textContent = perfil.cidade + ' · ' + perfil.estado;
+    if (cidEl) cidEl.textContent = (perfil.cidade || 'Curitiba') + ' · ' + (perfil.estado || 'PR');
     var avatarEl = document.querySelector('.painel__user-avatar');
     if (avatarEl) {
       if (perfil.fotoUrl) {
         avatarEl.innerHTML = '<img src="' + perfil.fotoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
       } else {
-        avatarEl.textContent = perfil.nome.charAt(0).toUpperCase();
+        avatarEl.textContent = (perfil.nome || 'A').charAt(0).toUpperCase();
       }
     }
+    renderMinhasVagas(perfil);
+  }
 
-    var navItems = document.querySelectorAll('.painel__nav-item');
-    var sections = document.querySelectorAll('.painel__section');
-
-    function showSection(id) {
-      sections.forEach(function (s) {
-        s.classList.toggle('active', s.id === id);
-      });
-      navItems.forEach(function (n) {
-        n.classList.toggle('active', n.dataset.section === id);
-      });
-
-      if (id === 'sec-minhas-vagas') renderMinhasVagas(perfil);
-      if (id === 'sec-todas-vagas') renderTodasVagas();
-      if (id === 'sec-candidaturas') renderMinhasCandidaturas();
-      if (id === 'sec-vitrine-talentos') renderPainelVitrine();
-    }
-
-    navItems.forEach(function (item) {
-      item.addEventListener('click', function () {
-        var section = item.dataset.section;
-        if (section === 'logout') {
-          localStorage.removeItem('ccin-logado');
-          window.location.href = 'index.html';
-          return;
-        }
-        showSection(section);
-        var sidebar = document.getElementById('painelSidebar');
-        if (sidebar) sidebar.classList.remove('sidebar-open');
-      });
-    });
-
-    var sidebarUser = document.getElementById('sidebarUserCard');
-    if (sidebarUser) {
-      sidebarUser.addEventListener('click', function() {
-        showSection('sec-perfil');
-      });
-    }
-
-    var initialSection = 'sec-minhas-vagas';
-    if (window.location.hash && document.getElementById(window.location.hash.substring(1))) {
-      initialSection = window.location.hash.substring(1);
-    }
-    showSection(initialSection);
+  getPerfilLocalOrFirestore(function(perfil) {
+    console.log('[Painel] Perfil carregado na UI:', perfil.nome, '| email:', perfil.email, '| foto:', !!perfil.fotoUrl);
+    atualizarInfoUsuarioPainel(perfil);
   });
 
   var sidebarToggle = document.getElementById('sidebarToggle');
@@ -1964,12 +2080,9 @@ function initPerfilForm() {
   }
 
   // ─── CARREGAMENTO DOS DADOS DO PERFIL ─────────────────────
-  getPerfilLocalOrFirestore(function(perfil) {
+  function carregarPerfilNoFormulario(perfil) {
     if (nivelSelect && areaSelect) {
       populateAreaSelect(perfil.statusAcademico || 'Pos-Graduado', areaSelect, perfil.area || '', false);
-      nivelSelect.addEventListener('change', function() {
-        populateAreaSelect(nivelSelect.value, areaSelect, '', false);
-      });
     }
 
     var fields = ['nome', 'email', 'statusAcademico', 'area', 'especialidade', 'modalidade', 'cidade', 'estado', 'whatsapp', 'bio', 'linkedin', 'instagram', 'site'];
@@ -1987,23 +2100,21 @@ function initPerfilForm() {
     if (contratadoCheck) {
       contratadoCheck.checked = !!perfil.contratadoPelaPlataforma;
       if (celebrationBanner) celebrationBanner.style.display = perfil.contratadoPelaPlataforma ? 'flex' : 'none';
-      contratadoCheck.addEventListener('change', function() {
-        if (celebrationBanner) celebrationBanner.style.display = contratadoCheck.checked ? 'flex' : 'none';
-      });
     }
 
     currentFotoUrl = perfil.fotoUrl || '';
     renderFotoPreview(currentFotoUrl);
 
-    currentCurriculo = {
-      file: null,
-      url: perfil.curriculoUrl || '',
-      nome: perfil.curriculoNome || (perfil.curriculoUrl ? 'Curriculo_Profissional.pdf' : ''),
-      tamanho: perfil.curriculoTamanho || (perfil.curriculoUrl ? 'PDF Anexado' : ''),
-      removed: false
-    };
+    // Se o perfil já possui currículo registrado, prepara a UI imediatamente
+    if (perfil.curriculoNome) {
+      currentCurriculo.nome = perfil.curriculoNome;
+      currentCurriculo.tamanho = perfil.curriculoTamanho || 'PDF Anexado';
+      currentCurriculo.url = perfil.curriculoUrl || ('cloud:' + perfil.email);
+      currentCurriculo.removed = false;
+      renderCurriculoUI();
+    }
 
-    // 1. Verifica IndexedDB local
+    // 1. Tenta obter o PDF do IndexedDB local
     PDFStorage.obterPDF(perfil.email, function(err, item) {
       if (!err && item && item.blob) {
         currentCurriculo.nome = item.nome || currentCurriculo.nome || 'Curriculo_Profissional.pdf';
@@ -2011,19 +2122,44 @@ function initPerfilForm() {
         currentCurriculo.url = 'indexeddb:' + perfil.email;
         currentCurriculo.removed = false;
         renderCurriculoUI();
+
+        // BACKUP PROATIVO: Se o PDF está apenas no IndexedDB, faz upload silencioso para a nuvem Firestore
+        CloudPDFStorage.salvar(perfil.email, item.blob, item.nome, function(cloudErr) {
+          if (!cloudErr) console.log('[Auto-Sync] PDF local sincronizado com a nuvem Firestore com sucesso!');
+        });
       } else {
-        // 2. Se não estiver no IndexedDB local, verifica se está no Firestore Cloud
+        // 2. Se não estiver no IndexedDB local (ex: Guia Anônima / outro PC), busca na Nuvem Firestore
         CloudPDFStorage.obter(perfil.email, function(cloudErr, cloudItem) {
           if (!cloudErr && cloudItem && cloudItem.blob) {
             currentCurriculo.nome = cloudItem.nome || currentCurriculo.nome || 'Curriculo_Profissional.pdf';
             currentCurriculo.tamanho = cloudItem.tamanho || currentCurriculo.tamanho || 'PDF Anexado';
             currentCurriculo.url = 'cloud:' + perfil.email;
             currentCurriculo.removed = false;
+            // Salva no IndexedDB local desta sessão para abrir instantaneamente nas próximas vezes
+            PDFStorage.salvarPDF(perfil.email, cloudItem.blob, currentCurriculo.nome, currentCurriculo.tamanho);
           }
           renderCurriculoUI();
         });
       }
     });
+  }
+
+  // Listener para mudança de nível acadêmico no formulário
+  if (nivelSelect && areaSelect) {
+    nivelSelect.addEventListener('change', function() {
+      populateAreaSelect(nivelSelect.value, areaSelect, '', false);
+    });
+  }
+
+  var contratadoCheckEl = form.querySelector('[name="contratadoPelaPlataforma"]');
+  if (contratadoCheckEl && celebrationBanner) {
+    contratadoCheckEl.addEventListener('change', function() {
+      celebrationBanner.style.display = contratadoCheckEl.checked ? 'flex' : 'none';
+    });
+  }
+
+  getPerfilLocalOrFirestore(function(perfil) {
+    carregarPerfilNoFormulario(perfil);
   });
 
   // ─── SALVAMENTO RESILIENTE (Local-First + Cloud Firestore Gratuito) ───
@@ -2072,12 +2208,25 @@ function initPerfilForm() {
       
       // 2. Grava na Nuvem Firestore (100% GRATUITO — sem plano pago!)
       CloudPDFStorage.salvar(updated.email, currentCurriculo.file, function(err) {
-        if (!err) console.log("PDF sincronizado com a nuvem Firestore com sucesso!");
+        if (!err) {
+          console.log("[Salvar] ✅ PDF sincronizado com a nuvem Firestore com sucesso!");
+        } else {
+          console.error("[Salvar] ❌ ERRO ao salvar PDF na nuvem:", err.message || err);
+        }
       });
     } else if (currentCurriculo.url && currentCurriculo.nome) {
       updated.curriculoNome = currentCurriculo.nome;
       updated.curriculoTamanho = currentCurriculo.tamanho;
-      updated.curriculoUrl = currentCurriculo.url;
+      updated.curriculoUrl = 'cloud:' + updated.email;
+
+      // Se o blob já está no IndexedDB, assegura que esteja espelhado na nuvem Firestore
+      PDFStorage.obterPDF(updated.email, function(err, item) {
+        if (!err && item && item.blob) {
+          CloudPDFStorage.salvar(updated.email, item.blob, item.nome, function(cloudErr) {
+            if (!cloudErr) console.log('[Salvar] PDF do IndexedDB assegurado na nuvem Firestore!');
+          });
+        }
+      });
     }
 
     // Gravação instantânea no LocalStorage
@@ -2139,11 +2288,31 @@ function initPerfilForm() {
 
     // Sincroniza dados do perfil no Firestore (Gratuito!)
     if (typeof db !== 'undefined' && updated.email) {
+      console.log('[Salvar] Sincronizando perfil com Firestore para:', updated.email);
+      console.log('[Salvar] Foto incluída:', !!updated.fotoUrl, '| Currículo:', !!updated.curriculoNome);
       try {
-        db.collection('perfis').doc(updated.email).set(updated, { merge: true }).catch(function(err) {
-          console.log("Firestore perfil sync:", err);
+        db.collection('perfis').doc(updated.email).set(updated, { merge: true }).then(function() {
+          console.log('[Salvar] ✅ Perfil sincronizado com sucesso na nuvem!');
+          // Atualizar o login-email caso o usuário tenha alterado o email
+          localStorage.setItem('ccin-login-email', updated.email);
+          if (feedbackEl && feedbackEl.style.display !== 'none') {
+            feedbackEl.innerHTML = '✅ <strong>Perfil salvo na nuvem!</strong> Seus dados, foto e currículo estão acessíveis de qualquer computador/navegador.';
+          }
+        }).catch(function(err) {
+          console.error('[Salvar] ❌ ERRO ao sincronizar com Firestore:', err.code || '', err.message || err);
+          if (feedbackEl) {
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.background = 'rgba(255,180,60,0.16)';
+            feedbackEl.style.border = '1px solid rgba(255,180,60,0.4)';
+            feedbackEl.style.color = '#ffb43c';
+            feedbackEl.innerHTML = '⚠️ <strong>Perfil salvo localmente.</strong> Não foi possível sincronizar com a nuvem: ' + (err.message || err) + '<br>Seus dados só estão neste navegador.';
+          }
         });
-      } catch(e) {}
+      } catch(e) {
+        console.error('[Salvar] Exceção Firestore:', e);
+      }
+    } else {
+      console.log('[Salvar] Firestore indisponível. Perfil salvo apenas localmente.');
     }
   });
 }
