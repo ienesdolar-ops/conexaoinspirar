@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área da Empresa — Conexão Inspirar</title>
+  <meta name="description" content="Publique vagas de estágio, trainee e especialistas para alunos e formados da Faculdade Inspirar em Saúde, Direito e Gestão.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<div class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-dot"></span>
+      Conexão Inspirar
+    </a>
+    <nav class="navbar__links">
+      <a href="index.html">Início</a>
+      <a href="#publicarVaga">Publicar vaga</a>
+      <a href="#vitrineTalentos">Vitrine de talentos</a>
+    </nav>
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
+      <a href="login.html" class="btn-ghost" style="padding:8px 16px;font-size:13px">Área do Aluno ↗</a>
+      <a href="#publicarVaga" class="btn-primary" style="padding:8px 16px;font-size:13px">Publicar Vaga</a>
+    </div>
+    <button class="navbar__hamburger" id="navHamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div>
+<div class="navbar__mobile-menu" id="mobileMenu">
+  <a href="index.html">Início</a>
+  <a href="#publicarVaga">Publicar vaga</a>
+  <a href="#vitrineTalentos">Vitrine de talentos</a>
+  <a href="login.html" class="btn-ghost">Área do Aluno ↗</a>
+</div>
+
+<!-- ========== HERO EMPRESA ========== -->
+<section class="empresa-hero">
+  <div class="ambient">
+    <div class="ambient__blob ambient__blob--a"></div>
+    <div class="ambient__blob ambient__blob--b"></div>
+  </div>
+  <div class="empresa-hero__inner">
+    <div class="section__eyebrow section__eyebrow--left" data-reveal>
+      <span class="section__eyebrow-dot"></span>
+      <span class="section__eyebrow-label">Para Empresas, Hospitais e Escritórios</span>
+    </div>
+    <h1 class="hero-title" data-reveal data-delay="80" style="font-size:clamp(30px, 3.8vw, 50px)">
+      Contrate talentos qualificados da<br><em>Faculdade Inspirar</em>
+    </h1>
+    <p class="hero-sub" data-reveal data-delay="160" style="max-width:620px">
+      Divulgue oportunidades para estudantes (estágios e programas de trainee) e profissionais formados (contratações CLT, PJ, coordenação e vagas especializadas) nos polos Presencial (Curitiba), EAD e Luanda (Angola).
+    </p>
+  </div>
+</section>
+
+<!-- ========== FORMULÁRIO DE PUBLICAÇÃO ========== -->
+<section class="empresa-form-section" id="publicarVaga">
+  <div class="empresa-form-cols">
+
+    <!-- Informações laterais -->
+    <div class="form-section-info" data-reveal>
+      <h2 class="form-section-info__title">Por que contratar pelo <em>Conexão Inspirar</em>?</h2>
+      <p class="form-section-info__desc">Conectamos sua empresa diretamente com profissionais e estudantes capacitados, sem intermediários, sem taxas e com contato direto via WhatsApp e E-mail.</p>
+
+      <div class="info-list">
+        <div class="info-list__item">
+          <div class="info-list__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>Estudantes e graduados 100% validados pela instituição</span>
+        </div>
+        <div class="info-list__item">
+          <div class="info-list__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>Graduações e especializações em Saúde, Direito e Gestão</span>
+        </div>
+        <div class="info-list__item">
+          <div class="info-list__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>Alcance nacional e internacional (Polos Brasil, EAD e Luanda/Angola)</span>
+        </div>
+        <div class="info-list__item">
+          <div class="info-list__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span>Escolha de contato: receba candidatos por WhatsApp, E-mail ou Ambos</span>
+        </div>
+      </div>
+
+      <!-- Banner de proteção -->
+      <div class="protection-banner" style="margin-top:32px;margin-bottom:0">
+        <div class="protection-banner__icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="protection-banner__title">Base Protegida & Qualificada</div>
+          <p class="protection-banner__text">Garantia acadêmica: todos os candidatos cadastrados possuem matrícula ativa ou diploma emitido pela Faculdade Inspirar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <div data-reveal data-delay="100">
+      <div id="vagaSuccess" class="success-msg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <div><strong>Vaga publicada com sucesso!</strong> Os alunos e formados compatíveis já podem visualizá-la no painel deles.</div>
+      </div>
+
+      <form id="vagaForm" class="feature-card" style="padding:36px">
+        <div class="form-group">
+          <label class="form-label" for="vagaEmpresa">Nome da empresa ou instituição contratante</label>
+          <input class="form-input" id="vagaEmpresa" name="empresa" type="text" placeholder="Hospital São Lucas, Carvalho Advocacia, Grupo Vitale..." required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaNivel">Nível de Formação Desejado</label>
+            <select class="form-select" id="vagaNivel" name="nivel" required>
+              <option value="">Selecione o nível...</option>
+              <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+              <option value="Graduado">🎓 Graduado</option>
+              <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaArea">Área / Curso de Formação</label>
+            <select class="form-select" id="vagaArea" name="area" required>
+              <option value="">Primeiro selecione o nível acima...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="vagaEspecialidade">Cargo / Título da Oportunidade</label>
+          <input class="form-input" id="vagaEspecialidade" name="especialidade" type="text" placeholder="Ex: Estágio em Fisioterapia, Advogado Júnior, Analista de Gestão Hospitalar, Fisioterapeuta Pélvico..." required>
+        </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaCidade">Cidade ou Polo</label>
+            <input class="form-input" id="vagaCidade" name="cidade" type="text" placeholder="Curitiba, Luanda, São Paulo, Florianópolis..." required>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaEstado">Localização / Polo</label>
+            <select class="form-select" id="vagaEstado" name="estado" required>
+              <option value="">Selecione a localização...</option>
+              <optgroup label="Polos no Brasil">
+                <option value="PR">Curitiba / Paraná (PR)</option>
+                <option value="SP">São Paulo (SP)</option>
+                <option value="SC">Santa Catarina (SC)</option>
+                <option value="RS">Rio Grande do Sul (RS)</option>
+                <option value="RJ">Rio de Janeiro (RJ)</option>
+                <option value="MG">Minas Gerais (MG)</option>
+                <option value="BA">Bahia (BA)</option>
+                <option value="DF">Distrito Federal (DF)</option>
+                <option value="AC">Acre (AC)</option><option value="AL">Alagoas (AL)</option><option value="AP">Amapá (AP)</option><option value="AM">Amazonas (AM)</option><option value="CE">Ceará (CE)</option><option value="ES">Espírito Santo (ES)</option><option value="GO">Goiás (GO)</option><option value="MA">Maranhão (MA)</option><option value="MT">Mato Grosso (MT)</option><option value="MS">Mato Grosso do Sul (MS)</option><option value="PA">Pará (PA)</option><option value="PB">Paraíba (PB)</option><option value="PE">Pernambuco (PE)</option><option value="PI">Piauí (PI)</option><option value="RN">Rio Grande do Norte (RN)</option><option value="RO">Rondônia (RO)</option><option value="RR">Roraima (RR)</option><option value="SE">Sergipe (SE)</option><option value="TO">Tocantins (TO)</option>
+              </optgroup>
+              <optgroup label="Polo Internacional">
+                <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+              </optgroup>
+              <optgroup label="Modalidade 100% Online">
+                <option value="100% Online (EAD)">100% Remoto / EAD</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaModalidade">Modalidade de Trabalho</label>
+            <select class="form-select" id="vagaModalidade" name="modalidade" required>
+              <option>Presencial</option>
+              <option>Híbrido / Semipresencial</option>
+              <option>100% Online (Remoto)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaTipo">Tipo de Contratação</label>
+            <select class="form-select" id="vagaTipo" name="tipo" required>
+              <option>Estágio</option>
+              <option>Trainee / Júnior</option>
+              <option>CLT</option>
+              <option>PJ</option>
+              <option>Plantão</option>
+              <option>Temporário</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaTipoContato">Preferência de Contato dos Candidatos</label>
+            <select class="form-select" id="vagaTipoContato" name="tipoContato" required>
+              <option value="ambos">Ambos (WhatsApp e E-mail)</option>
+              <option value="whatsapp">Apenas WhatsApp</option>
+              <option value="email">Apenas E-mail</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="vagaWhatsapp">WhatsApp do Recrutador / RH</label>
+            <input class="form-input" id="vagaWhatsapp" name="whatsapp" type="text" placeholder="(41) 9 9999-0000">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="vagaContato">E-mail para recebimento de candidaturas</label>
+          <input class="form-input" id="vagaContato" name="contato" type="email" placeholder="rh@empresa.com" required>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="vagaDescricao">Descrição e requisitos da oportunidade</label>
+          <textarea class="form-textarea" id="vagaDescricao" name="descricao" rows="4" placeholder="Descreva as principais atividades, requisitos, benefícios e carga horária..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:8px">
+          Publicar Oportunidade no Conexão Inspirar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <p style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:12px;line-height:1.5">A publicação é gratuita e imediata para alunos e formados em todo o ecossistema Inspirar.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ========== VAGAS PUBLICADAS ========== -->
+<section class="vagas-section" id="vagasPublicadas">
+  <div class="vagas-section__header" data-reveal>
+    <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:12px">
+      <span class="section__eyebrow-dot"></span>
+      <span class="section__eyebrow-label">Oportunidades em Aberto</span>
+    </div>
+    <h2 class="section__title" style="text-align:left;font-size:clamp(24px,2.5vw,32px)">Oportunidades <em>recentes</em> no portal</h2>
+    <p style="font-size:14px;color:var(--text-secondary);margin-top:8px">Vagas publicadas por empresas parceiras para estudantes e graduados.</p>
+  </div>
+  <div class="vagas-grid" id="vagasContainer">
+    <div style="padding:40px;text-align:center;color:var(--text-dim);font-size:14px;grid-column:1/-1">Carregando oportunidades...</div>
+  </div>
+</section>
+
+<!-- ========== VITRINE VIP DE TALENTOS ========== -->
+<section class="section" id="vitrineTalentos" style="padding-top:40px;padding-bottom:80px">
+  <div class="container">
+    <div class="section__header" data-reveal style="text-align:left">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:12px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Base de Talentos Protegida</span>
+      </div>
+      <h2 class="section__title" style="text-align:left;font-size:clamp(24px,2.5vw,34px)">Vitrine de <em>Talentos & Especialistas</em></h2>
+      <p style="font-size:14px;color:var(--text-secondary);margin-top:8px">Explore estudantes e profissionais graduados pela Faculdade Inspirar no Brasil, Polo Luanda (Angola) e EAD.</p>
+    </div>
+
+    <!-- Filtros da Vitrine -->
+    <div class="filter-bar" style="margin-bottom:28px">
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="vitrineFilterNivel">Nível de Formação</label>
+        <select class="form-select" id="vitrineFilterNivel">
+          <option value="">Todos os níveis</option>
+          <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+          <option value="Graduado">🎓 Graduado</option>
+          <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+        </select>
+      </div>
+      <div class="filter-bar__group" style="flex:1.5">
+        <label class="filter-bar__label" for="vitrineFilterArea">Área / Especialidade</label>
+        <select class="form-select" id="vitrineFilterArea">
+          <option value="">Todas as áreas</option>
+        </select>
+      </div>
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="vitrineFilterEst">Localização / Polo</label>
+        <select class="form-select" id="vitrineFilterEst">
+          <option value="">Todas as localizações</option>
+          <option value="PR">Curitiba / PR</option>
+          <option value="SP">São Paulo / SP</option>
+          <option value="SC">Santa Catarina / SC</option>
+          <option value="RS">Rio Grande do Sul / RS</option>
+          <option value="RJ">Rio de Janeiro / RJ</option>
+          <option value="MG">Minas Gerais / MG</option>
+          <option value="BA">Bahia / BA</option>
+          <option value="DF">Distrito Federal / DF</option>
+          <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+          <option value="100% Online (EAD)">100% Online (EAD)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Grid de Talentos -->
+    <div class="vagas-grid" id="vitrineTalentosGrid">
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-size:14px">Carregando talentos da base...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer-outer">
+  <div class="footer-outer__glow"></div>
+  <div class="footer-card">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand__name">
+          <span class="navbar__logo-dot"></span>
+          Conexão Inspirar
+        </div>
+        <p class="footer-brand__desc">O ecossistema oficial de carreiras, vagas e empregabilidade para alunos e formados da Faculdade Inspirar no Brasil e no mundo.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links__col">
+          <div class="footer-links__title">Portal</div>
+          <a href="index.html">Início</a>
+          <a href="login.html">Área do Aluno</a>
+          <a href="#publicarVaga">Publicar Vaga</a>
+          <a href="#vitrineTalentos">Vitrine de Talentos</a>
+        </div>
+        <div class="footer-links__col">
+          <div class="footer-links__title">Inspirar</div>
+          <a href="https://inspirar.com.br" target="_blank" rel="noopener">Site oficial</a>
+          <a href="admin.html">Painel Admin</a>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--text-dim)">© 2026 Faculdade Inspirar. Move a Sua Vida.</span>
+      <span style="font-size:12.5px;color:var(--text-dim)">Conexão Inspirar — Polos Brasil, EAD e Luanda (Angola)</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/design-system.js"></script>
+<script src="js/portal.js"></script>
+</body>
+</html>

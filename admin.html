@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin — Conexão Inspirar</title>
+  <meta name="description" content="Painel de controle institucional da Faculdade Inspirar para gestão de vagas e autorização de alunos e formados.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/portal.css">
+  <style>
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
+    .admin-table th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-mid); color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .admin-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .btn-danger-sm { padding: 5px 10px; font-size: 11.5px; border-radius: var(--radius-pill); background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.3); color: #ff8080; cursor: pointer; transition: background 0.2s; }
+    .btn-danger-sm:hover { background: rgba(255,80,80,0.25); color: #fff; }
+    .btn-status-sm { padding: 5px 10px; font-size: 11.5px; border-radius: var(--radius-pill); background: rgba(155,225,93,0.1); border: 1px solid rgba(155,225,93,0.3); color: var(--green-text); cursor: pointer; transition: background 0.2s; }
+    .btn-status-sm:hover { background: rgba(155,225,93,0.25); }
+    @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body id="adminApp">
+
+<!-- ========== NAVBAR ADMIN ========== -->
+<div class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-dot" style="background:#ff9050;box-shadow:0 0 8px 2px rgba(255,144,80,0.6)"></span>
+      Conexão Inspirar · Painel Admin
+    </a>
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
+      <a href="index.html" class="btn-ghost" style="padding:8px 16px;font-size:13px">Ver Portal Público ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CABEÇALHO ADMIN ========== -->
+<section class="section" style="padding-top:120px;padding-bottom:40px">
+  <div class="container">
+    <div class="section__eyebrow section__eyebrow--left">
+      <span class="section__eyebrow-dot" style="background:#ff9050;box-shadow:0 0 10px 2px rgba(255,144,80,0.6)"></span>
+      <span class="section__eyebrow-label" style="color:#ffb080">Gestão Institucional</span>
+    </div>
+    <h1 class="hero-title" style="font-size:clamp(28px,3.5vw,42px)">
+      Controle do Portal <em>Conexão Inspirar</em>
+    </h1>
+    <p class="hero-sub" style="font-size:15px;max-width:640px">
+      Gerencie o status de vagas publicadas por empresas parceiras e autorize alunos em curso e formados nos polos do Brasil, EAD e Luanda (Angola).
+    </p>
+
+    <!-- METRICAS ADMIN -->
+    <div class="stats-grid" style="margin-top:32px">
+      <div class="stat">
+        <div class="stat__value" id="adminTotalVagas">0</div>
+        <p class="stat__label">Vagas<br>Publicadas</p>
+      </div>
+      <div class="stat">
+        <div class="stat__value" id="adminTotalAlunos">0</div>
+        <p class="stat__label">Alunos e Formados<br>Cadastrados</p>
+      </div>
+      <div class="stat">
+        <div class="stat__value" id="adminTotalEmpresas">0</div>
+        <p class="stat__label">Empresas<br>Parceiras</p>
+      </div>
+      <div class="stat">
+        <div class="stat__value" style="color:#ffb080" id="adminStatusBanco">OK</div>
+        <p class="stat__label">Status Nuvem<br>Firestore & Storage</p>
+      </div>
+    </div>
+
+    <!-- SEÇÕES ADMIN GRID -->
+    <div class="admin-grid">
+
+      <!-- COLUNA 1: GESTÃO DE VAGAS -->
+      <div class="feature-card" style="padding:28px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <div>
+            <h3 class="feature-card__title" style="font-size:18px">Oportunidades Cadastradas</h3>
+            <p style="font-size:13px;color:var(--text-dim)">Alterne o status da vaga (Aberta/Encerrada) ou exclua</p>
+          </div>
+          <button class="btn-outline" style="padding:6px 14px;font-size:12px" onclick="loadAdminVagas()">Atualizar Lista</button>
+        </div>
+        <div style="overflow-x:auto;max-height:480px;overflow-y:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Área / Cargo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="adminVagasTbody">
+              <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:24px">Carregando oportunidades...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- COLUNA 2: CADASTRAR ALUNOS E FORMADOS -->
+      <div class="feature-card" style="padding:28px">
+        <h3 class="feature-card__title" style="font-size:18px;margin-bottom:4px">Autorizar Novo Aluno ou Formado</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px">Cadastre o aluno de qualquer curso ou polo para liberar seu acesso</p>
+
+        <form id="adminAlunoForm">
+          <div class="form-group">
+            <label class="form-label" for="adminNome">Nome Completo</label>
+            <input class="form-input" id="adminNome" name="nome" type="text" placeholder="Ex: Juliana Santos" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminEmail">E-mail</label>
+              <input class="form-input" id="adminEmail" name="email" type="email" placeholder="aluno@inspirar.com" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminStatusAcademico">Nível Acadêmico</label>
+              <select class="form-select" id="adminStatusAcademico" name="statusAcademico" required>
+                <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+                <option value="Graduado">🎓 Graduado</option>
+                <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:14px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminArea">Área / Curso de Formação</label>
+              <select class="form-select" id="adminArea" name="area" required>
+                <option value="">Selecione o nível acima...</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminEsp">Título / Especialidade</label>
+              <input class="form-input" id="adminEsp" name="especialidade" type="text" placeholder="Fisioterapia Pélvica, Direito Médico, Gestão Hospitalar..." required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:14px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminModalidade">Modalidade do Curso</label>
+              <select class="form-select" id="adminModalidade" name="modalidade" required>
+                <option>Presencial (Curitiba)</option>
+                <option>Semipresencial</option>
+                <option>100% Online (EAD)</option>
+                <option>Polo Luanda (Angola)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="adminUf">Localização / Polo</label>
+              <select class="form-select" id="adminUf" name="estado" required>
+                <option value="PR">Curitiba / Paraná (PR)</option>
+                <option value="SP">São Paulo (SP)</option>
+                <option value="SC">Santa Catarina (SC)</option>
+                <option value="RS">Rio Grande do Sul (RS)</option>
+                <option value="RJ">Rio de Janeiro (RJ)</option>
+                <option value="MG">Minas Gerais (MG)</option>
+                <option value="BA">Bahia (BA)</option>
+                <option value="DF">Distrito Federal (DF)</option>
+                <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+                <option value="100% Online (EAD)">100% Online (EAD)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;margin-top:20px;justify-content:center">
+            Autorizar Aluno no Conexão Inspirar
+          </button>
+        </form>
+
+        <h4 style="font-size:14px;color:var(--text-heading);margin-top:28px;margin-bottom:12px">Comunidade Cadastrada</h4>
+        <div style="overflow-x:auto;max-height:220px;overflow-y:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Status</th>
+                <th>Curso / Área</th>
+              </tr>
+            </thead>
+            <tbody id="adminAlunosTbody">
+              <tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:16px">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer-outer" style="margin-top:60px">
+  <div class="footer-card" style="text-align:center">
+    <span style="font-size:13px;color:var(--text-dim)">Painel Administrativo Institucional — Conexão Inspirar · Faculdade Inspirar © 2026</span>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/design-system.js"></script>
+<script src="js/portal.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    loadAdminVagas();
+    loadAdminAlunos();
+    initAdminForm();
+  });
+
+  function loadAdminVagas() {
+    var tbody = document.getElementById('adminVagasTbody');
+    if (!tbody) return;
+
+    listenVagas(function(vagas) {
+      document.getElementById('adminTotalVagas').textContent = vagas.length;
+
+      var empresas = {};
+      vagas.forEach(function(v) { if (v.empresa) empresas[v.empresa] = true; });
+      document.getElementById('adminTotalEmpresas').textContent = Object.keys(empresas).length;
+
+      if (!vagas.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:24px">Nenhuma oportunidade cadastrada.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = vagas.map(function(v) {
+        var isEncerrada = v.status === 'encerrada';
+        var statusLabel = isEncerrada
+          ? '<span class="tag tag--encerrada" style="font-size:10px;padding:2px 6px">Encerrada</span>'
+          : '<span class="tag tag--aberta" style="font-size:10px;padding:2px 6px">Aberta</span>';
+
+        var btnToggle = isEncerrada
+          ? '<button class="btn-status-sm" onclick="toggleStatusVaga(\'' + v.id + '\', \'aberta\')">Reabrir</button>'
+          : '<button class="btn-status-sm" style="background:rgba(255,160,80,0.1);border-color:rgba(255,160,80,0.3);color:#ffbe76" onclick="toggleStatusVaga(\'' + v.id + '\', \'encerrada\')">Encerrar</button>';
+
+        return '<tr>' +
+          '<td><strong>' + (v.empresa || 'Empresa') + '</strong><br><small style="color:var(--text-dim)">' + (v.cidade || '') + ' · ' + (v.estado || '') + '</small></td>' +
+          '<td>' + (v.especialidade || v.area || 'Geral') + '</td>' +
+          '<td>' + statusLabel + '</td>' +
+          '<td style="white-space:nowrap;display:flex;gap:6px;align-items:center">' +
+            btnToggle +
+            '<button class="btn-danger-sm" onclick="deletarVaga(\'' + v.id + '\')">Excluir</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    });
+  }
+
+  window.toggleStatusVaga = function(id, novoStatus) {
+    if (typeof db !== 'undefined' && !id.startsWith('loc-') && !id.startsWith('mock-')) {
+      db.collection('vagas').doc(id).update({ status: novoStatus }).then(function() {
+        loadAdminVagas();
+      });
+    } else {
+      var saved = JSON.parse(localStorage.getItem('ccin-vagas') || '[]');
+      var item = saved.find(function(v) { return v.id === id; });
+      if (item) {
+        item.status = novoStatus;
+        localStorage.setItem('ccin-vagas', JSON.stringify(saved));
+      }
+      loadAdminVagas();
+    }
+  };
+
+  window.deletarVaga = function(id) {
+    if (!confirm('Deseja realmente remover esta vaga do portal?')) return;
+    if (typeof db !== 'undefined' && !id.startsWith('loc-') && !id.startsWith('mock-')) {
+      db.collection('vagas').doc(id).delete().then(function() {
+        alert('Vaga removida!');
+        loadAdminVagas();
+      });
+    } else {
+      var saved = JSON.parse(localStorage.getItem('ccin-vagas') || '[]');
+      saved = saved.filter(function(v) { return v.id !== id; });
+      localStorage.setItem('ccin-vagas', JSON.stringify(saved));
+      alert('Vaga removida!');
+      loadAdminVagas();
+    }
+  };
+
+  function loadAdminAlunos() {
+    var tbody = document.getElementById('adminAlunosTbody');
+    if (!tbody) return;
+
+    var alunos = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
+    if (!alunos.some(function(f) { return f.email === DEMO_USER.email; })) {
+      alunos.unshift(DEMO_USER);
+    }
+    document.getElementById('adminTotalAlunos').textContent = alunos.length;
+
+    tbody.innerHTML = alunos.map(function(a) {
+      var badge = a.statusAcademico === 'Estudante'
+        ? '<span class="tag tag--estudante" style="font-size:10px;padding:2px 6px">Estudante</span>'
+        : '<span class="tag tag--formado" style="font-size:10px;padding:2px 6px">Formado</span>';
+
+      return '<tr>' +
+        '<td><strong>' + a.nome + '</strong><br><small style="color:var(--text-dim)">' + a.email + '</small></td>' +
+        '<td>' + badge + '</td>' +
+        '<td>' + (a.especialidade || a.area || 'Saúde') + '<br><small style="color:var(--text-dim)">' + (a.modalidade || 'Presencial') + '</small></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function initAdminForm() {
+    var form = document.getElementById('adminAlunoForm');
+    if (!form) return;
+
+    var statusSelect = document.getElementById('adminStatusAcademico');
+    var areaSelect = document.getElementById('adminArea');
+    if (statusSelect && areaSelect) {
+      populateAreaSelect(statusSelect.value, areaSelect, '', false);
+      statusSelect.addEventListener('change', function() {
+        populateAreaSelect(statusSelect.value, areaSelect, '', false);
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var novo = {
+        nome: form.elements['nome'].value.trim(),
+        email: form.elements['email'].value.trim().toLowerCase(),
+        statusAcademico: form.elements['statusAcademico'].value,
+        area: form.elements['area'].value,
+        especialidade: form.elements['especialidade'].value.trim(),
+        modalidade: form.elements['modalidade'].value,
+        estado: form.elements['estado'].value,
+        cidade: form.elements['estado'].value.includes('Luanda') ? 'Luanda' : 'Curitiba',
+        senha: '123456'
+      };
+
+      var saved = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
+      saved.unshift(novo);
+      localStorage.setItem('ccin-admin-formados', JSON.stringify(saved));
+
+      if (typeof db !== 'undefined') {
+        db.collection('perfis').doc(novo.email).set(novo, { merge: true });
+      }
+
+      alert('Aluno(a) ' + novo.nome + ' autorizado com sucesso no Conexão Inspirar!\nLogin: ' + novo.email + '\nSenha padrão: 123456');
+      form.reset();
+      if (statusSelect && areaSelect) populateAreaSelect(statusSelect.value, areaSelect, '', false);
+      loadAdminAlunos();
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Aluno — Conexão Inspirar</title>
+  <meta name="description" content="Acesse o portal Conexão Inspirar. Vagas exclusivas de estágio, trainee e especialistas para alunos e formados da Faculdade Inspirar.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<div class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__logo">
+      <span class="navbar__logo-dot"></span>
+      Conexão Inspirar
+    </a>
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
+      <a href="empresa.html" class="btn-ghost" style="padding:8px 16px;font-size:13px">Área da Empresa ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LOGIN SECTION ========== -->
+<section class="login-section">
+  <div class="ambient">
+    <div class="ambient__blob ambient__blob--a"></div>
+    <div class="ambient__blob ambient__blob--b"></div>
+  </div>
+
+  <div class="login-card" data-reveal>
+    <div class="login-card__header">
+      <div class="section__eyebrow" style="margin-bottom:12px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Comunidade Inspirar</span>
+      </div>
+      <h1 class="login-card__title">Área do Aluno e Formado</h1>
+      <p class="login-card__sub">Acesse oportunidades exclusivas de estágio, trainee e especialistas no Brasil, EAD e Polo Luanda.</p>
+    </div>
+
+    <!-- Mensagem de erro -->
+    <div id="loginError" class="login-error" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      E-mail ou senha incorretos. Use o login de demonstração abaixo.
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">E-mail institucional ou CPF</label>
+        <input class="form-input" id="loginEmail" type="text" placeholder="seuemail@inspirar.com ou CPF" value="demo@inspirar.com" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <label class="form-label" for="loginSenha" style="margin-bottom:0">Senha de acesso</label>
+          <a href="#" class="login-card__forgot" onclick="alert('Instruções de recuperação foram enviadas para seu WhatsApp cadastrado na faculdade.'); return false;">Esqueceu a senha?</a>
+        </div>
+        <div class="pwd-input-wrap">
+          <input class="form-input" id="loginSenha" type="password" placeholder="••••••••" value="123456" required autocomplete="current-password">
+          <button type="button" class="pwd-toggle-btn" id="togglePwd" aria-label="Mostrar ou ocultar senha">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px">
+        Entrar no Conexão Inspirar →
+      </button>
+    </form>
+
+    <!-- Contexto demo -->
+    <div class="login-card__hint">
+      <strong>Acesso de Demonstração:</strong><br>
+      E-mail: <code style="font-size:12px;color:var(--green)">demo@inspirar.com</code> &nbsp;|&nbsp; Senha: <code style="font-size:12px;color:var(--green)">123456</code>
+    </div>
+
+    <div style="text-align:center;margin-top:20px">
+      <span style="font-size:12.5px;color:var(--text-dim)">
+        É aluno ou formado e ainda não ativou seu acesso?
+        <a href="https://wa.me/5541999990000?text=Ol%C3%A1%2C%20sou%20aluno%20da%20Inspirar%20e%20gostaria%20de%20ativar%20meu%20acesso%20ao%20Conex%C3%A3o%20Inspirar" target="_blank" rel="noopener" style="color:var(--green-text);font-weight:600;display:block;margin-top:4px">Solicitar ativação via WhatsApp da Faculdade →</a>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer-outer" style="margin-top:0">
+  <div class="footer-card" style="padding:24px 40px;text-align:center">
+    <div style="font-size:13px;color:var(--text-dim)">
+      Conexão Inspirar — Faculdade Inspirar © 2026 · Brasil, EAD e Polo Luanda (Angola)
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/design-system.js"></script>
+<script src="js/portal.js"></script>
+</body>
+</html>

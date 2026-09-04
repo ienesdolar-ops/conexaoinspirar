@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Painel — Conexão Inspirar</title>
+  <meta name="description" content="Painel exclusivo do aluno e formado da Faculdade Inspirar. Vagas, candidaturas e conexões profissionais.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body id="painelApp">
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="painel__sidebar" id="painelSidebar">
+  <div class="painel__sidebar-header">
+    <a href="index.html" class="painel__sidebar-logo">
+      <span class="navbar__logo-dot"></span>
+      Conexão Inspirar
+    </a>
+
+    <!-- Card do Usuário -->
+    <div class="painel__user">
+      <div class="painel__user-avatar">A</div>
+      <div class="painel__user-info">
+        <div class="painel__user-name">Carregando...</div>
+        <div class="painel__user-esp">Especialidade / Curso</div>
+        <div class="painel__user-cidade">Cidade · UF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegação -->
+  <nav class="painel__nav" aria-label="Menu do painel">
+    <div class="painel__nav-section">Oportunidades</div>
+
+    <button class="painel__nav-item active" data-section="sec-minhas-vagas" id="navMinhasVagas">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Vagas para Mim
+    </button>
+
+    <button class="painel__nav-item" data-section="sec-todas-vagas" id="navTodasVagas">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      Todas as Vagas
+    </button>
+
+    <button class="painel__nav-item" data-section="sec-candidaturas" id="navCandidaturas">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Minhas Candidaturas
+    </button>
+
+    <button class="painel__nav-item" data-section="sec-vitrine-talentos" id="navVitrineTalentos">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Rede de Talentos
+    </button>
+
+    <div class="painel__nav-section" style="margin-top:8px">Conta</div>
+
+    <button class="painel__nav-item" data-section="sec-perfil" id="navPerfil">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Meu Perfil & Bio
+    </button>
+
+    <button class="painel__nav-item painel__nav-item--danger" data-section="logout" id="navLogout">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </button>
+  </nav>
+
+  <!-- Footer da sidebar -->
+  <div class="painel__sidebar-footer">
+    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema" style="width:auto;padding:6px 12px;border-radius:var(--radius-pill);font-size:12px;gap:6px;display:flex;align-items:center">
+      <span id="themeLabel">Tema escuro</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="painel__main">
+
+  <!-- Header mobile -->
+  <div class="painel__mobile-header">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="painel__mobile-logo">
+      <span style="display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px">
+        <span class="navbar__logo-dot"></span>
+        Conexão Inspirar
+      </span>
+    </div>
+  </div>
+
+  <!-- ========== SEÇÃO: VAGAS PARA MIM ========== -->
+  <section class="painel__section active" id="sec-minhas-vagas">
+    <div class="painel__section-header">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:10px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Recomendadas para você</span>
+      </div>
+      <h2 class="painel__section-title">Oportunidades Compatíveis</h2>
+      <p class="painel__section-sub">Vagas de estágio, trainee e especialistas cruzadas com sua área, modalidade e polo de ensino.</p>
+    </div>
+    <div class="painel-vagas-grid" id="minhasVagasContainer">
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-size:14px">Carregando oportunidades...</div>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: TODAS AS VAGAS ========== -->
+  <section class="painel__section" id="sec-todas-vagas">
+    <div class="painel__section-header">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:10px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Banco Completo</span>
+      </div>
+      <h2 class="painel__section-title">Todas as Oportunidades</h2>
+      <p class="painel__section-sub">Explore vagas de estágio e contratações em Saúde, Direito e Gestão nos polos Brasil, EAD e Luanda.</p>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-bar__group" style="flex:1.5;min-width:180px">
+        <label class="filter-bar__label" for="filterSearch">Buscar por palavra-chave</label>
+        <input class="form-input" id="filterSearch" type="text" placeholder="Hospital, cargo, cidade, especialidade...">
+      </div>
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="filterNivel">Nível de Formação</label>
+        <select class="form-select" id="filterNivel">
+          <option value="">Todos os níveis</option>
+          <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+          <option value="Graduado">🎓 Graduado</option>
+          <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+        </select>
+      </div>
+      <div class="filter-bar__group" style="flex:1.5">
+        <label class="filter-bar__label" for="filterArea">Área / Especialidade</label>
+        <select class="form-select" id="filterArea">
+          <option value="">Todas as áreas</option>
+        </select>
+      </div>
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="filterEst">Localização / Polo</label>
+        <select class="form-select" id="filterEst">
+          <option value="">Todas as localizações</option>
+          <option value="PR">Curitiba / PR</option>
+          <option value="SP">São Paulo / SP</option>
+          <option value="SC">Santa Catarina / SC</option>
+          <option value="RS">Rio Grande do Sul / RS</option>
+          <option value="RJ">Rio de Janeiro / RJ</option>
+          <option value="MG">Minas Gerais / MG</option>
+          <option value="BA">Bahia / BA</option>
+          <option value="DF">Distrito Federal / DF</option>
+          <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+          <option value="100% Online (EAD)">100% Online (EAD)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="painel-vagas-grid" id="todasVagasContainer">
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-size:14px">Carregando oportunidades...</div>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: MINHAS CANDIDATURAS ========== -->
+  <section class="painel__section" id="sec-candidaturas">
+    <div class="painel__section-header">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:10px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Acompanhamento</span>
+      </div>
+      <h2 class="painel__section-title">Minhas Candidaturas</h2>
+      <p class="painel__section-sub">Acompanhe em tempo real o andamento de todas as vagas para as quais você se candidatou.</p>
+    </div>
+
+    <div class="painel-vagas-grid" id="minhasCandidaturasContainer">
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-size:14px">Carregando candidaturas...</div>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: REDE DE TALENTOS ========== -->
+  <section class="painel__section" id="sec-vitrine-talentos">
+    <div class="painel__section-header">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:10px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Comunidade Inspirar</span>
+      </div>
+      <h2 class="painel__section-title">Rede de Talentos & Colegas</h2>
+      <p class="painel__section-sub">Conecte-se e faça networking com estudantes e formados da Faculdade Inspirar no Brasil e no exterior.</p>
+    </div>
+
+    <div class="filter-bar" style="margin-bottom:24px">
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="painelVitrineNivel">Nível de Formação</label>
+        <select class="form-select" id="painelVitrineNivel">
+          <option value="">Todos os níveis</option>
+          <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+          <option value="Graduado">🎓 Graduado</option>
+          <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+        </select>
+      </div>
+      <div class="filter-bar__group" style="flex:1.5">
+        <label class="filter-bar__label" for="painelVitrineArea">Área / Especialidade</label>
+        <select class="form-select" id="painelVitrineArea">
+          <option value="">Todas as áreas</option>
+        </select>
+      </div>
+      <div class="filter-bar__group">
+        <label class="filter-bar__label" for="painelVitrineEst">Localização / Polo</label>
+        <select class="form-select" id="painelVitrineEst">
+          <option value="">Todas as localizações</option>
+          <option value="PR">Curitiba / PR</option>
+          <option value="SP">São Paulo / SP</option>
+          <option value="SC">Santa Catarina / SC</option>
+          <option value="RS">Rio Grande do Sul / RS</option>
+          <option value="RJ">Rio de Janeiro / RJ</option>
+          <option value="MG">Minas Gerais / MG</option>
+          <option value="BA">Bahia / BA</option>
+          <option value="DF">Distrito Federal / DF</option>
+          <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+          <option value="100% Online (EAD)">100% Online (EAD)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="painel-vagas-grid" id="painelVitrineGrid">
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-dim);font-size:14px">Carregando talentos...</div>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: MEU PERFIL ========== -->
+  <section class="painel__section" id="sec-perfil">
+    <div class="painel__section-header">
+      <div class="section__eyebrow section__eyebrow--left" style="margin-bottom:10px">
+        <span class="section__eyebrow-dot"></span>
+        <span class="section__eyebrow-label">Sua Vitrine Profissional</span>
+      </div>
+      <h2 class="painel__section-title">Meu Perfil & Apresentação</h2>
+      <p class="painel__section-sub">Mantenha seus dados, bio, redes sociais e currículo atualizados para ser encontrado por empresas.</p>
+    </div>
+
+    <!-- Banner comemorativo de contratação -->
+    <div id="celebrationBanner" class="celebration-banner" style="display:none">
+      <div>
+        <div class="celebration-banner__title">🏆 Parabéns pela sua Conquista!</div>
+        <div class="celebration-banner__text">Seu perfil está destacado com o selo oficial <strong>"Contratado via Conexão Inspirar"</strong> na vitrine de talentos!</div>
+      </div>
+      <span class="badge-contratado" style="font-size:12px;padding:6px 14px">Selo Ativo ✨</span>
+    </div>
+
+    <div class="perfil-form-card feature-card" style="padding:36px">
+      <form id="perfilForm">
+
+        <!-- Checkbox de contratação -->
+        <div style="padding:14px 18px;border-radius:var(--radius-md);background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);margin-bottom:20px;display:flex;align-items:center;gap:12px">
+          <input type="checkbox" id="contratadoCheck" name="contratadoPelaPlataforma" style="width:18px;height:18px;accent-color:var(--green);cursor:pointer">
+          <label for="contratadoCheck" style="font-size:13.5px;color:var(--text-primary);cursor:pointer;font-weight:600;margin-bottom:0">
+            🎉 Consegui uma oportunidade de trabalho/estágio através do Conexão Inspirar!
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="perfilNome">Nome Completo</label>
+          <input class="form-input" id="perfilNome" name="nome" type="text" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilStatusAcademico">Nível Acadêmico</label>
+            <select class="form-select" id="perfilStatusAcademico" name="statusAcademico" required>
+              <option value="Graduando">🎓 Graduando (Aluno em Curso)</option>
+              <option value="Graduado">🎓 Graduado</option>
+              <option value="Pos-Graduado">🏆 Pós-Graduado / Especialista</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilArea">Área / Curso de Formação</label>
+            <select class="form-select" id="perfilArea" name="area" required>
+              <option value="">Selecione o nível acadêmico...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="perfilEsp">Título / Especialidade Principal</label>
+          <input class="form-input" id="perfilEsp" name="especialidade" type="text" placeholder="Ex: Fisioterapia Pélvica, Direito Médico, Gestão Hospitalar, Enfermagem UTI..." required>
+        </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilModalidade">Modalidade do Curso</label>
+            <select class="form-select" id="perfilModalidade" name="modalidade" required>
+              <option>Presencial (Curitiba)</option>
+              <option>Semipresencial</option>
+              <option>100% Online (EAD)</option>
+              <option>Polo Luanda (Angola)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilEstado">Localização / Polo</label>
+            <select class="form-select" id="perfilEstado" name="estado" required>
+              <option value="PR">Curitiba / Paraná (PR)</option>
+              <option value="SP">São Paulo (SP)</option>
+              <option value="SC">Santa Catarina (SC)</option>
+              <option value="RS">Rio Grande do Sul (RS)</option>
+              <option value="RJ">Rio de Janeiro (RJ)</option>
+              <option value="MG">Minas Gerais (MG)</option>
+              <option value="BA">Bahia (BA)</option>
+              <option value="DF">Distrito Federal (DF)</option>
+              <option value="Luanda (Angola)">Polo Luanda (Angola)</option>
+              <option value="100% Online (EAD)">100% Online (EAD)</option>
+            </select>
+          </div>
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="perfilWhatsapp">WhatsApp para contato de recrutadores</label>
+          <input class="form-input" id="perfilWhatsapp" name="whatsapp" type="text" placeholder="(41) 9 9999-8888" required>
+        </div>
+
+        <!-- Bio / Apresentação -->
+        <div class="form-group" style="margin-top:16px">
+          <label class="form-label" for="perfilBio">
+            Bio Profissional / Mini Apresentação
+            <span style="font-size:12px;color:var(--text-dim);font-weight:400">(Opcional)</span>
+          </label>
+          <textarea class="form-textarea" id="perfilBio" name="bio" rows="3" placeholder="Resuma em poucas linhas sua experiência, interesses profissionais e principais habilidades..."></textarea>
+        </div>
+
+        <!-- Redes Sociais -->
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilLinkedin">LinkedIn (URL ou usuário)</label>
+            <input class="form-input" id="perfilLinkedin" name="linkedin" type="text" placeholder="https://linkedin.com/in/seuperfil">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilInstagram">Instagram (@usuario)</label>
+            <input class="form-input" id="perfilInstagram" name="instagram" type="text" placeholder="@seuinstagram">
+          </div>
+        </div>
+
+        <!-- Upload foto de perfil -->
+        <div class="form-group" style="margin-top:20px">
+          <label class="form-label">Foto de Perfil</label>
+          <div class="avatar-upload-box">
+            <div class="avatar-preview-wrap" id="avatarPreviewWrap" title="Clique para escolher uma nova foto">
+              <img id="avatarPreviewImg" class="avatar-preview-img" style="display:none" alt="Foto de perfil">
+              <div id="avatarPreviewFallback" class="avatar-preview-fallback">A</div>
+            </div>
+            <div class="avatar-upload-info">
+              <div class="avatar-upload-title" id="avatarUploadTitle">Sua Foto de Perfil</div>
+              <div class="avatar-upload-sub">Formatos JPG, PNG ou WebP. Redimensionamento e otimização automáticos de alta nitidez.</div>
+              <div class="avatar-actions">
+                <label for="perfilFoto" class="btn-outline btn-sm" style="cursor:pointer;font-size:12px;padding:6px 14px">
+                  📷 Selecionar Foto
+                </label>
+                <button type="button" id="btnRemoverFoto" class="btn-danger-ghost" style="display:none">
+                  🗑️ Remover Foto
+                </button>
+              </div>
+            </div>
+            <input type="file" id="perfilFoto" accept="image/png,image/jpeg,image/webp,image/jpg" style="display:none">
+          </div>
+        </div>
+
+        <!-- Upload currículo -->
+        <div class="form-group" style="margin-top:20px">
+          <label class="form-label">Currículo Profissional em PDF</label>
+
+          <!-- Dropzone para envio de PDF -->
+          <label class="upload-area" id="curriculoDropzone" for="perfilCurriculo">
+            <input type="file" id="perfilCurriculo" accept=".pdf,application/pdf">
+            <div class="upload-area__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-area__text" id="curriculoNoticeText">
+              <strong>Clique para anexar seu currículo</strong> ou arraste o PDF aqui
+            </div>
+            <div class="upload-area__hint">Formato PDF (máx. 10 MB) · Ficará visível para recrutadores e empresas parceiras</div>
+          </label>
+
+          <!-- Card quando já existe um PDF anexado -->
+          <div id="curriculoCard" class="curriculo-card" style="display:none">
+            <div class="curriculo-card__icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="curriculo-card__info">
+              <div class="curriculo-card__name" id="curriculoCardName">Curriculo_Profissional.pdf</div>
+              <div class="curriculo-card__meta">
+                <span id="curriculoCardSize">185 KB</span>
+                <span>•</span>
+                <span class="tag tag--aberta" style="font-size:10px;padding:2px 8px">Disponível para Empresas</span>
+              </div>
+            </div>
+            <div class="curriculo-card__actions">
+              <button type="button" id="btnVisualizarPDF" class="btn-primary btn-sm" style="font-size:12px;padding:6px 12px">
+                👁️ Ver PDF
+              </button>
+              <button type="button" id="btnBaixarPDF" class="btn-outline btn-sm" style="font-size:12px;padding:6px 12px" title="Baixar arquivo">
+                📥 Baixar
+              </button>
+              <button type="button" id="btnRemoverPDF" class="btn-danger-ghost" title="Remover este currículo">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:20px">
+          Salvar Alterações no Meu Perfil
+        </button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/design-system.js"></script>
+<script src="js/portal.js"></script>
+</body>
+</html>

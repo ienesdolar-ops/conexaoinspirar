@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System — Faculdade Inspirar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+<style>
+  /* Estilos só desta página de showcase (não fazem parte do design system) */
+  .ds-block { position: relative; z-index: 1; padding: 64px 32px; max-width: var(--max-w); margin: 0 auto; }
+  .ds-block__label {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--green-text); margin-bottom: 10px;
+  }
+  .ds-block__title { font-size: 24px; font-weight: 700; margin-bottom: 6px; color: var(--text-heading); }
+  .ds-block__desc { font-size: 14px; color: var(--text-secondary); max-width: 640px; margin-bottom: 32px; }
+  .ds-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .ds-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ds-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .ds-swatch { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); }
+  .ds-swatch__color { height: 64px; }
+  .ds-swatch__meta { padding: 10px 12px; font-size: 12px; background: var(--bg-card); }
+  .ds-swatch__name { font-weight: 600; color: var(--text-primary); }
+  .ds-swatch__hex { color: var(--text-dim); font-family: monospace; }
+  .ds-divider { border-top: 1px solid var(--border-subtle); }
+  .ds-hero { position: relative; padding: 140px 32px 80px; overflow: hidden; }
+  .ds-hero__inner { position: relative; z-index: 1; max-width: var(--max-w); margin: 0 auto; }
+  @media (max-width: 900px) {
+    .ds-grid-3, .ds-grid-4 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .ds-grid-3, .ds-grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<div class="navbar">
+  <div class="navbar__inner">
+    <div class="navbar__logo">Faculdade Inspirar</div>
+    <nav class="navbar__links">
+      <a href="#cores">Cores</a>
+      <a href="#tipografia">Tipografia</a>
+      <a href="#botoes">Botões</a>
+      <a href="#cards">Cards</a>
+      <a href="#formulario">Formulário</a>
+      <a href="#stack">Timeline</a>
+    </nav>
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a href="#" class="btn-primary" style="padding:10px 18px;font-size:13.5px">Matricular-se</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== HERO / TIPOGRAFIA DE DESTAQUE ========== -->
+<section class="ds-hero">
+  <div class="ambient">
+    <div class="ambient__blob ambient__blob--a"></div>
+  </div>
+  <div class="ds-hero__inner">
+    <span class="ds-block__label">Design System</span>
+    <h1 class="hero-title">Página genérica<br>com o design <em>system</em> aplicado</h1>
+    <p class="hero-sub">Use esta página como referência viva de todos os componentes, tokens e padrões de interação do site da Faculdade Inspirar. Copie o HTML/CSS direto daqui.</p>
+    <div class="ds-row">
+      <a href="#cores" class="btn-primary">Ver componentes →</a>
+      <a href="#formulario" class="btn-ghost">Ir para o formulário</a>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== CORES ========== -->
+<section class="ds-block" id="cores">
+  <span class="ds-block__label">01 · Cores</span>
+  <h2 class="ds-block__title">Paleta</h2>
+  <p class="ds-block__desc">Tokens em <code>:root</code> (tema escuro, padrão) — os mesmos nomes existem no tema claro via <code>[data-theme="light"]</code>, com valores diferentes. Nunca usar hex direto num componente.</p>
+  <div class="ds-grid-4">
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#9be15d"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green</div><div class="ds-swatch__hex">#9be15d</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#06140a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-dark</div><div class="ds-swatch__hex">#06140a</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#080808"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--bg</div><div class="ds-swatch__hex">#080808</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#f7f9f6"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--text-primary</div><div class="ds-swatch__hex">#f7f9f6</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#9aa39a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--text-secondary</div><div class="ds-swatch__hex">#9aa39a</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#b7e89a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-text</div><div class="ds-swatch__hex">#b7e89a</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(155,225,93,0.25);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-border</div><div class="ds-swatch__hex">25% opacidade</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(255,255,255,0.08);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--border-subtle</div><div class="ds-swatch__hex">8% opacidade</div></div></div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== TIPOGRAFIA ========== -->
+<section class="ds-block" id="tipografia">
+  <span class="ds-block__label">02 · Tipografia</span>
+  <h2 class="ds-block__title">Escala e famílias</h2>
+  <p class="ds-block__desc">Inter (sans) para tudo. Cormorant Garamond (serif itálico) só para a palavra de destaque dentro de um título, via <code>&lt;em&gt;</code>.</p>
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div>
+      <h1 class="hero-title" style="font-size:56px;margin-bottom:6px">Título hero <em>com destaque</em></h1>
+      <span class="ds-swatch__hex">.hero-title — clamp(42px, 5.5vw, 70px) · weight 700</span>
+    </div>
+    <div>
+      <h2 class="section__title" style="text-align:left">Título de seção <em>com destaque</em></h2>
+      <span class="ds-swatch__hex">.section__title — clamp(30px, 3.6vw, 44px) · weight 600</span>
+    </div>
+    <div>
+      <div class="section__eyebrow"><span class="section__eyebrow-dot"></span><span class="section__eyebrow-label">Eyebrow label</span></div>
+      <span class="ds-swatch__hex">.section__eyebrow-label — 11px · uppercase · letter-spacing .14em</span>
+    </div>
+    <div>
+      <p style="font-size:18px;line-height:1.62;color:var(--text-secondary);max-width:480px">Parágrafo de subtítulo, 18px, usado logo abaixo de um título hero.</p>
+      <span class="ds-swatch__hex">.hero-sub</span>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== BOTÕES E TAGS ========== -->
+<section class="ds-block" id="botoes">
+  <span class="ds-block__label">03 · Botões e tags</span>
+  <h2 class="ds-block__title">Ações</h2>
+  <div class="ds-row" style="margin-bottom:28px">
+    <a href="#" class="btn-primary">Botão primário →</a>
+    <a href="#" class="btn-ghost">Botão ghost</a>
+    <a href="#" class="btn-outline">Botão outline</a>
+    <a href="#" class="btn-link">Link com seta →</a>
+  </div>
+  <div class="ds-row">
+    <span class="tag">Ortopédica</span>
+    <span class="tag">Pélvica</span>
+    <span class="tag">Neurofuncional</span>
+    <span class="tag">Estética</span>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== CARDS ========== -->
+<section class="ds-block" id="cards">
+  <span class="ds-block__label">04 · Cards</span>
+  <h2 class="ds-block__title">Feature cards e image cards</h2>
+  <p class="ds-block__desc">Cards de vidro (glassmorphism) para blocos de conteúdo, e cards de imagem com overlay para categorias/áreas.</p>
+  <div class="ds-grid-3" style="margin-bottom:28px">
+    <div class="feature-card" data-reveal>
+      <div class="feature-card__icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5l2 5.2h5.5l-4.4 3.2 1.7 5.1L9 12.2l-4.8 2.8 1.7-5.1L1.5 6.7H7z"/></svg>
+      </div>
+      <h3 class="feature-card__title">Aprendizado prático</h3>
+      <p class="feature-card__text">Descrição curta do diferencial, direta e com fato concreto por trás.</p>
+    </div>
+    <div class="feature-card" data-reveal>
+      <div class="feature-card__icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><polyline points="9,5 9,9 12,11"/></svg>
+      </div>
+      <h3 class="feature-card__title">Suporte contínuo</h3>
+      <p class="feature-card__text">Descrição curta do diferencial, direta e com fato concreto por trás.</p>
+    </div>
+    <div class="feature-card" data-reveal>
+      <div class="feature-card__icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="3" width="15" height="12" rx="2"/><path d="M9 5v2M9 11v2"/></svg>
+      </div>
+      <h3 class="feature-card__title">Certificação reconhecida</h3>
+      <p class="feature-card__text">Descrição curta do diferencial, direta e com fato concreto por trás.</p>
+    </div>
+  </div>
+  <div class="ds-grid-4">
+    <div class="image-card" data-reveal>
+      <div class="image-card__overlay"></div>
+      <div class="image-card__content"><span class="image-card__title">Categoria A</span></div>
+    </div>
+    <div class="image-card" data-reveal>
+      <div class="image-card__overlay"></div>
+      <div class="image-card__content"><span class="image-card__title">Categoria B</span></div>
+    </div>
+    <div class="image-card" data-reveal>
+      <div class="image-card__overlay"></div>
+      <div class="image-card__content"><span class="image-card__title">Categoria C</span></div>
+    </div>
+    <div class="image-card" data-reveal>
+      <div class="image-card__overlay"></div>
+      <div class="image-card__content"><span class="image-card__title">Categoria D</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== ESTATÍSTICAS ========== -->
+<section class="ds-block" id="estatisticas">
+  <span class="ds-block__label">05 · Estatísticas</span>
+  <h2 class="ds-block__title">Números animados</h2>
+  <p class="ds-block__desc">Contam de 0 até o valor quando entram na viewport (<code>data-count</code> + <code>data-suffix</code> opcional).</p>
+  <div class="ds-grid-4">
+    <div class="stat"><div class="stat__value" data-count="29">0</div><p class="stat__label">Anos de experiência</p></div>
+    <div class="stat"><div class="stat__value" data-count="41">0</div><p class="stat__label">Unidades no Brasil</p></div>
+    <div class="stat"><div class="stat__value" data-count="100" data-suffix="k+">0</div><p class="stat__label">Profissionais formados</p></div>
+    <div class="stat"><div class="stat__value" data-count="98" data-suffix="%">0</div><p class="stat__label">Satisfação dos alunos</p></div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== FORMULÁRIO ========== -->
+<section class="ds-block" id="formulario">
+  <span class="ds-block__label">06 · Formulário</span>
+  <h2 class="ds-block__title">Inputs</h2>
+  <div class="feature-card" style="max-width:520px">
+    <div style="margin-bottom:16px">
+      <label class="form-label" for="dsNome">Nome completo</label>
+      <input class="form-input" id="dsNome" type="text" placeholder="Seu nome">
+    </div>
+    <div style="margin-bottom:16px">
+      <label class="form-label" for="dsEmail">E-mail</label>
+      <input class="form-input" id="dsEmail" type="email" placeholder="seu@email.com">
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="form-label" for="dsArea">Área de interesse</label>
+      <select class="form-select" id="dsArea">
+        <option>Selecione...</option>
+        <option>Fisioterapia Pélvica</option>
+        <option>Traumato-Ortopedia</option>
+      </select>
+    </div>
+    <button type="button" class="btn-primary" style="width:100%;justify-content:center">Enviar →</button>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== CARDS EMPILHADOS (TIMELINE / SCROLL STACK) ========== -->
+<section class="ds-block" id="stack" style="overflow:visible">
+  <span class="ds-block__label">07 · Timeline empilhada</span>
+  <h2 class="ds-block__title">Cards com stack no scroll + imagem accordion no hover</h2>
+  <p class="ds-block__desc">Role a página para ver os cards empilharem (position: sticky com offset crescente). Passe o mouse sobre a imagem de cada card num desktop para vê-la expandir.</p>
+  <div class="jstack" id="journeyStack">
+    <article class="jstep" style="--i:0">
+      <div class="jstep__card">
+        <span class="jstep__num">1</span>
+        <div class="jstep__media"></div>
+        <div class="jstep__body">
+          <span class="jstep__eyebrow">Etapa 1 de 4</span>
+          <h3 class="jstep__title">Primeira etapa</h3>
+          <p class="jstep__text">Texto curto e concreto explicando o que acontece nesta etapa.</p>
+        </div>
+      </div>
+    </article>
+    <article class="jstep" style="--i:1">
+      <div class="jstep__card">
+        <span class="jstep__num">2</span>
+        <div class="jstep__media"></div>
+        <div class="jstep__body">
+          <span class="jstep__eyebrow">Etapa 2 de 4</span>
+          <h3 class="jstep__title">Segunda etapa</h3>
+          <p class="jstep__text">Texto curto e concreto explicando o que acontece nesta etapa.</p>
+        </div>
+      </div>
+    </article>
+    <article class="jstep" style="--i:2">
+      <div class="jstep__card jstep__card--featured">
+        <span class="jstep__num">3</span>
+        <div class="jstep__media"></div>
+        <div class="jstep__body">
+          <span class="jstep__eyebrow">Etapa 3 de 4</span>
+          <h3 class="jstep__title">Etapa em destaque</h3>
+          <p class="jstep__text">Use <code>.jstep__card--featured</code> para a etapa mais importante da jornada.</p>
+        </div>
+      </div>
+    </article>
+    <article class="jstep" style="--i:3">
+      <div class="jstep__card">
+        <span class="jstep__num">4</span>
+        <div class="jstep__media"></div>
+        <div class="jstep__body">
+          <span class="jstep__eyebrow">Etapa 4 de 4</span>
+          <h3 class="jstep__title">Última etapa</h3>
+          <p class="jstep__text">Texto curto e concreto explicando o que acontece nesta etapa.</p>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ========== LOGO LOOP ========== -->
+<section class="ds-block" id="logoloop">
+  <span class="ds-block__label">08 · Logo loop</span>
+  <h2 class="ds-block__title">Marquee infinito de parceiros</h2>
+  <p class="ds-block__desc">Pausa suave no hover. Troque os <code>&lt;span class="logoloop__placeholder"&gt;</code> por <code>&lt;img&gt;</code> quando tiver os logos reais.</p>
+</section>
+<div class="logoloop-section">
+  <div class="logoloop" id="logoLoop" data-speed="60" data-direction="left" data-gap="56" data-logo-height="22" role="region" aria-label="Exemplo de logo loop">
+    <div class="logoloop__track">
+      <ul class="logoloop__list" role="list">
+        <li class="logoloop__item"><span class="logoloop__placeholder">Parceiro 1</span></li>
+        <li class="logoloop__item"><span class="logoloop__placeholder">Parceiro 2</span></li>
+        <li class="logoloop__item"><span class="logoloop__placeholder">Parceiro 3</span></li>
+        <li class="logoloop__item"><span class="logoloop__placeholder">Parceiro 4</span></li>
+        <li class="logoloop__item"><span class="logoloop__placeholder">Parceiro 5</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FOOTER — CARD FLUTUANTE SOBRE GRADIENTE ========== -->
+<div class="ds-block" style="padding-bottom:24px">
+  <span class="ds-block__label">09 · Rodapé</span>
+  <h2 class="ds-block__title">Card flutuante sobre gradiente</h2>
+  <p class="ds-block__desc">Padrão de fechamento de página: <code>.footer-outer</code> (fundo com gradiente) envolvendo <code>.footer-card</code> (card sólido arredondado).</p>
+</div>
+<div class="footer-outer">
+  <div class="footer-outer__glow"></div>
+  <div class="footer-card">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px">
+      <div>
+        <div style="font-weight:700;font-size:18px;margin-bottom:6px">Faculdade Inspirar</div>
+        <div style="font-size:13px;color:var(--text-secondary)">© 2026 Faculdade Inspirar, Move a Sua Vida.</div>
+      </div>
+      <a href="#" class="btn-primary">Quero me matricular →</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/design-system.js"></script>
+</body>
+</html>
