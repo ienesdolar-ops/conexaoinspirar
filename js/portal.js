@@ -709,26 +709,25 @@ function formatDate(dateStr) {
 }
 
 function listenVagas(callback) {
-  var timer = setTimeout(function () {
-    var saved = localStorage.getItem('ccin-vagas');
-    var localList = saved ? JSON.parse(saved) : [];
-    callback(localList.concat(VAGAS_MOCK));
-  }, 2500);
+  // 1. Imediato: entrega as vagas locais + mock instantaneamente para não travar a UI em loading
+  var saved = localStorage.getItem('ccin-vagas');
+  var localList = saved ? JSON.parse(saved) : [];
+  callback(localList.concat(VAGAS_MOCK));
 
+  // 2. Conexão em tempo real com o Firestore Cloud (se disponível)
   if (typeof db !== 'undefined') {
     try {
       db.collection('vagas').orderBy('createdAt', 'desc').onSnapshot(function (snapshot) {
-        clearTimeout(timer);
         var cloudVagas = [];
         snapshot.forEach(function (doc) {
           var d = doc.data();
           d.id = doc.id;
           cloudVagas.push(d);
         });
-        var saved = localStorage.getItem('ccin-vagas');
-        var localList = saved ? JSON.parse(saved) : [];
+        var savedRecent = localStorage.getItem('ccin-vagas');
+        var localListRecent = savedRecent ? JSON.parse(savedRecent) : [];
         var all = cloudVagas.concat(
-          localList.filter(function (l) {
+          localListRecent.filter(function (l) {
             return !cloudVagas.some(function (c) { return c.id === l.id; });
           })
         ).concat(VAGAS_MOCK);
@@ -740,23 +739,11 @@ function listenVagas(callback) {
         });
         callback(unique);
       }, function (err) {
-        clearTimeout(timer);
-        console.log("Firestore fallback:", err);
-        var saved = localStorage.getItem('ccin-vagas');
-        var localList = saved ? JSON.parse(saved) : [];
-        callback(localList.concat(VAGAS_MOCK));
+        console.warn("Firestore vagas onSnapshot info:", err.message || err);
       });
     } catch (err) {
-      clearTimeout(timer);
-      var saved = localStorage.getItem('ccin-vagas');
-      var localList = saved ? JSON.parse(saved) : [];
-      callback(localList.concat(VAGAS_MOCK));
+      console.warn("Firestore vagas catch:", err);
     }
-  } else {
-    clearTimeout(timer);
-    var saved = localStorage.getItem('ccin-vagas');
-    var localList = saved ? JSON.parse(saved) : [];
-    callback(localList.concat(VAGAS_MOCK));
   }
 }
 
@@ -1495,7 +1482,7 @@ function renderVagasEmpresa() {
 })();
 
 function renderMinhasVagas(perfil) {
-  var container = document.getElementById('minhasVagasGrid');
+  var container = document.getElementById('minhasVagasContainer') || document.getElementById('minhasVagasGrid');
   if (!container) return;
 
   listenVagas(function (all) {
@@ -1513,7 +1500,7 @@ function renderMinhasVagas(perfil) {
     });
 
     if (!filtered.length) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-state__title">Nenhuma vaga recomendada no momento</div><p>Atualize sua área de especialidade em "Meu Perfil" ou confira a aba "Todas as Vagas".</p></div>';
+      container.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-state__title">Nenhuma vaga recomendada no momento</div><p>Atualize sua área de especialidade em "Meu Perfil" ou confira a aba "Todas as Vagas".</p></div>';
       return;
     }
 
@@ -1523,11 +1510,11 @@ function renderMinhasVagas(perfil) {
 }
 
 function renderTodasVagas() {
-  var container = document.getElementById('todasVagasGrid');
-  var filterArea = document.getElementById('filtroArea');
-  var filterEst = document.getElementById('filtroEst');
-  var filterNivel = document.getElementById('filtroNivel');
-  var searchInput = document.getElementById('buscaVagas');
+  var container = document.getElementById('todasVagasContainer') || document.getElementById('todasVagasGrid');
+  var filterArea = document.getElementById('filterArea') || document.getElementById('filtroArea');
+  var filterEst = document.getElementById('filterEst') || document.getElementById('filtroEst');
+  var filterNivel = document.getElementById('filterNivel') || document.getElementById('filtroNivel');
+  var searchInput = document.getElementById('filterSearch') || document.getElementById('buscaVagas');
   if (!container) return;
 
   if (filterNivel && filterArea) {
@@ -1559,7 +1546,7 @@ function renderTodasVagas() {
       }
 
       if (!vagas.length) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-state__title">Nenhuma vaga encontrada</div><p>Tente ajustar os filtros ou os termos de busca.</p></div>';
+        container.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-state__title">Nenhuma vaga encontrada</div><p>Tente ajustar os filtros ou os termos de busca.</p></div>';
         return;
       }
 
@@ -1577,7 +1564,7 @@ function renderTodasVagas() {
 
 /* ─── RENDER: MINHAS CANDIDATURAS ───────────────────────── */
 function renderMinhasCandidaturas() {
-  var container = document.getElementById('minhasCandidaturasGrid');
+  var container = document.getElementById('minhasCandidaturasContainer') || document.getElementById('minhasCandidaturasGrid');
   if (!container) return;
 
   var candidaturas = JSON.parse(localStorage.getItem('ccin-candidaturas') || '[]');
