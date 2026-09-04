@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/design-system.css">
-  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/design-system.css?v=2.5.0">
+  <link rel="stylesheet" href="css/portal.css?v=2.5.0">
 </head>
 <body id="painelApp">
 
@@ -22,7 +22,7 @@
     </a>
 
     <!-- Card do Usuário -->
-    <div class="painel__user">
+    <div class="painel__user" id="sidebarUserCard" style="cursor:pointer" title="Clique para editar seu perfil">
       <div class="painel__user-avatar">A</div>
       <div class="painel__user-info">
         <div class="painel__user-name">Carregando...</div>
@@ -259,12 +259,18 @@
           </label>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="perfilNome">Nome Completo</label>
-          <input class="form-input" id="perfilNome" name="nome" type="text" required>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilNome">Nome Completo</label>
+            <input class="form-input" id="perfilNome" name="nome" type="text" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilEmail">E-mail (Identificação e Currículo)</label>
+            <input class="form-input" id="perfilEmail" name="email" type="email" placeholder="seuemail@exemplo.com" required>
+          </div>
         </div>
 
-        <div class="form-row">
+        <div class="form-row" style="margin-top:16px">
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" for="perfilStatusAcademico">Nível Acadêmico</label>
             <select class="form-select" id="perfilStatusAcademico" name="statusAcademico" required>
@@ -311,9 +317,17 @@
               <option value="100% Online (EAD)">100% Online (EAD)</option>
             </select>
           </div>
-        <div class="form-group" style="margin-top:16px">
-          <label class="form-label" for="perfilWhatsapp">WhatsApp para contato de recrutadores</label>
-          <input class="form-input" id="perfilWhatsapp" name="whatsapp" type="text" placeholder="(41) 9 9999-8888" required>
+        </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilCidade">Cidade</label>
+            <input class="form-input" id="perfilCidade" name="cidade" type="text" placeholder="Ex: Curitiba" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="perfilWhatsapp">WhatsApp para contato de recrutadores</label>
+            <input class="form-input" id="perfilWhatsapp" name="whatsapp" type="text" placeholder="(41) 9 9999-8888" required>
+          </div>
         </div>
 
         <!-- Bio / Apresentação -->
@@ -341,7 +355,7 @@
         <div class="form-group" style="margin-top:20px">
           <label class="form-label">Foto de Perfil</label>
           <div class="avatar-upload-box">
-            <div class="avatar-preview-wrap" id="avatarPreviewWrap" title="Clique para escolher uma nova foto">
+            <div class="avatar-preview-wrap" id="avatarPreviewWrap" title="Clique para selecionar ou arraste uma foto" style="cursor:pointer">
               <img id="avatarPreviewImg" class="avatar-preview-img" style="display:none" alt="Foto de perfil">
               <div id="avatarPreviewFallback" class="avatar-preview-fallback">A</div>
             </div>
@@ -349,33 +363,35 @@
               <div class="avatar-upload-title" id="avatarUploadTitle">Sua Foto de Perfil</div>
               <div class="avatar-upload-sub">Formatos JPG, PNG ou WebP. Redimensionamento e otimização automáticos de alta nitidez.</div>
               <div class="avatar-actions">
-                <label for="perfilFoto" class="btn-outline btn-sm" style="cursor:pointer;font-size:12px;padding:6px 14px">
+                <button type="button" id="btnSelecionarFoto" class="btn-outline btn-sm" style="font-size:12px;padding:6px 14px;cursor:pointer">
                   📷 Selecionar Foto
-                </label>
+                </button>
                 <button type="button" id="btnRemoverFoto" class="btn-danger-ghost" style="display:none">
                   🗑️ Remover Foto
                 </button>
               </div>
             </div>
-            <input type="file" id="perfilFoto" accept="image/png,image/jpeg,image/webp,image/jpg" style="display:none">
           </div>
+          <input type="file" id="perfilFoto" accept="image/png,image/jpeg,image/webp,image/jpg" style="display:none">
         </div>
 
         <!-- Upload currículo -->
         <div class="form-group" style="margin-top:20px">
           <label class="form-label">Currículo Profissional em PDF</label>
 
+          <!-- Input oculto FORA da dropzone para eliminar conflitos de bubbling -->
+          <input type="file" id="perfilCurriculo" accept=".pdf,application/pdf" style="display:none">
+
           <!-- Dropzone para envio de PDF -->
-          <label class="upload-area" id="curriculoDropzone" for="perfilCurriculo">
-            <input type="file" id="perfilCurriculo" accept=".pdf,application/pdf">
+          <div class="upload-area" id="curriculoDropzone" role="button" tabindex="0" style="cursor:pointer">
             <div class="upload-area__icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <div class="upload-area__text" id="curriculoNoticeText">
-              <strong>Clique para anexar seu currículo</strong> ou arraste o PDF aqui
+              <strong>Clique para selecionar seu currículo</strong> ou arraste o PDF aqui
             </div>
-            <div class="upload-area__hint">Formato PDF (máx. 10 MB) · Ficará visível para recrutadores e empresas parceiras</div>
-          </label>
+            <div class="upload-area__hint">Formato PDF (máx. 10 MB) · Ficará visível para recrutadores na Vitrine de Talentos</div>
+          </div>
 
           <!-- Card quando já existe um PDF anexado -->
           <div id="curriculoCard" class="curriculo-card" style="display:none">
@@ -397,6 +413,9 @@
               <button type="button" id="btnBaixarPDF" class="btn-outline btn-sm" style="font-size:12px;padding:6px 12px" title="Baixar arquivo">
                 📥 Baixar
               </button>
+              <button type="button" id="btnSubstituirPDF" class="btn-outline btn-sm" style="font-size:12px;padding:6px 12px" title="Escolher outro arquivo PDF">
+                🔄 Trocar PDF
+              </button>
               <button type="button" id="btnRemoverPDF" class="btn-danger-ghost" title="Remover este currículo">
                 🗑️
               </button>
@@ -404,7 +423,9 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:20px">
+        <div id="perfilFeedback" style="display:none;margin-top:16px;padding:12px 16px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500"></div>
+
+        <button type="submit" id="btnSalvarPerfil" class="btn-primary" style="width:100%;justify-content:center;margin-top:20px">
           Salvar Alterações no Meu Perfil
         </button>
       </form>
@@ -413,11 +434,36 @@
 
 </main>
 
+<!-- ========== MODAL DE VISUALIZAÇÃO DE CURRÍCULO PDF ========== -->
+<div id="pdfViewerModal" class="pdf-modal">
+  <div class="pdf-modal__backdrop" onclick="fecharModalPDF()"></div>
+  <div class="pdf-modal__content">
+    <div class="pdf-modal__header">
+      <div class="pdf-modal__title-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span id="pdfModalTitle" class="pdf-modal__title">Visualizar Currículo</span>
+      </div>
+      <div class="pdf-modal__actions">
+        <a id="pdfModalNewTabBtn" href="#" target="_blank" rel="noopener" class="btn-outline btn-sm" style="font-size:12px;padding:6px 12px">
+          ↗ Nova Aba
+        </a>
+        <button type="button" id="pdfModalDownloadBtn" class="btn-primary btn-sm" style="font-size:12px;padding:6px 12px">
+          📥 Baixar
+        </button>
+        <button type="button" class="pdf-modal__close" onclick="fecharModalPDF()" aria-label="Fechar visualizador">✕</button>
+      </div>
+    </div>
+    <div class="pdf-modal__body">
+      <iframe id="pdfModalIframe" class="pdf-modal__iframe" src=""></iframe>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-<script src="js/firebase-config.js"></script>
-<script src="js/design-system.js"></script>
-<script src="js/portal.js"></script>
+<script src="js/firebase-config.js?v=2.5.0"></script>
+<script src="js/design-system.js?v=2.5.0"></script>
+<script src="js/portal.js?v=2.5.0"></script>
 </body>
 </html>

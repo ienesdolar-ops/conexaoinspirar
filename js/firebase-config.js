@@ -12,6 +12,15 @@ firebase.initializeApp({
   appId:             "1:303962933237:web:935576e634aacb6065c2bc"
 });
 
-// Instâncias globais do Firestore e Storage
+// Instância global do Firestore (100% Gratuito no Plano Spark)
 var db = firebase.firestore();
-var storage = firebase.storage();
+
+// Storage opcional e seguro (não bloqueia o app se o plano Spark estiver ativo)
+var storage = null;
+try {
+  if (typeof firebase.storage === 'function') {
+    storage = firebase.storage();
+  }
+} catch (e) {
+  console.info('[Firebase] Armazenamento de arquivos operando via Cloud Firestore 100% Gratuito.');
+}

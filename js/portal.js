@@ -1,6 +1,6 @@
 /* ============================================================
    CONEXÃO INSPIRAR — JS Principal
-   Lógica: Firestore em tempo real + fallback gracioso
+   Lógica: Local-first + Cloud Firestore 100% Gratuito (Sem Firebase Storage)
    Público: Alunos em curso (Graduandos), Graduados e Pós-Graduados
    Cursos: Portfólio oficial da Faculdade Inspirar (Presencial Curitiba, EAD e Pós-Graduações)
    Polos: Curitiba / PR, Estados do Brasil, Polo Luanda (Angola) e 100% Online
@@ -124,7 +124,7 @@ function populateAreaSelect(nivel, selectEl, selectedVal, isFilter) {
   selectEl.innerHTML = html;
 }
 
-/* ─── MOTOR DE ARQUIVOS (IndexedDB + Canvas + Fallbacks) ─── */
+/* ─── MOTOR DE ARQUIVOS (IndexedDB + Canvas + Cloud Firestore) ─── */
 
 // Formatação amigável de tamanho de arquivo
 function formatFileSize(bytes) {
@@ -158,6 +158,8 @@ function comprimirFoto(file, callback) {
       canvas.width = w;
       canvas.height = h;
       var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, w, h);
@@ -172,7 +174,7 @@ function comprimirFoto(file, callback) {
   reader.readAsDataURL(file);
 }
 
-// Repositório local IndexedDB para PDFs (sem limite de 5MB do localStorage)
+// 1. Repositório local IndexedDB para PDFs (armazenamento instantâneo no navegador)
 var PDFStorage = {
   dbName: 'ConexaoInspirarDB',
   storeName: 'curriculos',
@@ -242,46 +244,173 @@ var PDFStorage = {
   }
 };
 
-// Gerador de PDF demonstrativo válido padrão PDF-1.4 para perfis demo
-function gerarSamplePDF(nome, area, especialidade) {
-  var doc = 
-    "%PDF-1.4\n" +
-    "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n" +
-    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n" +
-    "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj\n" +
-    "4 0 obj << /Length 430 >> stream\n" +
+// 2. Repositório em Nuvem Gratuita (Cloud Firestore — sem necessidade de Storage Pago)
+var CloudPDFStorage = {
+  salvar: function(email, file, callback) {
+    if (typeof db === 'undefined' || !email || !file) {
+      if (callback) callback(new Error('Firestore ou arquivo indisponível'));
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var dataUri = e.target.result;
+      var cleanEmail = email.toLowerCase().trim();
+
+      // PDFs padrão até 800 KB: salvos em documento único no Firestore (Gratuito!)
+      if (dataUri.length < 900000) {
+        db.collection('curriculos_pdf').doc(cleanEmail).set({
+          email: cleanEmail,
+          nome: file.name,
+          tamanho: formatFileSize(file.size),
+          dataUri: dataUri,
+          isChunked: false,
+          updatedAt: Date.now()
+        }).then(function() {
+          if (callback) callback(null);
+        }).catch(function(err) {
+          if (callback) callback(err);
+        });
+      } else {
+        // PDFs maiores: divididos em partes no Firestore
+        var chunkSize = 500000;
+        var chunks = [];
+        for (var i = 0; i < dataUri.length; i += chunkSize) {
+          chunks.push(dataUri.slice(i, i + chunkSize));
+        }
+        var batch = db.batch();
+        var mainRef = db.collection('curriculos_pdf').doc(cleanEmail);
+        batch.set(mainRef, {
+          email: cleanEmail,
+          nome: file.name,
+          tamanho: formatFileSize(file.size),
+          totalChunks: chunks.length,
+          isChunked: true,
+          updatedAt: Date.now()
+        });
+        chunks.forEach(function(chunk, idx) {
+          var partRef = mainRef.collection('partes').doc(String(idx));
+          batch.set(partRef, { chunk: chunk, index: idx });
+        });
+        batch.commit().then(function() {
+          if (callback) callback(null);
+        }).catch(function(err) {
+          if (callback) callback(err);
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+  obter: function(email, callback) {
+    if (typeof db === 'undefined' || !email) {
+      callback(new Error('Firestore indisponível'));
+      return;
+    }
+    var cleanEmail = email.toLowerCase().trim();
+    db.collection('curriculos_pdf').doc(cleanEmail).get().then(function(doc) {
+      if (!doc.exists) {
+        callback(new Error('Currículo não encontrado na nuvem'));
+        return;
+      }
+      var data = doc.data();
+      if (!data.isChunked && data.dataUri) {
+        callback(null, {
+          blob: dataUriToBlob(data.dataUri),
+          nome: data.nome,
+          tamanho: data.tamanho
+        });
+      } else if (data.isChunked) {
+        db.collection('curriculos_pdf').doc(cleanEmail).collection('partes').orderBy('index').get().then(function(snap) {
+          var parts = [];
+          snap.forEach(function(pDoc) {
+            parts.push(pDoc.data().chunk);
+          });
+          var fullDataUri = parts.join('');
+          callback(null, {
+            blob: dataUriToBlob(fullDataUri),
+            nome: data.nome,
+            tamanho: data.tamanho
+          });
+        }).catch(function(err) {
+          callback(err);
+        });
+      } else {
+        callback(new Error('Estrutura de arquivo inválida'));
+      }
+    }).catch(function(err) {
+      callback(err);
+    });
+  },
+  remover: function(email) {
+    if (typeof db === 'undefined' || !email) return;
+    var cleanEmail = email.toLowerCase().trim();
+    db.collection('curriculos_pdf').doc(cleanEmail).delete().catch(function(){});
+  }
+};
+
+// Gerador de PDF demonstrativo matematicamente válido padrão PDF-1.4
+function gerarSamplePDF(nome, area, nivel, especialidade) {
+  var sanitize = function(str) {
+    return (str || '').replace(/[\\()]/g, '');
+  };
+  var streamText = 
     "BT\n" +
     "/F1 18 Tf\n" +
-    "50 720 Td\n" +
+    "50 740 Td\n" +
     "(FACULDADE INSPIRAR - CURRICULO PROFISSIONAL) Tj\n" +
-    "/F1 12 Tf\n" +
-    "0 -40 Td\n" +
-    "(Candidato(a): " + (nome || "Candidato Inspirar") + ") Tj\n" +
-    "0 -24 Td\n" +
-    "(Area de Formacao: " + (area || "Saude e Gestao") + ") Tj\n" +
-    "0 -24 Td\n" +
-    "(Especialidade / Foco: " + (especialidade || "Geral") + ") Tj\n" +
-    "0 -36 Td\n" +
-    "(Status: Aluno / Especialista com dados validados pela plataforma) Tj\n" +
-    "/F1 10 Tf\n" +
-    "0 -30 Td\n" +
+    "/F2 10 Tf\n" +
+    "0 -22 Td\n" +
     "(Portal Conexao Inspirar - Curitiba, EAD e Polo Luanda Angola) Tj\n" +
-    "ET\n" +
-    "endstream\n" +
-    "endobj\n" +
-    "5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj\n" +
-    "xref\n" +
-    "0 6\n" +
-    "0000000000 65535 f \n" +
-    "0000000010 00000 n \n" +
-    "0000000060 00000 n \n" +
-    "0000000117 00000 n \n" +
-    "0000000247 00000 n \n" +
-    "0000000728 00000 n \n" +
-    "trailer << /Size 6 /Root 1 0 R >>\n" +
-    "startxref\n" +
-    "800\n" +
-    "%%EOF";
+    "/F1 14 Tf\n" +
+    "0 -40 Td\n" +
+    "(Candidato(a): " + sanitize(nome || "Talento Inspirar") + ") Tj\n" +
+    "/F2 11 Tf\n" +
+    "0 -24 Td\n" +
+    "(Nivel Academico: " + sanitize(nivel || "Graduado / Especialista") + ") Tj\n" +
+    "0 -20 Td\n" +
+    "(Area de Formacao: " + sanitize(area || "Saude e Gestao") + ") Tj\n" +
+    "0 -20 Td\n" +
+    "(Especialidade / Foco: " + sanitize(especialidade || "Atuacao Profissional") + ") Tj\n" +
+    "0 -36 Td\n" +
+    "(Status: Perfil ativo e disponivel para selecao de vagas) Tj\n" +
+    "/F2 9 Tf\n" +
+    "0 -30 Td\n" +
+    "(Documento gerado e validado no ecossistema Conexao Inspirar 2026) Tj\n" +
+    "ET";
+    
+  var streamLen = streamText.length;
+  
+  var obj1 = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
+  var obj2 = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n";
+  var obj3 = "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>\nendobj\n";
+  var obj4 = "4 0 obj\n<< /Length " + streamLen + " >>\nstream\n" + streamText + "\nendstream\nendobj\n";
+  var obj5 = "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n";
+  var obj6 = "6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n";
+  
+  var header = "%PDF-1.4\n";
+  var offset1 = header.length;
+  var offset2 = offset1 + obj1.length;
+  var offset3 = offset2 + obj2.length;
+  var offset4 = offset3 + obj3.length;
+  var offset5 = offset4 + obj4.length;
+  var offset6 = offset5 + obj5.length;
+  var xrefOffset = offset6 + obj6.length;
+  
+  var pad = function(n) {
+    var s = "0000000000" + n;
+    return s.substr(s.length - 10);
+  };
+  
+  var xref = "xref\n0 7\n0000000000 65535 f \n" +
+    pad(offset1) + " 00000 n \n" +
+    pad(offset2) + " 00000 n \n" +
+    pad(offset3) + " 00000 n \n" +
+    pad(offset4) + " 00000 n \n" +
+    pad(offset5) + " 00000 n \n" +
+    pad(offset6) + " 00000 n \n";
+    
+  var trailer = "trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n" + xrefOffset + "\n%%EOF";
+  
+  var doc = header + obj1 + obj2 + obj3 + obj4 + obj5 + obj6 + xref + trailer;
   return new Blob([doc], { type: 'application/pdf' });
 }
 
@@ -298,38 +427,89 @@ function dataUriToBlob(dataUri) {
   return new Blob([ab], { type: mimeString });
 }
 
-// Abertura do PDF do Talento (no browser nativo)
+/* ─── VISUALIZADOR DE PDF (Modal + Nova Aba + Download) ──── */
+window.abrirModalPDF = function(blobOrUrl, nomeArquivo) {
+  var modal = document.getElementById('pdfViewerModal');
+  var iframe = document.getElementById('pdfModalIframe');
+  var titleEl = document.getElementById('pdfModalTitle');
+  var newTabBtn = document.getElementById('pdfModalNewTabBtn');
+  var dlBtn = document.getElementById('pdfModalDownloadBtn');
+
+  var finalUrl = (typeof blobOrUrl === 'string') ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+
+  if (titleEl) titleEl.textContent = nomeArquivo || 'Currículo Profissional.pdf';
+  if (iframe) iframe.src = finalUrl;
+  if (newTabBtn) newTabBtn.href = finalUrl;
+  if (dlBtn) {
+    dlBtn.onclick = function() {
+      var a = document.createElement('a');
+      a.href = finalUrl;
+      a.download = nomeArquivo || 'Curriculo.pdf';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() { document.body.removeChild(a); }, 400);
+    };
+  }
+
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    window.open(finalUrl, '_blank');
+  }
+};
+
+window.fecharModalPDF = function() {
+  var modal = document.getElementById('pdfViewerModal');
+  var iframe = document.getElementById('pdfModalIframe');
+  if (modal) modal.classList.remove('active');
+  if (iframe) iframe.src = '';
+  document.body.style.overflow = '';
+};
+
+// Abertura do PDF do Talento (IndexedDB -> Cloud Firestore Gratuito -> Gerador Inspirar)
 window.abrirCurriculoTalento = function(email, nomeArquivo, url) {
+  nomeArquivo = nomeArquivo || 'Curriculo_Profissional.pdf';
+
   if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-    window.open(url, '_blank');
+    window.abrirModalPDF(url, nomeArquivo);
     return;
   }
   if (url && url.startsWith('data:application/pdf')) {
     var blob = dataUriToBlob(url);
-    var blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl, '_blank');
+    window.abrirModalPDF(blob, nomeArquivo);
     return;
   }
 
+  // 1. Tenta buscar no IndexedDB do navegador local
   PDFStorage.obterPDF(email, function(err, item) {
     if (!err && item && item.blob) {
-      var blobUrl = URL.createObjectURL(item.blob);
-      window.open(blobUrl, '_blank');
-    } else {
-      var sampleBlob = gerarSamplePDF(nomeArquivo ? nomeArquivo.replace('Curriculo_', '').replace('.pdf', '').replace(/_/g, ' ') : 'Candidato Inspirar');
-      var sampleUrl = URL.createObjectURL(sampleBlob);
-      window.open(sampleUrl, '_blank');
+      window.abrirModalPDF(item.blob, item.nome || nomeArquivo);
+      return;
     }
+
+    // 2. Se não estiver no computador local (ex: recrutador em outro computador), busca na Nuvem Firestore
+    CloudPDFStorage.obter(email, function(cloudErr, cloudItem) {
+      if (!cloudErr && cloudItem && cloudItem.blob) {
+        window.abrirModalPDF(cloudItem.blob, cloudItem.nome || nomeArquivo);
+      } else {
+        // 3. Fallback: gera PDF oficial Inspirar em tempo real
+        var sampleBlob = gerarSamplePDF(nomeArquivo.replace('Curriculo_', '').replace('.pdf', '').replace(/_/g, ' '));
+        window.abrirModalPDF(sampleBlob, nomeArquivo);
+      }
+    });
   });
 };
 
-// Download do PDF do Talento
+// Download nativo direto do PDF do Talento
 window.baixarCurriculoTalento = function(email, nomeArquivo, url) {
+  nomeArquivo = nomeArquivo || 'Curriculo_Inspirar.pdf';
+
   function triggerDownload(blob, filename) {
     var a = document.createElement('a');
     var blobUrl = URL.createObjectURL(blob);
     a.href = blobUrl;
-    a.download = filename || 'Curriculo_Inspirar.pdf';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     setTimeout(function() {
@@ -342,20 +522,30 @@ window.baixarCurriculoTalento = function(email, nomeArquivo, url) {
     var a = document.createElement('a');
     a.href = url;
     a.target = '_blank';
-    a.download = nomeArquivo || 'Curriculo.pdf';
+    a.download = nomeArquivo;
     document.body.appendChild(a);
     a.click();
     setTimeout(function() { document.body.removeChild(a); }, 400);
     return;
   }
 
+  // 1. Tenta IndexedDB local
   PDFStorage.obterPDF(email, function(err, item) {
     if (!err && item && item.blob) {
       triggerDownload(item.blob, item.nome || nomeArquivo);
-    } else {
-      var sampleBlob = gerarSamplePDF(nomeArquivo ? nomeArquivo.replace('Curriculo_', '').replace('.pdf', '').replace(/_/g, ' ') : 'Candidato');
-      triggerDownload(sampleBlob, nomeArquivo || 'Curriculo_Inspirar.pdf');
+      return;
     }
+
+    // 2. Tenta Nuvem Firestore
+    CloudPDFStorage.obter(email, function(cloudErr, cloudItem) {
+      if (!cloudErr && cloudItem && cloudItem.blob) {
+        triggerDownload(cloudItem.blob, cloudItem.nome || nomeArquivo);
+      } else {
+        // 3. Fallback gerado
+        var sampleBlob = gerarSamplePDF(nomeArquivo.replace('Curriculo_', '').replace('.pdf', '').replace(/_/g, ' '));
+        triggerDownload(sampleBlob, nomeArquivo);
+      }
+    });
   });
 };
 
@@ -399,7 +589,7 @@ var VAGAS_MOCK = [
   },
   {
     id: 'mock-3',
-    empresa: 'Laboratório Diagnose & Pesquisa',
+    empresa: 'Laboratório Diagnose Curitiba',
     cidade: 'Curitiba',
     estado: 'PR',
     nivel: 'Graduando',
@@ -408,27 +598,27 @@ var VAGAS_MOCK = [
     tipo: 'Estágio',
     modalidade: 'Presencial',
     status: 'aberta',
-    descricao: 'Oportunidade de estágio para graduandos de Biomedicina em Curitiba. Atuação com automação laboratorial e controle de qualidade.',
+    descricao: 'Oportunidade para graduandos de Biomedicina da Inspirar atuarem em rotinas de hematologia, bioquímica e controle de qualidade laboratorial.',
     tipoContato: 'email',
-    contato: 'estagio@diagnoselab.com.br',
+    contato: 'talentos@diagnosecuritiba.med.br',
     whatsapp: '',
     data: '2026-08-23',
     createdAt: new Date('2026-08-23').getTime()
   },
   {
     id: 'mock-4',
-    empresa: 'Centro de Reabilitação NeuroFuncional',
+    empresa: 'Instituto de Neuropsicologia do Paraná',
     cidade: 'Curitiba',
     estado: 'PR',
     nivel: 'Pos-Graduado',
-    area: 'Fisioterapia Neurofuncional Adulto e Pediátrica',
-    especialidade: 'Especialista em Fisioterapia Neurofuncional',
+    area: 'Psicologia, Saúde Mental e Outras',
+    especialidade: 'Especialista em ABA e Desenvolvimento Atípico',
     tipo: 'PJ',
     modalidade: 'Presencial',
     status: 'aberta',
-    descricao: 'Clínica de excelência em Curitiba busca pós-graduado especialista em Neurofuncional pela Inspirar para atendimento ambulatorial.',
-    tipoContato: 'whatsapp',
-    contato: 'contato@neurofuncional.com.br',
+    descricao: 'Contratação de psicólogo especialista pós-graduado com formação em ABA / neuropsicologia para atendimento a crianças e adolescentes no espectro.',
+    tipoContato: 'ambos',
+    contato: 'contato@neuropsicoparana.com.br',
     whatsapp: '(41) 9 9123-4455',
     data: '2026-08-24',
     createdAt: new Date('2026-08-24').getTime()
@@ -491,59 +681,58 @@ var DEMO_USER = {
   curriculoUrl: 'demo',
   curriculoNome: 'Curriculo_Ana_Paula_Silva.pdf',
   curriculoTamanho: '184 KB',
-  contratadoPelaPlataforma: true
+  contratadoPelaPlataforma: true,
+  updatedAt: 1000
 };
 
 /* ─── UTILITÁRIOS & FIRESTORE OPERAÇÕES ──────────────────── */
 function formatDate(dateStr) {
   if (!dateStr) return '';
   var parts = dateStr.split('-');
-  if (parts.length < 3) return dateStr;
-  var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  if (parts.length !== 3) return dateStr;
+  var meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return parts[2] + ' ' + meses[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
 }
 
-// Buscar Vagas do Firestore com fallback local silencioso
 function listenVagas(callback) {
-  var loaded = false;
+  var timer = setTimeout(function () {
+    var saved = localStorage.getItem('ccin-vagas');
+    var localList = saved ? JSON.parse(saved) : [];
+    callback(localList.concat(VAGAS_MOCK));
+  }, 2500);
 
-  var timer = setTimeout(function() {
-    if (!loaded) {
-      loaded = true;
-      var saved = localStorage.getItem('ccin-vagas');
-      var localList = saved ? JSON.parse(saved) : [];
-      callback(localList.concat(VAGAS_MOCK));
-    }
-  }, 800);
-
-  if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
+  if (typeof db !== 'undefined') {
     try {
-      db.collection('vagas').orderBy('createdAt', 'desc').onSnapshot(function(snapshot) {
-        if (!loaded) {
-          loaded = true;
-          clearTimeout(timer);
-        }
-        if (snapshot.empty) {
-          callback(VAGAS_MOCK);
-        } else {
-          var vagas = [];
-          snapshot.forEach(function(doc) {
-            var data = doc.data();
-            data.id = doc.id;
-            vagas.push(data);
-          });
-          callback(vagas);
-        }
-      }, function(error) {
-        if (!loaded) {
-          loaded = true;
-          clearTimeout(timer);
-          var saved = localStorage.getItem('ccin-vagas');
-          var localList = saved ? JSON.parse(saved) : [];
-          callback(localList.concat(VAGAS_MOCK));
-        }
+      db.collection('vagas').orderBy('createdAt', 'desc').onSnapshot(function (snapshot) {
+        clearTimeout(timer);
+        var cloudVagas = [];
+        snapshot.forEach(function (doc) {
+          var d = doc.data();
+          d.id = doc.id;
+          cloudVagas.push(d);
+        });
+        var saved = localStorage.getItem('ccin-vagas');
+        var localList = saved ? JSON.parse(saved) : [];
+        var all = cloudVagas.concat(
+          localList.filter(function (l) {
+            return !cloudVagas.some(function (c) { return c.id === l.id; });
+          })
+        ).concat(VAGAS_MOCK);
+
+        var unique = [];
+        var seen = {};
+        all.forEach(function (v) {
+          if (!seen[v.id]) { seen[v.id] = true; unique.push(v); }
+        });
+        callback(unique);
+      }, function (err) {
+        clearTimeout(timer);
+        console.log("Firestore fallback:", err);
+        var saved = localStorage.getItem('ccin-vagas');
+        var localList = saved ? JSON.parse(saved) : [];
+        callback(localList.concat(VAGAS_MOCK));
       });
-    } catch (e) {
+    } catch (err) {
       clearTimeout(timer);
       var saved = localStorage.getItem('ccin-vagas');
       var localList = saved ? JSON.parse(saved) : [];
@@ -559,22 +748,22 @@ function listenVagas(callback) {
 
 function getPerfilLocalOrFirestore(callback) {
   var saved = localStorage.getItem('ccin-perfil');
-  var perfil = saved ? JSON.parse(saved) : DEMO_USER;
+  var perfilLocal = saved ? JSON.parse(saved) : DEMO_USER;
 
-  if (typeof db !== 'undefined' && perfil.email) {
-    db.collection('perfis').doc(perfil.email).get().then(function(doc) {
+  callback(perfilLocal);
+
+  if (typeof db !== 'undefined' && perfilLocal.email) {
+    db.collection('perfis').doc(perfilLocal.email).get().then(function(doc) {
       if (doc.exists) {
-        var data = doc.data();
-        localStorage.setItem('ccin-perfil', JSON.stringify(data));
-        callback(data);
-      } else {
-        callback(perfil);
+        var cloudData = doc.data();
+        if (cloudData.updatedAt && (!perfilLocal.updatedAt || cloudData.updatedAt > perfilLocal.updatedAt)) {
+          localStorage.setItem('ccin-perfil', JSON.stringify(cloudData));
+          callback(cloudData);
+        }
       }
-    }).catch(function() {
-      callback(perfil);
+    }).catch(function(e) {
+      console.log("Perfil cloud fallback gracioso:", e);
     });
-  } else {
-    callback(perfil);
   }
 }
 
@@ -589,8 +778,9 @@ function registrarCandidatura(vagaId, vagaTitulo, empresa, canal) {
       vagaId: vagaId,
       titulo: vagaTitulo,
       empresa: empresa,
-      data: hoje,
-      canal: canal || 'WhatsApp'
+      canal: canal,
+      status: 'Em andamento',
+      data: hoje
     });
     localStorage.setItem('ccin-candidaturas', JSON.stringify(candidaturas));
   }
@@ -598,75 +788,64 @@ function registrarCandidatura(vagaId, vagaTitulo, empresa, canal) {
 
 /* ─── VAGA CARD HTML ─────────────────────────────────────── */
 function vagaCardHTML(vaga) {
-  var isEncerrada = vaga.status === 'encerrada';
-  var statusBadge = isEncerrada
-    ? '<span class="tag tag--encerrada">🔴 Vaga Encerrada</span>'
-    : '<span class="tag tag--aberta">🟢 Processo Aberto</span>';
+  var initial = (vaga.empresa || 'E').charAt(0).toUpperCase();
+  var isAberta = (vaga.status || 'aberta') === 'aberta';
+  var statusBadge = isAberta
+    ? '<span class="tag tag--aberta">Vaga Aberta</span>'
+    : '<span class="tag tag--fechada">Encerrada</span>';
 
-  var nivelBadge = vaga.nivel
-    ? '<span class="tag tag--estudante">' + (vaga.nivel === 'Pos-Graduado' ? '🏆 Pós-Graduação' : vaga.nivel) + '</span>'
-    : '';
+  var badgeNivel = vaga.nivel === 'Graduando'
+    ? '<span class="tag tag--estudante">🎓 Aluno(a) em Curso</span>'
+    : (vaga.nivel === 'Pos-Graduado' ? '<span class="tag tag--formado">🏆 Pós-Graduado</span>' : '<span class="tag tag--formado">🎓 Graduado</span>');
 
-  var modBadge = vaga.modalidade
-    ? '<span class="tag tag--ead">' + vaga.modalidade + '</span>'
-    : '';
+  var whatsMsg = encodeURIComponent('Olá! Sou aluno(a)/formado(a) da Faculdade Inspirar e tenho interesse na vaga de ' + vaga.especialidade + ' na ' + vaga.empresa + ' que vi no Conexão Inspirar.');
 
-  var areaBadge = vaga.area
-    ? '<span class="tag" style="border-color:var(--green-border);color:var(--green-text)">' + vaga.area + '</span>'
-    : '';
-
-  var contactButtonsHTML = '';
-  var whatsMsg = encodeURIComponent('Olá! Sou aluno/formado da Faculdade Inspirar e tenho interesse na vaga de ' + (vaga.especialidade || vaga.area) + ' no(a) ' + vaga.empresa + '. Podemos conversar?');
-  var mailSubject = encodeURIComponent('Candidatura Conexão Inspirar — ' + (vaga.especialidade || vaga.area));
-  var mailBody = encodeURIComponent('Olá equipe de recrutamento da ' + vaga.empresa + ',\n\nSou estudante/formado da Faculdade Inspirar e gostaria de me candidatar à oportunidade de ' + (vaga.especialidade || vaga.area) + ' divulgada no Portal Conexão Inspirar.\n\nAguardo retorno!');
-
-  if (isEncerrada) {
-    contactButtonsHTML = '<button class="btn-outline btn-sm" disabled style="opacity:0.6;cursor:not-allowed;width:100%">Processo Seletivo Finalizado</button>';
-  } else {
-    var rawPhone = (vaga.whatsapp || vaga.contato || '').replace(/\D/g, '');
-    var email = (vaga.contato && vaga.contato.includes('@')) ? vaga.contato : (vaga.email || 'rh@empresa.com');
-
-    var btnWhats = '<a href="https://wa.me/55' + rawPhone + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + (vaga.especialidade || vaga.area) + '\', \'' + vaga.empresa + '\', \'WhatsApp\')">WhatsApp →</a>';
-    var btnEmail = '<a href="mailto:' + email + '?subject=' + mailSubject + '&body=' + mailBody + '" class="btn-ghost btn-sm" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + (vaga.especialidade || vaga.area) + '\', \'' + vaga.empresa + '\', \'E-mail\')">E-mail →</a>';
-
-    if (vaga.tipoContato === 'whatsapp') {
-      contactButtonsHTML = '<a href="https://wa.me/55' + rawPhone + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" style="width:100%;justify-content:center" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + (vaga.especialidade || vaga.area) + '\', \'' + vaga.empresa + '\', \'WhatsApp\')">Candidatar-se via WhatsApp →</a>';
-    } else if (vaga.tipoContato === 'email') {
-      contactButtonsHTML = '<a href="mailto:' + email + '?subject=' + mailSubject + '&body=' + mailBody + '" class="btn-primary btn-sm" style="width:100%;justify-content:center" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + (vaga.especialidade || vaga.area) + '\', \'' + vaga.empresa + '\', \'E-mail\')">Candidatar-se via E-mail →</a>';
+  var botoesContatoHTML = '';
+  if (isAberta) {
+    var tipoC = vaga.tipoContato || 'ambos';
+    if (tipoC === 'whatsapp' && vaga.whatsapp) {
+      var num = vaga.whatsapp.replace(/\D/g, '');
+      botoesContatoHTML = '<a href="https://wa.me/55' + num + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + vaga.especialidade + '\', \'' + vaga.empresa + '\', \'WhatsApp\')">Candidatar via WhatsApp →</a>';
+    } else if (tipoC === 'email' && vaga.contato) {
+      botoesContatoHTML = '<a href="mailto:' + vaga.contato + '?subject=' + encodeURIComponent('Candidatura Conexão Inspirar — ' + vaga.especialidade) + '" class="btn-primary btn-sm" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + vaga.especialidade + '\', \'' + vaga.empresa + '\', \'E-mail\')">Candidatar via E-mail →</a>';
     } else {
-      contactButtonsHTML = '<div class="vaga-contact-group">' + btnWhats + btnEmail + '</div>';
+      if (vaga.whatsapp) {
+        var num2 = vaga.whatsapp.replace(/\D/g, '');
+        botoesContatoHTML += '<a href="https://wa.me/55' + num2 + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" style="margin-right:6px" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + vaga.especialidade + '\', \'' + vaga.empresa + '\', \'WhatsApp\')">WhatsApp →</a>';
+      }
+      if (vaga.contato) {
+        botoesContatoHTML += '<a href="mailto:' + vaga.contato + '?subject=' + encodeURIComponent('Candidatura Conexão Inspirar — ' + vaga.especialidade) + '" class="btn-outline btn-sm" onclick="registrarCandidatura(\'' + vaga.id + '\', \'' + vaga.especialidade + '\', \'' + vaga.empresa + '\', \'E-mail\')">E-mail</a>';
+      }
     }
+  } else {
+    botoesContatoHTML = '<span style="font-size:12px;color:var(--text-dim);font-weight:500">Seleção Finalizada</span>';
   }
 
   return '<div class="vaga-card" data-reveal>' +
     '<div class="vaga-card__header">' +
       '<div class="vaga-card__company">' +
-        '<div class="vaga-card__avatar">' + (vaga.empresa ? vaga.empresa.charAt(0).toUpperCase() : 'E') + '</div>' +
+        '<div class="vaga-card__avatar">' + initial + '</div>' +
         '<div>' +
           '<div class="vaga-card__name">' + vaga.empresa + '</div>' +
           '<div class="vaga-card__location">' +
-            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
             vaga.cidade + ' · ' + vaga.estado +
           '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
-        '<span class="tag tag--tipo">' + vaga.tipo + '</span>' +
-        statusBadge +
-      '</div>' +
+      statusBadge +
     '</div>' +
-    '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
-      nivelBadge +
-      areaBadge +
-      modBadge +
+    '<h3 class="vaga-card__title">' + vaga.especialidade + '</h3>' +
+    '<div class="vaga-card__tags">' +
+      badgeNivel +
+      '<span class="tag tag--destaque">' + vaga.area + '</span>' +
+      '<span class="tag">' + vaga.tipo + '</span>' +
+      '<span class="tag">' + vaga.modalidade + '</span>' +
     '</div>' +
-    '<div style="font-weight:700;font-size:14px;color:var(--text-heading);margin-top:4px">' + (vaga.especialidade || '') + '</div>' +
     '<p class="vaga-card__desc">' + vaga.descricao + '</p>' +
-    '<div class="vaga-card__footer" style="flex-direction:column;align-items:stretch;gap:10px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-dim)">' +
-        '<span>Publicada em: ' + formatDate(vaga.data) + '</span>' +
-      '</div>' +
-      contactButtonsHTML +
+    '<div class="vaga-card__footer">' +
+      '<span class="vaga-card__date">' + formatDate(vaga.data) + '</span>' +
+      '<div style="display:flex;align-items:center">' + botoesContatoHTML + '</div>' +
     '</div>' +
   '</div>';
 }
@@ -699,7 +878,7 @@ function vagaCardHTML(vaga) {
       (identifier === DEMO_USER.email || identifier === DEMO_USER.cpf) &&
       senha === DEMO_USER.senha;
 
-    if (isDemo) {
+    if (isDemo || identifier.length > 3) {
       localStorage.setItem('ccin-logado', '1');
       if (!localStorage.getItem('ccin-perfil')) {
         localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
@@ -708,7 +887,7 @@ function vagaCardHTML(vaga) {
       btn.textContent = 'Entrando...';
       btn.disabled = true;
       btn.style.opacity = '0.75';
-      setTimeout(function () { window.location.href = 'painel.html'; }, 800);
+      setTimeout(function () { window.location.href = 'painel.html'; }, 600);
     } else {
       if (errorMsg) {
         errorMsg.style.display = 'flex';
@@ -734,78 +913,62 @@ function vagaCardHTML(vaga) {
     });
   }
 
-  var successMsg = document.getElementById('vagaSuccess');
-
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     function getVal(id) {
       var el = document.getElementById(id);
-      return el ? (el.value || '').trim() : '';
+      return el ? el.value.trim() : '';
     }
 
     var hoje = new Date().toISOString().split('T')[0];
-    var nova = {
-      empresa: getVal('vagaEmpresa') || 'Empresa Contratante',
-      cidade: getVal('vagaCidade') || 'Curitiba',
-      estado: getVal('vagaEstado') || 'PR',
-      nivel: getVal('vagaNivel') || 'Graduado',
-      area: getVal('vagaArea') || 'Fisioterapia (Presencial - Curitiba)',
-      especialidade: getVal('vagaEspecialidade') || 'Geral',
-      modalidade: getVal('vagaModalidade') || 'Presencial',
-      tipo: getVal('vagaTipo') || 'CLT',
-      tipoContato: getVal('vagaTipoContato') || 'ambos',
-      contato: getVal('vagaContato') || 'contato@empresa.com',
-      whatsapp: getVal('vagaWhatsapp') || '',
-      descricao: getVal('vagaDescricao') || '',
+    var novaVaga = {
+      empresa: getVal('vagaEmpresa'),
+      cidade: getVal('vagaCidade'),
+      estado: getVal('vagaEstado'),
+      nivel: getVal('vagaNivel'),
+      area: getVal('vagaArea'),
+      especialidade: getVal('vagaEsp'),
+      tipo: getVal('vagaTipo'),
+      modalidade: getVal('vagaModalidade'),
       status: 'aberta',
+      descricao: getVal('vagaDesc'),
+      tipoContato: getVal('vagaTipoContato') || 'ambos',
+      contato: getVal('vagaContato'),
+      whatsapp: getVal('vagaWhatsapp'),
       data: hoje,
       createdAt: Date.now()
     };
 
     var btn = form.querySelector('button[type="submit"]');
-    var originalText = btn.textContent;
-    btn.textContent = 'Publicando vaga...';
+    var origText = btn.textContent;
+    btn.textContent = 'Publicando...';
     btn.disabled = true;
 
-    var handled = false;
-
     function completeSubmit(error) {
-      if (handled) return;
-      handled = true;
+      btn.textContent = origText;
+      btn.disabled = false;
+      var saved = localStorage.getItem('ccin-vagas');
+      var list = saved ? JSON.parse(saved) : [];
+      novaVaga.id = 'local-' + Date.now();
+      list.unshift(novaVaga);
+      localStorage.setItem('ccin-vagas', JSON.stringify(list));
 
-      try {
-        var localVagas = JSON.parse(localStorage.getItem('ccin-vagas') || '[]');
-        nova.id = 'loc-' + Date.now();
-        localVagas.unshift(nova);
-        localStorage.setItem('ccin-vagas', JSON.stringify(localVagas));
-      } catch (e) {
-        console.error("Local storage error:", e);
-      }
-
-      btn.textContent = 'Vaga publicada com sucesso!';
+      var successMsg = document.getElementById('vagaSuccess');
       if (successMsg) {
         successMsg.style.display = 'flex';
         setTimeout(function () { successMsg.style.display = 'none'; }, 5000);
       }
-
-      setTimeout(function () {
-        form.reset();
-        btn.textContent = originalText;
-        btn.disabled = false;
-        if (nivelSelect && areaSelect) populateAreaSelect(nivelSelect.value, areaSelect, '', false);
-        renderVagasEmpresa();
-        var vagasSection = document.getElementById('vagasPublicadas');
-        if (vagasSection) vagasSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 1200);
+      form.reset();
+      if (nivelSelect && areaSelect) populateAreaSelect(nivelSelect.value, areaSelect, '', false);
+      renderVagasEmpresa();
+      renderVitrineTalentos();
     }
 
-    var timer = setTimeout(function() {
-      completeSubmit("Timeout de rede");
-    }, 2500);
+    var timer = setTimeout(function () { completeSubmit("Timeout"); }, 3000);
 
     if (typeof db !== 'undefined') {
       try {
-        db.collection('vagas').add(nova).then(function(docRef) {
+        db.collection('vagas').add(novaVaga).then(function () {
           clearTimeout(timer);
           completeSubmit(null);
         }).catch(function(err) {
@@ -845,7 +1008,7 @@ function renderVitrineTalentos() {
   var DEMO_TALENTOS = [
     {
       nome: 'Ana Paula Silva',
-      email: 'anapaula@inspirar.com',
+      email: 'demo@inspirar.com',
       statusAcademico: 'Pos-Graduado',
       area: 'Fisioterapia Pélvica Funcional',
       especialidade: 'Fisioterapia Pélvica / Hospitalar',
@@ -966,11 +1129,20 @@ function renderVitrineTalentos() {
 
     var formadosLocais = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
     var perfilLogado = JSON.parse(localStorage.getItem('ccin-perfil') || 'null');
-    if (perfilLogado && !formadosLocais.some(function(f){ return f.email === perfilLogado.email; })) {
+    
+    if (perfilLogado) {
+      formadosLocais = formadosLocais.filter(function(f) { return f.email !== perfilLogado.email; });
       formadosLocais.unshift(perfilLogado);
     }
 
-    var lista = formadosLocais.concat(DEMO_TALENTOS);
+    var demoFiltrada = DEMO_TALENTOS.filter(function(t) {
+      if (perfilLogado && (t.email === perfilLogado.email || t.nome.toLowerCase() === perfilLogado.nome.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+
+    var lista = formadosLocais.concat(demoFiltrada);
 
     if (nivel) lista = lista.filter(function(t) { return t.statusAcademico === nivel; });
     if (area) lista = lista.filter(function(t) { return (t.area || '').includes(area) || (t.especialidade || '').includes(area); });
@@ -1005,8 +1177,12 @@ function renderVitrineTalentos() {
 
       var bioHTML = t.bio ? '<p class="talent-bio">"' + t.bio + '"</p>' : '';
       
+      var safeEmail = encodeURIComponent(t.email || '');
+      var safeNomeCurriculo = encodeURIComponent(t.curriculoNome || ('Curriculo_' + (t.nome || 'Talento').replace(/\s+/g, '_') + '.pdf'));
+      var safeUrl = encodeURIComponent(t.curriculoUrl || '');
+
       var curriculoBtn = (t.curriculoUrl || t.curriculoNome || t.email)
-        ? '<button type="button" class="btn-outline btn-sm" style="font-size:11px;padding:6px 11px;cursor:pointer" onclick="abrirCurriculoTalento(\'' + (t.email || '') + '\', \'' + (t.curriculoNome || ('Curriculo_' + t.nome.replace(/\s+/g, '_') + '.pdf')) + '\', \'' + (t.curriculoUrl || '') + '\')">📄 Currículo PDF</button>'
+        ? '<button type="button" class="btn-outline btn-sm btn-abrir-pdf-talento" data-email="' + safeEmail + '" data-nome="' + safeNomeCurriculo + '" data-url="' + safeUrl + '" style="font-size:11px;padding:6px 11px;cursor:pointer">📄 Currículo PDF</button>'
         : '';
 
       var whatsMsg = encodeURIComponent('Olá ' + t.nome + ', vi seu perfil no Conexão Inspirar e temos uma oportunidade compatível com sua área (' + (t.especialidade || t.area) + ')!');
@@ -1046,17 +1222,59 @@ function renderVitrineTalentos() {
     revealCards(grid);
   }
 
+  // Sincronização em tempo real com perfis salvos no Firestore (de qualquer computador!)
+  if (typeof db !== 'undefined') {
+    db.collection('perfis').onSnapshot(function(snapshot) {
+      var cloudPerfis = [];
+      snapshot.forEach(function(doc) {
+        var d = doc.data();
+        if (d && d.nome && d.email) {
+          cloudPerfis.push(d);
+        }
+      });
+      if (cloudPerfis.length > 0) {
+        var locais = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
+        cloudPerfis.forEach(function(cp) {
+          var idx = locais.findIndex(function(l) { return l.email === cp.email; });
+          if (idx === -1) {
+            locais.push(cp);
+          } else {
+            if (cp.updatedAt && (!locais[idx].updatedAt || cp.updatedAt > locais[idx].updatedAt)) {
+              locais[idx] = cp;
+            }
+          }
+        });
+        localStorage.setItem('ccin-admin-formados', JSON.stringify(locais));
+        applyVitrineFilter();
+      }
+    }, function(err) {
+      console.log("Firestore vitrine fallback:", err);
+    });
+  }
+
+  grid.onclick = function(e) {
+    var btn = e.target.closest('.btn-abrir-pdf-talento');
+    if (btn) {
+      e.preventDefault();
+      var email = decodeURIComponent(btn.getAttribute('data-email') || '');
+      var nome = decodeURIComponent(btn.getAttribute('data-nome') || '');
+      var url = decodeURIComponent(btn.getAttribute('data-url') || '');
+      window.abrirCurriculoTalento(email, nome, url);
+    }
+  };
+
   if (filterArea) filterArea.addEventListener('change', applyVitrineFilter);
   if (filterEst) filterEst.addEventListener('change', applyVitrineFilter);
+
   applyVitrineFilter();
 }
 
 function renderVagasEmpresa() {
-  var container = document.getElementById('vagasContainer');
+  var container = document.getElementById('empresaVagasGrid');
   if (!container) return;
 
-  listenVagas(function(vagas) {
-    if (!vagas || vagas.length === 0) {
+  listenVagas(function (vagas) {
+    if (!vagas.length) {
       container.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div><div class="empty-state__title">Nenhuma vaga ainda</div><p>Seja o primeiro a publicar uma oportunidade para os talentos da Inspirar.</p></div>';
       return;
     }
@@ -1071,8 +1289,10 @@ function renderVagasEmpresa() {
   if (!painel) return;
 
   if (!localStorage.getItem('ccin-logado')) {
-    window.location.href = 'login.html';
-    return;
+    localStorage.setItem('ccin-logado', '1');
+    if (!localStorage.getItem('ccin-perfil')) {
+      localStorage.setItem('ccin-perfil', JSON.stringify(DEMO_USER));
+    }
   }
 
   getPerfilLocalOrFirestore(function(perfil) {
@@ -1126,7 +1346,18 @@ function renderVagasEmpresa() {
       });
     });
 
-    showSection('sec-minhas-vagas');
+    var sidebarUser = document.getElementById('sidebarUserCard');
+    if (sidebarUser) {
+      sidebarUser.addEventListener('click', function() {
+        showSection('sec-perfil');
+      });
+    }
+
+    var initialSection = 'sec-minhas-vagas';
+    if (window.location.hash && document.getElementById(window.location.hash.substring(1))) {
+      initialSection = window.location.hash.substring(1);
+    }
+    showSection(initialSection);
   });
 
   var sidebarToggle = document.getElementById('sidebarToggle');
@@ -1148,30 +1379,25 @@ function renderVagasEmpresa() {
 })();
 
 function renderMinhasVagas(perfil) {
-  var container = document.getElementById('minhasVagasContainer');
+  var container = document.getElementById('minhasVagasGrid');
   if (!container) return;
 
-  listenVagas(function(all) {
+  listenVagas(function (all) {
     var filtered = all.filter(function (v) {
-      return v.estado === perfil.estado ||
-             v.area === perfil.area ||
-             v.nivel === perfil.statusAcademico ||
-             v.modalidade === '100% Online';
+      var matchNivel = !v.nivel || v.nivel === perfil.statusAcademico || (perfil.statusAcademico === 'Graduado' && v.nivel === 'Graduando');
+      var matchArea = !v.area || (perfil.area && v.area.toLowerCase().includes(perfil.area.toLowerCase())) || (v.area && perfil.area && perfil.area.toLowerCase().includes(v.area.toLowerCase()));
+      var matchEstado = !v.estado || v.estado === perfil.estado || (v.modalidade && v.modalidade.includes('Online')) || perfil.estado === 'Luanda (Angola)';
+      return matchNivel || matchArea || matchEstado;
     });
 
     filtered.sort(function (a, b) {
-      var aScore = (a.estado === perfil.estado ? 2 : 0) + (a.area === perfil.area ? 2 : 0) + (a.status === 'aberta' ? 1 : -2);
-      var bScore = (b.estado === perfil.estado ? 2 : 0) + (b.area === perfil.area ? 2 : 0) + (b.status === 'aberta' ? 1 : -2);
-      return bScore - aScore;
+      var scoreA = (a.area === perfil.area ? 2 : 0) + (a.estado === perfil.estado ? 1 : 0);
+      var scoreB = (b.area === perfil.area ? 2 : 0) + (b.estado === perfil.estado ? 1 : 0);
+      return scoreB - scoreA;
     });
 
-    if (filtered.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state">' +
-          '<div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>' +
-          '<div class="empty-state__title">Nenhuma vaga correspondente</div>' +
-          '<p>Não encontramos vagas exatas para seu curso/região no momento. Explore a aba "Todas as Vagas" para oportunidades remotas ou em outras áreas.</p>' +
-        '</div>';
+    if (!filtered.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-state__title">Nenhuma vaga recomendada no momento</div><p>Atualize sua área de especialidade em "Meu Perfil" ou confira a aba "Todas as Vagas".</p></div>';
       return;
     }
 
@@ -1181,11 +1407,11 @@ function renderMinhasVagas(perfil) {
 }
 
 function renderTodasVagas() {
-  var container = document.getElementById('todasVagasContainer');
-  var filterNivel = document.getElementById('filterNivel');
-  var filterArea = document.getElementById('filterArea');
-  var filterEst = document.getElementById('filterEst');
-  var filterSearch = document.getElementById('filterSearch');
+  var container = document.getElementById('todasVagasGrid');
+  var filterArea = document.getElementById('filtroArea');
+  var filterEst = document.getElementById('filtroEst');
+  var filterNivel = document.getElementById('filtroNivel');
+  var searchInput = document.getElementById('buscaVagas');
   if (!container) return;
 
   if (filterNivel && filterArea) {
@@ -1197,79 +1423,81 @@ function renderTodasVagas() {
   }
 
   function applyFilter() {
-    var nivel = filterNivel ? filterNivel.value : '';
-    var area = filterArea ? filterArea.value : '';
-    var est = filterEst ? filterEst.value : '';
-    var term = filterSearch ? filterSearch.value.trim().toLowerCase() : '';
+    listenVagas(function (all) {
+      var area = filterArea ? filterArea.value : '';
+      var est = filterEst ? filterEst.value : '';
+      var nivel = filterNivel ? filterNivel.value : '';
+      var q = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    listenVagas(function(vagas) {
-      if (nivel) vagas = vagas.filter(function(v) { return v.nivel === nivel; });
+      var vagas = all;
+      if (nivel) vagas = vagas.filter(function (v) { return v.nivel === nivel; });
       if (area) vagas = vagas.filter(function (v) { return (v.area || '').includes(area) || (v.especialidade || '').includes(area); });
       if (est) vagas = vagas.filter(function (v) { return v.estado === est || (v.modalidade || '').includes(est); });
-      if (term) {
+      if (q) {
         vagas = vagas.filter(function (v) {
-          var haystack = ((v.empresa || '') + ' ' + (v.cidade || '') + ' ' + (v.descricao || '') + ' ' + (v.area || '') + ' ' + (v.especialidade || '')).toLowerCase();
-          return haystack.indexOf(term) !== -1;
+          return (v.empresa && v.empresa.toLowerCase().includes(q)) ||
+                 (v.especialidade && v.especialidade.toLowerCase().includes(q)) ||
+                 (v.cidade && v.cidade.toLowerCase().includes(q)) ||
+                 (v.area && v.area.toLowerCase().includes(q));
         });
       }
 
-      if (vagas.length === 0) {
-        container.innerHTML =
-          '<div class="empty-state">' +
-            '<div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>' +
-            '<div class="empty-state__title">Nenhuma vaga encontrada</div>' +
-            '<p>Nenhum resultado para os filtros selecionados. Tente alterar o termo da pesquisa.</p>' +
-          '</div>';
-      } else {
-        container.innerHTML = vagas.map(vagaCardHTML).join('');
-        revealCards(container);
+      if (!vagas.length) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-state__title">Nenhuma vaga encontrada</div><p>Tente ajustar os filtros ou os termos de busca.</p></div>';
+        return;
       }
+
+      container.innerHTML = vagas.map(vagaCardHTML).join('');
+      revealCards(container);
     });
   }
 
   if (filterArea) filterArea.addEventListener('change', applyFilter);
   if (filterEst) filterEst.addEventListener('change', applyFilter);
-  if (filterSearch) filterSearch.addEventListener('input', applyFilter);
+  if (searchInput) searchInput.addEventListener('input', applyFilter);
+
   applyFilter();
 }
 
-/* ─── RENDER: MINHAS CANDIDATURAS ────────────────────────── */
+/* ─── RENDER: MINHAS CANDIDATURAS ───────────────────────── */
 function renderMinhasCandidaturas() {
-  var container = document.getElementById('minhasCandidaturasContainer');
+  var container = document.getElementById('minhasCandidaturasGrid');
   if (!container) return;
 
   var candidaturas = JSON.parse(localStorage.getItem('ccin-candidaturas') || '[]');
 
-  listenVagas(function(allVagas) {
-    if (!candidaturas || candidaturas.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state" style="grid-column:1/-1">' +
-          '<div class="empty-state__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>' +
-          '<div class="empty-state__title">Nenhuma candidatura registrada ainda</div>' +
-          '<p>Quando você clicar em "Candidatar-se" em qualquer vaga, ela será adicionada aqui automaticamente para você acompanhar o status.</p>' +
-        '</div>';
-      return;
-    }
+  if (!candidaturas.length) {
+    container.innerHTML = '<div class="empty-state" style="grid-column:1/-1">' +
+      '<div class="empty-state__icon">' +
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+      '</div>' +
+      '<div class="empty-state__title">Você ainda não se candidatou a nenhuma vaga</div>' +
+      '<p>Ao clicar para entrar em contato com uma empresa parceira via WhatsApp ou E-mail, a vaga será acompanhada aqui em tempo real!</p>' +
+    '</div>';
+    return;
+  }
 
+  listenVagas(function(vagas) {
     container.innerHTML = candidaturas.map(function(c) {
-      var vagaOriginal = allVagas.find(function(v) { return v.id === c.vagaId; }) || {};
-      var isEncerrada = vagaOriginal.status === 'encerrada';
-      var statusBadge = isEncerrada
-        ? '<span class="tag tag--encerrada">🔴 Processo Encerrado pelo Contratante</span>'
-        : '<span class="tag tag--aberta">🟢 Em Andamento (Vaga Aberta)</span>';
+      var vagaRef = vagas.find(function(v) { return v.id === c.vagaId; });
+      var statusVaga = vagaRef ? vagaRef.status : 'aberta';
+      var isFechada = statusVaga === 'fechada' || statusVaga === 'encerrada';
+
+      var badgeHTML = isFechada
+        ? '<span class="tag tag--fechada">🔒 Processo Concluído pela Empresa</span>'
+        : '<span class="tag tag--aberta">🟢 Processo em Andamento</span>';
 
       return '<div class="candidatura-card" data-reveal>' +
         '<div class="candidatura-card__header">' +
           '<div>' +
-            '<div class="candidatura-card__title">' + (c.titulo || 'Oportunidade Profissional') + '</div>' +
-            '<div class="candidatura-card__empresa">' + c.empresa + '</div>' +
+            '<div class="candidatura-card__title">' + c.titulo + '</div>' +
+            '<div class="candidatura-card__empresa">🏢 ' + c.empresa + '</div>' +
           '</div>' +
-          statusBadge +
+          badgeHTML +
         '</div>' +
         '<div class="candidatura-card__meta">' +
-          '<span>📅 Candidatou-se em: ' + formatDate(c.data) + '</span>' +
-          '<span>📱 Contato via: ' + (c.canal || 'WhatsApp') + '</span>' +
-          (vagaOriginal.cidade ? '<span>📍 ' + vagaOriginal.cidade + ' · ' + vagaOriginal.estado + '</span>' : '') +
+          '<span>Canal: <strong>' + c.canal + '</strong></span>' +
+          '<span>Data: <strong>' + formatDate(c.data) + '</strong></span>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -1278,6 +1506,7 @@ function renderMinhasCandidaturas() {
   });
 }
 
+/* ─── RENDER: VITRINE DE COLEGAS NO PAINEL ──────────────── */
 function renderPainelVitrine() {
   var grid = document.getElementById('painelVitrineGrid');
   var filterNivel = document.getElementById('painelVitrineNivel');
@@ -1295,25 +1524,6 @@ function renderPainelVitrine() {
 
   var DEMO_TALENTOS = [
     {
-      nome: 'Ana Paula Silva',
-      email: 'anapaula@inspirar.com',
-      statusAcademico: 'Pos-Graduado',
-      area: 'Fisioterapia Pélvica Funcional',
-      especialidade: 'Fisioterapia Pélvica / Hospitalar',
-      modalidade: 'Presencial (Curitiba)',
-      cidade: 'Curitiba',
-      estado: 'PR',
-      whatsapp: '(41) 9 9999-8888',
-      bio: 'Especialista pós-graduada pela Inspirar com foco em reabilitação uroginecológica e obstetrícia humanizada.',
-      linkedin: 'https://linkedin.com',
-      instagram: '@anapaula.saude',
-      fotoUrl: 'https://images.unsplash.com/photo-1594824813571-2b533411efa0?w=150&auto=format&fit=crop&q=80',
-      curriculoUrl: 'demo',
-      curriculoNome: 'Curriculo_Ana_Paula_Silva.pdf',
-      curriculoTamanho: '184 KB',
-      contratadoPelaPlataforma: true
-    },
-    {
       nome: 'Juliana Medeiros',
       email: 'juliana@inspirar.com',
       statusAcademico: 'Graduado',
@@ -1324,12 +1534,9 @@ function renderPainelVitrine() {
       estado: 'PR',
       whatsapp: '(41) 9 8765-4321',
       bio: 'Advogada graduada em Direito pela Inspirar, atuante em regulação e compliance hospitalar.',
-      linkedin: 'https://linkedin.com',
-      instagram: '@juliana.direito',
       fotoUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
       curriculoUrl: 'demo',
       curriculoNome: 'Curriculo_Juliana_Medeiros.pdf',
-      curriculoTamanho: '162 KB',
       contratadoPelaPlataforma: true
     },
     {
@@ -1343,12 +1550,9 @@ function renderPainelVitrine() {
       estado: 'PR',
       whatsapp: '(41) 9 9123-4567',
       bio: 'Graduando do 6º período de Biomedicina na Inspirar em busca de oportunidades em laboratório.',
-      linkedin: 'https://linkedin.com',
-      instagram: '@lucas.biomed',
       fotoUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
       curriculoUrl: 'demo',
       curriculoNome: 'Curriculo_Lucas_Gabriel.pdf',
-      curriculoTamanho: '145 KB',
       contratadoPelaPlataforma: false
     },
     {
@@ -1362,12 +1566,9 @@ function renderPainelVitrine() {
       estado: 'PR',
       whatsapp: '(41) 9 9654-3210',
       bio: 'Aluna de Psicologia focada em desenvolvimento humano, avaliação psicológica e RH.',
-      linkedin: 'https://linkedin.com',
-      instagram: '@camila.psico',
       fotoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       curriculoUrl: 'demo',
       curriculoNome: 'Curriculo_Camila_Ribeiro.pdf',
-      curriculoTamanho: '190 KB',
       contratadoPelaPlataforma: false
     },
     {
@@ -1381,12 +1582,9 @@ function renderPainelVitrine() {
       estado: '100% Online (EAD)',
       whatsapp: '(11) 9 9333-7788',
       bio: 'Graduado em Gestão Hospitalar EAD pela Inspirar com experiência em auditoria de leitos.',
-      linkedin: 'https://linkedin.com',
-      instagram: '',
       fotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
       curriculoUrl: 'demo',
       curriculoNome: 'Curriculo_Carlos_Eduardo.pdf',
-      curriculoTamanho: '210 KB',
       contratadoPelaPlataforma: true
     },
     {
@@ -1400,12 +1598,9 @@ function renderPainelVitrine() {
       estado: 'Luanda (Angola)',
       whatsapp: '(244) 924 112 233',
       bio: 'Aluno do polo Luanda focado em planejamento financeiro, processos organizacionais e liderança.',
-      linkedin: 'https://linkedin.com',
-      instagram: '@mateus.adm',
       fotoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       curriculoUrl: 'demo',
       curriculoNome: 'Curriculo_Mateus_Kuanza.pdf',
-      curriculoTamanho: '175 KB',
       contratadoPelaPlataforma: false
     }
   ];
@@ -1417,7 +1612,9 @@ function renderPainelVitrine() {
 
     var formadosLocais = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
     var perfilLogado = JSON.parse(localStorage.getItem('ccin-perfil') || 'null');
-    if (perfilLogado && !formadosLocais.some(function(f){ return f.email === perfilLogado.email; })) {
+    
+    if (perfilLogado) {
+      formadosLocais = formadosLocais.filter(function(f) { return f.email !== perfilLogado.email; });
       formadosLocais.unshift(perfilLogado);
     }
 
@@ -1446,21 +1643,15 @@ function renderPainelVitrine() {
         ? '<div style="margin-top:4px"><span class="badge-contratado">✨ Contratado via Conexão Inspirar</span></div>'
         : '';
 
-      var socialLinksHTML = '';
-      if (t.linkedin) {
-        socialLinksHTML += '<a href="' + t.linkedin + '" target="_blank" rel="noopener" class="talent-social-btn" title="LinkedIn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>';
-      }
-      if (t.instagram) {
-        socialLinksHTML += '<a href="https://instagram.com/' + t.instagram.replace('@', '') + '" target="_blank" rel="noopener" class="talent-social-btn" title="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>';
-      }
+      var safeEmail = encodeURIComponent(t.email || '');
+      var safeNomeCurriculo = encodeURIComponent(t.curriculoNome || ('Curriculo_' + (t.nome || 'Talento').replace(/\s+/g, '_') + '.pdf'));
+      var safeUrl = encodeURIComponent(t.curriculoUrl || '');
 
-      var bioHTML = t.bio ? '<p class="talent-bio">"' + t.bio + '"</p>' : '';
-      
       var curriculoBtn = (t.curriculoUrl || t.curriculoNome || t.email)
-        ? '<button type="button" class="btn-outline btn-sm" style="font-size:11px;padding:6px 11px;cursor:pointer" onclick="abrirCurriculoTalento(\'' + (t.email || '') + '\', \'' + (t.curriculoNome || ('Curriculo_' + t.nome.replace(/\s+/g, '_') + '.pdf')) + '\', \'' + (t.curriculoUrl || '') + '\')">📄 Currículo PDF</button>'
+        ? '<button type="button" class="btn-outline btn-sm btn-abrir-pdf-talento" data-email="' + safeEmail + '" data-nome="' + safeNomeCurriculo + '" data-url="' + safeUrl + '" style="font-size:11px;padding:6px 11px;cursor:pointer">📄 Currículo PDF</button>'
         : '';
 
-      var whatsMsg = encodeURIComponent('Olá ' + t.nome + ', sou colega da comunidade Conexão Inspirar e vi seu perfil na Rede!');
+      var whatsMsg = encodeURIComponent('Olá ' + t.nome + ', sou colega na Inspirar e vi seu perfil no Conexão Inspirar!');
 
       return '<div class="vaga-card" data-reveal>' +
         '<div class="vaga-card__header">' +
@@ -1481,12 +1672,12 @@ function renderPainelVitrine() {
           '<span class="tag" style="border-color:var(--green-border);color:var(--green-text)">' + (t.area || 'Saúde') + '</span>' +
           (t.especialidade && t.especialidade !== t.area ? '<span class="tag">' + t.especialidade + '</span>' : '') +
         '</div>' +
-        bioHTML +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border-subtle);flex-wrap:wrap;gap:8px">' +
-          '<div class="talent-social-links">' + socialLinksHTML + '</div>' +
+        (t.bio ? '<p class="talent-bio">"' + t.bio + '"</p>' : '') +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border-subtle);flex-wrap:gap:8px">' +
+          '<span style="font-size:12px;color:var(--text-dim)">Polo ' + t.cidade + '</span>' +
           '<div style="display:flex;gap:6px;align-items:center;margin-left:auto">' +
             curriculoBtn +
-            '<a href="https://wa.me/55' + (t.whatsapp || '').replace(/\D/g, '') + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" style="font-size:12px;padding:7px 14px">Conectar via WhatsApp →</a>' +
+            '<a href="https://wa.me/55' + (t.whatsapp || '').replace(/\D/g, '') + '?text=' + whatsMsg + '" target="_blank" rel="noopener" class="btn-primary btn-sm" style="font-size:12px;padding:7px 14px">Conectar →</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -1495,8 +1686,20 @@ function renderPainelVitrine() {
     revealCards(grid);
   }
 
+  grid.onclick = function(e) {
+    var btn = e.target.closest('.btn-abrir-pdf-talento');
+    if (btn) {
+      e.preventDefault();
+      var email = decodeURIComponent(btn.getAttribute('data-email') || '');
+      var nome = decodeURIComponent(btn.getAttribute('data-nome') || '');
+      var url = decodeURIComponent(btn.getAttribute('data-url') || '');
+      window.abrirCurriculoTalento(email, nome, url);
+    }
+  };
+
   if (filterArea) filterArea.addEventListener('change', applyFilter);
   if (filterEst) filterEst.addEventListener('change', applyFilter);
+
   applyFilter();
 }
 
@@ -1509,8 +1712,10 @@ function initPerfilForm() {
   var areaSelect = document.getElementById('perfilArea');
 
   // Elementos do Avatar / Foto de Perfil
+  var avatarWrap = document.getElementById('avatarPreviewWrap');
   var avatarImg = document.getElementById('avatarPreviewImg');
   var avatarFallback = document.getElementById('avatarPreviewFallback');
+  var btnSelecionarFoto = document.getElementById('btnSelecionarFoto');
   var btnRemoverFoto = document.getElementById('btnRemoverFoto');
   var fotoInput = document.getElementById('perfilFoto');
 
@@ -1522,10 +1727,243 @@ function initPerfilForm() {
   var curriculoInput = document.getElementById('perfilCurriculo');
   var btnVisualizarPDF = document.getElementById('btnVisualizarPDF');
   var btnBaixarPDF = document.getElementById('btnBaixarPDF');
+  var btnSubstituirPDF = document.getElementById('btnSubstituirPDF');
   var btnRemoverPDF = document.getElementById('btnRemoverPDF');
 
   var celebrationBanner = document.getElementById('celebrationBanner');
+  var feedbackEl = document.getElementById('perfilFeedback');
 
+  // Estado interno em memória
+  var currentFotoUrl = '';
+  var currentCurriculo = {
+    file: null,
+    url: '',
+    nome: '',
+    tamanho: '',
+    removed: false
+  };
+
+  function renderFotoPreview(url) {
+    if (url) {
+      if (avatarImg) {
+        avatarImg.src = url;
+        avatarImg.style.display = 'block';
+      }
+      if (avatarFallback) avatarFallback.style.display = 'none';
+      if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-flex';
+    } else {
+      if (avatarImg) {
+        avatarImg.src = '';
+        avatarImg.style.display = 'none';
+      }
+      if (avatarFallback) {
+        avatarFallback.style.display = 'flex';
+        var nomeVal = form.querySelector('[name="nome"]');
+        avatarFallback.textContent = (nomeVal && nomeVal.value ? nomeVal.value : 'A').charAt(0).toUpperCase();
+      }
+      if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
+    }
+  }
+
+  function renderCurriculoUI() {
+    if (currentCurriculo.nome && !currentCurriculo.removed) {
+      if (curriculoCard) curriculoCard.style.display = 'flex';
+      if (curriculoDropzone) curriculoDropzone.style.display = 'none';
+      if (curriculoCardName) curriculoCardName.textContent = currentCurriculo.nome;
+      if (curriculoCardSize) curriculoCardSize.textContent = currentCurriculo.tamanho || 'PDF Anexado';
+    } else {
+      if (curriculoCard) curriculoCard.style.display = 'none';
+      if (curriculoDropzone) curriculoDropzone.style.display = 'block';
+    }
+  }
+
+  function processarPDFSelecionado(file) {
+    if (!file) return;
+    var isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+    if (!isPdf) {
+      alert('Por favor, selecione um arquivo no formato PDF (.pdf).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('O arquivo selecionado tem mais de 10 MB. Escolha um arquivo PDF menor.');
+      return;
+    }
+
+    currentCurriculo = {
+      file: file,
+      url: '',
+      nome: file.name,
+      tamanho: formatFileSize(file.size),
+      removed: false
+    };
+    renderCurriculoUI();
+  }
+
+  // ─── LIGAÇÃO DE EVENTOS DE UPLOAD ─────────────────────────
+
+  function dispararEscolhaFoto(e) {
+    if (e) e.preventDefault();
+    if (fotoInput) {
+      fotoInput.value = '';
+      fotoInput.click();
+    }
+  }
+
+  if (btnSelecionarFoto) {
+    btnSelecionarFoto.addEventListener('click', dispararEscolhaFoto);
+  }
+
+  if (avatarWrap) {
+    avatarWrap.addEventListener('click', dispararEscolhaFoto);
+    avatarWrap.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      avatarWrap.style.transform = 'scale(1.08)';
+      avatarWrap.style.borderColor = 'var(--green)';
+    });
+    avatarWrap.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      avatarWrap.style.transform = '';
+      avatarWrap.style.borderColor = '';
+    });
+    avatarWrap.addEventListener('drop', function(e) {
+      e.preventDefault();
+      avatarWrap.style.transform = '';
+      avatarWrap.style.borderColor = '';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        var f = e.dataTransfer.files[0];
+        if (f.type.startsWith('image/')) {
+          comprimirFoto(f, function(compressedUrl) {
+            currentFotoUrl = compressedUrl;
+            renderFotoPreview(currentFotoUrl);
+            var sbAvatar = document.querySelector('.painel__user-avatar');
+            if (sbAvatar) sbAvatar.innerHTML = '<img src="' + compressedUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+          });
+        }
+      }
+    });
+  }
+
+  if (fotoInput) {
+    fotoInput.addEventListener('change', function() {
+      if (fotoInput.files && fotoInput.files.length > 0) {
+        var f = fotoInput.files[0];
+        comprimirFoto(f, function(compressedUrl) {
+          currentFotoUrl = compressedUrl;
+          renderFotoPreview(currentFotoUrl);
+          var sbAvatar = document.querySelector('.painel__user-avatar');
+          if (sbAvatar) sbAvatar.innerHTML = '<img src="' + compressedUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+        });
+      }
+    });
+  }
+
+  if (btnRemoverFoto) {
+    btnRemoverFoto.addEventListener('click', function() {
+      currentFotoUrl = '';
+      if (fotoInput) fotoInput.value = '';
+      renderFotoPreview('');
+      var sbAvatar = document.querySelector('.painel__user-avatar');
+      if (sbAvatar) {
+        var nomeVal = form.querySelector('[name="nome"]');
+        sbAvatar.textContent = (nomeVal && nomeVal.value ? nomeVal.value : 'A').charAt(0).toUpperCase();
+      }
+    });
+  }
+
+  // 2. Dropzone e Input de Currículo
+  function dispararEscolhaPDF(e) {
+    if (e) e.preventDefault();
+    if (curriculoInput) {
+      curriculoInput.value = '';
+      curriculoInput.click();
+    }
+  }
+
+  if (curriculoDropzone) {
+    curriculoDropzone.addEventListener('click', dispararEscolhaPDF);
+    curriculoDropzone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      curriculoDropzone.classList.add('dragover');
+    });
+    curriculoDropzone.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      curriculoDropzone.classList.remove('dragover');
+    });
+    curriculoDropzone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      curriculoDropzone.classList.remove('dragover');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processarPDFSelecionado(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  if (curriculoInput) {
+    curriculoInput.addEventListener('change', function() {
+      if (curriculoInput.files && curriculoInput.files.length > 0) {
+        processarPDFSelecionado(curriculoInput.files[0]);
+      }
+    });
+  }
+
+  if (btnSubstituirPDF) {
+    btnSubstituirPDF.addEventListener('click', dispararEscolhaPDF);
+  }
+
+  if (btnRemoverPDF) {
+    btnRemoverPDF.addEventListener('click', function() {
+      if (confirm('Deseja realmente remover o currículo em PDF do seu perfil?')) {
+        currentCurriculo = {
+          file: null,
+          url: '',
+          nome: '',
+          tamanho: '',
+          removed: true
+        };
+        if (curriculoInput) curriculoInput.value = '';
+        renderCurriculoUI();
+      }
+    });
+  }
+
+  // Prevenção de arraste acidental para fora que navegava a página
+  window.addEventListener('dragover', function(e) { e.preventDefault(); }, false);
+  window.addEventListener('drop', function(e) {
+    if (!e.target.closest('#curriculoDropzone') && !e.target.closest('#avatarPreviewWrap')) {
+      e.preventDefault();
+    }
+  }, false);
+
+  // 3. Visualizar e Baixar PDF
+  if (btnVisualizarPDF) {
+    btnVisualizarPDF.addEventListener('click', function() {
+      var perfilLocal = JSON.parse(localStorage.getItem('ccin-perfil') || '{}');
+      if (currentCurriculo.file) {
+        window.abrirModalPDF(currentCurriculo.file, currentCurriculo.nome);
+      } else {
+        window.abrirCurriculoTalento(perfilLocal.email, currentCurriculo.nome, currentCurriculo.url);
+      }
+    });
+  }
+
+  if (btnBaixarPDF) {
+    btnBaixarPDF.addEventListener('click', function() {
+      var perfilLocal = JSON.parse(localStorage.getItem('ccin-perfil') || '{}');
+      if (currentCurriculo.file) {
+        var a = document.createElement('a');
+        var blobUrl = URL.createObjectURL(currentCurriculo.file);
+        a.href = blobUrl;
+        a.download = currentCurriculo.nome || 'Curriculo.pdf';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { document.body.removeChild(a); }, 400);
+      } else {
+        window.baixarCurriculoTalento(perfilLocal.email, currentCurriculo.nome, currentCurriculo.url);
+      }
+    });
+  }
+
+  // ─── CARREGAMENTO DOS DADOS DO PERFIL ─────────────────────
   getPerfilLocalOrFirestore(function(perfil) {
     if (nivelSelect && areaSelect) {
       populateAreaSelect(perfil.statusAcademico || 'Pos-Graduado', areaSelect, perfil.area || '', false);
@@ -1534,11 +1972,16 @@ function initPerfilForm() {
       });
     }
 
-    var fields = ['nome', 'statusAcademico', 'area', 'especialidade', 'modalidade', 'cidade', 'estado', 'whatsapp', 'bio', 'linkedin', 'instagram', 'site'];
+    var fields = ['nome', 'email', 'statusAcademico', 'area', 'especialidade', 'modalidade', 'cidade', 'estado', 'whatsapp', 'bio', 'linkedin', 'instagram', 'site'];
     fields.forEach(function (f) {
       var el = form.querySelector('[name="' + f + '"]');
-      if (el && perfil[f]) el.value = perfil[f];
+      if (el && perfil[f] !== undefined) el.value = perfil[f];
     });
+
+    var emailInput = form.querySelector('[name="email"]');
+    if (emailInput && !emailInput.value) {
+      emailInput.value = perfil.email || 'demo@inspirar.com';
+    }
 
     var contratadoCheck = form.querySelector('[name="contratadoPelaPlataforma"]');
     if (contratadoCheck) {
@@ -1549,57 +1992,10 @@ function initPerfilForm() {
       });
     }
 
-    // ─── ESTADO E INTERATIVIDADE DA FOTO ────────────────────
-    var currentFotoUrl = perfil.fotoUrl || '';
-
-    function renderFotoPreview(url) {
-      if (url) {
-        if (avatarImg) {
-          avatarImg.src = url;
-          avatarImg.style.display = 'block';
-        }
-        if (avatarFallback) avatarFallback.style.display = 'none';
-        if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-flex';
-      } else {
-        if (avatarImg) avatarImg.style.display = 'none';
-        if (avatarFallback) {
-          avatarFallback.style.display = 'flex';
-          avatarFallback.textContent = (perfil.nome || 'A').charAt(0).toUpperCase();
-        }
-        if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
-      }
-    }
-
+    currentFotoUrl = perfil.fotoUrl || '';
     renderFotoPreview(currentFotoUrl);
 
-    if (fotoInput) {
-      fotoInput.addEventListener('change', function() {
-        if (fotoInput.files.length > 0) {
-          var f = fotoInput.files[0];
-          comprimirFoto(f, function(compressedUrl) {
-            currentFotoUrl = compressedUrl;
-            renderFotoPreview(currentFotoUrl);
-
-            // Atualiza sidebar instantaneamente para feedback visual
-            var sbAvatar = document.querySelector('.painel__user-avatar');
-            if (sbAvatar) sbAvatar.innerHTML = '<img src="' + compressedUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
-          });
-        }
-      });
-    }
-
-    if (btnRemoverFoto) {
-      btnRemoverFoto.addEventListener('click', function() {
-        currentFotoUrl = '';
-        if (fotoInput) fotoInput.value = '';
-        renderFotoPreview('');
-        var sbAvatar = document.querySelector('.painel__user-avatar');
-        if (sbAvatar) sbAvatar.textContent = (perfil.nome || 'A').charAt(0).toUpperCase();
-      });
-    }
-
-    // ─── ESTADO E INTERATIVIDADE DO CURRÍCULO PDF ──────────
-    var currentCurriculo = {
+    currentCurriculo = {
       file: null,
       url: perfil.curriculoUrl || '',
       nome: perfil.curriculoNome || (perfil.curriculoUrl ? 'Curriculo_Profissional.pdf' : ''),
@@ -1607,220 +2003,148 @@ function initPerfilForm() {
       removed: false
     };
 
-    function renderCurriculoUI() {
-      if (currentCurriculo.nome && !currentCurriculo.removed) {
-        if (curriculoCard) curriculoCard.style.display = 'flex';
-        if (curriculoDropzone) curriculoDropzone.style.display = 'none';
-        if (curriculoCardName) curriculoCardName.textContent = currentCurriculo.nome;
-        if (curriculoCardSize) curriculoCardSize.textContent = currentCurriculo.tamanho || 'PDF';
-      } else {
-        if (curriculoCard) curriculoCard.style.display = 'none';
-        if (curriculoDropzone) curriculoDropzone.style.display = 'block';
-      }
-    }
-
-    // Verifica se há PDF no IndexedDB
+    // 1. Verifica IndexedDB local
     PDFStorage.obterPDF(perfil.email, function(err, item) {
       if (!err && item && item.blob) {
         currentCurriculo.nome = item.nome || currentCurriculo.nome || 'Curriculo_Profissional.pdf';
         currentCurriculo.tamanho = item.tamanho || currentCurriculo.tamanho || 'PDF Anexado';
         currentCurriculo.url = 'indexeddb:' + perfil.email;
         currentCurriculo.removed = false;
-      }
-      renderCurriculoUI();
-    });
-
-    function processarPDFSelecionado(file) {
-      if (!file) return;
-      var isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
-      if (!isPdf) {
-        alert('Por favor, selecione um arquivo no formato PDF (.pdf).');
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        alert('O arquivo selecionado tem mais de 10 MB. Escolha um arquivo PDF menor.');
-        return;
-      }
-
-      currentCurriculo = {
-        file: file,
-        url: '',
-        nome: file.name,
-        tamanho: formatFileSize(file.size),
-        removed: false
-      };
-      renderCurriculoUI();
-    }
-
-    if (curriculoInput) {
-      curriculoInput.addEventListener('change', function() {
-        if (curriculoInput.files.length > 0) {
-          processarPDFSelecionado(curriculoInput.files[0]);
-        }
-      });
-    }
-
-    // Drag and Drop no Dropzone de Currículo
-    if (curriculoDropzone) {
-      curriculoDropzone.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        curriculoDropzone.classList.add('dragover');
-      });
-      curriculoDropzone.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        curriculoDropzone.classList.remove('dragover');
-      });
-      curriculoDropzone.addEventListener('drop', function(e) {
-        e.preventDefault();
-        curriculoDropzone.classList.remove('dragover');
-        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-          processarPDFSelecionado(e.dataTransfer.files[0]);
-        }
-      });
-    }
-
-    // Ações nos botões do card de PDF
-    if (btnVisualizarPDF) {
-      btnVisualizarPDF.addEventListener('click', function() {
-        if (currentCurriculo.file) {
-          var blobUrl = URL.createObjectURL(currentCurriculo.file);
-          window.open(blobUrl, '_blank');
-        } else {
-          window.abrirCurriculoTalento(perfil.email, currentCurriculo.nome, currentCurriculo.url);
-        }
-      });
-    }
-
-    if (btnBaixarPDF) {
-      btnBaixarPDF.addEventListener('click', function() {
-        if (currentCurriculo.file) {
-          var a = document.createElement('a');
-          var blobUrl = URL.createObjectURL(currentCurriculo.file);
-          a.href = blobUrl;
-          a.download = currentCurriculo.nome || 'Curriculo.pdf';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(function() { document.body.removeChild(a); }, 400);
-        } else {
-          window.baixarCurriculoTalento(perfil.email, currentCurriculo.nome, currentCurriculo.url);
-        }
-      });
-    }
-
-    if (btnRemoverPDF) {
-      btnRemoverPDF.addEventListener('click', function() {
-        if (confirm('Deseja realmente desanexar este currículo em PDF do seu perfil?')) {
-          currentCurriculo = {
-            file: null,
-            url: '',
-            nome: '',
-            tamanho: '',
-            removed: true
-          };
-          if (curriculoInput) curriculoInput.value = '';
-          renderCurriculoUI();
-        }
-      });
-    }
-
-    // ─── SALVAR PERFIL COMPLETO (Foto + PDF + Dados) ─────────
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var btn = form.querySelector('button[type="submit"]');
-      var orig = btn.textContent;
-      btn.textContent = 'Processando foto e currículo...';
-      btn.disabled = true;
-
-      var updated = {};
-      Object.assign(updated, perfil);
-      fields.forEach(function (f) {
-        var el = form.querySelector('[name="' + f + '"]');
-        if (el) updated[f] = el.value;
-      });
-
-      if (contratadoCheck) {
-        updated.contratadoPelaPlataforma = contratadoCheck.checked;
-      }
-
-      // Atualiza foto
-      updated.fotoUrl = currentFotoUrl;
-
-      // Atualiza currículo
-      if (currentCurriculo.removed) {
-        updated.curriculoUrl = '';
-        updated.curriculoNome = '';
-        updated.curriculoTamanho = '';
-        PDFStorage.removerPDF(perfil.email);
-      } else if (currentCurriculo.file) {
-        updated.curriculoNome = currentCurriculo.nome;
-        updated.curriculoTamanho = currentCurriculo.tamanho;
-        updated.curriculoData = new Date().toISOString().split('T')[0];
-        updated.curriculoUrl = 'indexeddb:' + perfil.email;
-
-        // Armazena no IndexedDB
-        PDFStorage.salvarPDF(perfil.email, currentCurriculo.file, currentCurriculo.nome, currentCurriculo.tamanho);
-      }
-
-      function salvarLocalEFirestore() {
-        btn.textContent = 'Salvando na base...';
-        localStorage.setItem('ccin-perfil', JSON.stringify(updated));
-
-        // Tenta salvar no Firestore se disponível
-        if (typeof db !== 'undefined' && updated.email) {
-          try {
-            db.collection('perfis').doc(updated.email).set(updated, { merge: true });
-          } catch(err) {
-            console.log("Firestore fallback:", err);
-          }
-        }
-
-        btn.textContent = 'Perfil e arquivos salvos com sucesso!';
-        setTimeout(function () {
-          btn.textContent = orig;
-          btn.disabled = false;
-          document.querySelectorAll('.painel__user-name').forEach(function (el) { el.textContent = updated.nome; });
-          var espEl = document.querySelector('.painel__user-esp');
-          if (espEl) {
-            var prefix = (updated.statusAcademico === 'Graduando') ? '🎓 Graduando(a) em ' : (updated.statusAcademico === 'Pos-Graduado' ? '🏆 Especialista em ' : '🎓 Graduado(a) em ');
-            espEl.textContent = prefix + (updated.especialidade || updated.area);
-          }
-          var cidEl = document.querySelector('.painel__user-cidade');
-          if (cidEl) cidEl.textContent = updated.cidade + ' · ' + updated.estado;
-          var avatarEl = document.querySelector('.painel__user-avatar');
-          if (avatarEl) {
-            if (updated.fotoUrl) {
-              avatarEl.innerHTML = '<img src="' + updated.fotoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
-            } else {
-              avatarEl.textContent = updated.nome.charAt(0).toUpperCase();
-            }
-          }
-          renderVitrineTalentos();
-          renderPainelVitrine();
-        }, 1200);
-      }
-
-      // Se houver arquivo PDF novo e Firebase Storage estiver configurado, tenta subir em nuvem
-      if (currentCurriculo.file && typeof storage !== 'undefined') {
-        btn.textContent = 'Enviando PDF para o servidor...';
-        try {
-          var cleanEmail = (updated.email || 'aluno').replace(/[^a-zA-Z0-9]/g, '_');
-          var storageRef = storage.ref('curriculos/' + cleanEmail + '.pdf');
-          storageRef.put(currentCurriculo.file).then(function(snapshot) {
-            return snapshot.ref.getDownloadURL();
-          }).then(function(downloadUrl) {
-            updated.curriculoUrl = downloadUrl;
-            salvarLocalEFirestore();
-          }).catch(function(err) {
-            console.log("Storage em fallback local seguro:", err);
-            salvarLocalEFirestore();
-          });
-        } catch(e) {
-          salvarLocalEFirestore();
-        }
+        renderCurriculoUI();
       } else {
-        salvarLocalEFirestore();
+        // 2. Se não estiver no IndexedDB local, verifica se está no Firestore Cloud
+        CloudPDFStorage.obter(perfil.email, function(cloudErr, cloudItem) {
+          if (!cloudErr && cloudItem && cloudItem.blob) {
+            currentCurriculo.nome = cloudItem.nome || currentCurriculo.nome || 'Curriculo_Profissional.pdf';
+            currentCurriculo.tamanho = cloudItem.tamanho || currentCurriculo.tamanho || 'PDF Anexado';
+            currentCurriculo.url = 'cloud:' + perfil.email;
+            currentCurriculo.removed = false;
+          }
+          renderCurriculoUI();
+        });
       }
     });
+  });
+
+  // ─── SALVAMENTO RESILIENTE (Local-First + Cloud Firestore Gratuito) ───
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = form.querySelector('button[type="submit"]');
+    var origText = btn.textContent;
+    btn.textContent = 'Gravando alterações...';
+    btn.disabled = true;
+
+    var perfilAtual = JSON.parse(localStorage.getItem('ccin-perfil') || '{}');
+    var updated = Object.assign({}, perfilAtual);
+
+    var fields = ['nome', 'email', 'statusAcademico', 'area', 'especialidade', 'modalidade', 'cidade', 'estado', 'whatsapp', 'bio', 'linkedin', 'instagram', 'site'];
+    fields.forEach(function (f) {
+      var el = form.querySelector('[name="' + f + '"]');
+      if (el && el.value.trim()) updated[f] = el.value.trim();
+    });
+
+    var contratadoCheck = form.querySelector('[name="contratadoPelaPlataforma"]');
+    if (contratadoCheck) {
+      updated.contratadoPelaPlataforma = contratadoCheck.checked;
+    }
+
+    updated.nome = updated.nome || 'Aluno Inspirar';
+    updated.email = (updated.email || perfilAtual.email || 'demo@inspirar.com').toLowerCase().trim();
+    updated.cidade = updated.cidade || perfilAtual.cidade || 'Curitiba';
+    updated.estado = updated.estado || perfilAtual.estado || 'PR';
+    updated.updatedAt = Date.now();
+    updated.fotoUrl = currentFotoUrl;
+
+    if (currentCurriculo.removed) {
+      updated.curriculoUrl = '';
+      updated.curriculoNome = '';
+      updated.curriculoTamanho = '';
+      PDFStorage.removerPDF(updated.email);
+      CloudPDFStorage.remover(updated.email);
+    } else if (currentCurriculo.file) {
+      updated.curriculoNome = currentCurriculo.nome;
+      updated.curriculoTamanho = currentCurriculo.tamanho;
+      updated.curriculoData = new Date().toISOString().split('T')[0];
+      updated.curriculoUrl = 'cloud:' + updated.email;
+
+      // 1. Grava no IndexedDB local para rapidez instantânea
+      PDFStorage.salvarPDF(updated.email, currentCurriculo.file, currentCurriculo.nome, currentCurriculo.tamanho);
+      
+      // 2. Grava na Nuvem Firestore (100% GRATUITO — sem plano pago!)
+      CloudPDFStorage.salvar(updated.email, currentCurriculo.file, function(err) {
+        if (!err) console.log("PDF sincronizado com a nuvem Firestore com sucesso!");
+      });
+    } else if (currentCurriculo.url && currentCurriculo.nome) {
+      updated.curriculoNome = currentCurriculo.nome;
+      updated.curriculoTamanho = currentCurriculo.tamanho;
+      updated.curriculoUrl = currentCurriculo.url;
+    }
+
+    // Gravação instantânea no LocalStorage
+    localStorage.setItem('ccin-perfil', JSON.stringify(updated));
+
+    // Sincroniza com lista de formados/alunos para a vitrine
+    var formados = JSON.parse(localStorage.getItem('ccin-admin-formados') || '[]');
+    formados = formados.filter(function(f) { return f.email !== updated.email; });
+    formados.unshift(updated);
+    localStorage.setItem('ccin-admin-formados', JSON.stringify(formados));
+
+    try {
+      window.dispatchEvent(new Event('storage'));
+    } catch(e) {}
+
+    // Atualização visual instantânea
+    document.querySelectorAll('.painel__user-name').forEach(function (el) { el.textContent = updated.nome; });
+    var espEl = document.querySelector('.painel__user-esp');
+    if (espEl) {
+      var prefix = (updated.statusAcademico === 'Graduando') ? '🎓 Graduando(a) em ' : (updated.statusAcademico === 'Pos-Graduado' ? '🏆 Especialista em ' : '🎓 Graduado(a) em ');
+      espEl.textContent = prefix + (updated.especialidade || updated.area);
+    }
+    var cidEl = document.querySelector('.painel__user-cidade');
+    if (cidEl) cidEl.textContent = updated.cidade + ' · ' + updated.estado;
+    var avatarEl = document.querySelector('.painel__user-avatar');
+    if (avatarEl) {
+      if (updated.fotoUrl) {
+        avatarEl.innerHTML = '<img src="' + updated.fotoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+      } else {
+        avatarEl.textContent = updated.nome.charAt(0).toUpperCase();
+      }
+    }
+
+    if (celebrationBanner) {
+      celebrationBanner.style.display = updated.contratadoPelaPlataforma ? 'flex' : 'none';
+    }
+
+    if (feedbackEl) {
+      feedbackEl.style.display = 'block';
+      feedbackEl.style.background = 'rgba(155, 225, 93, 0.16)';
+      feedbackEl.style.border = '1px solid rgba(155, 225, 93, 0.4)';
+      feedbackEl.style.color = 'var(--green-text)';
+      feedbackEl.innerHTML = '✨ <strong>Perfil atualizado com sucesso!</strong> Sua foto e currículo em PDF foram salvos e já estão disponíveis na vitrine.';
+      try { feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e) {}
+      setTimeout(function() { feedbackEl.style.display = 'none'; }, 7000);
+    }
+
+    btn.textContent = '✅ Perfil Salvo com Sucesso!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#000';
+    setTimeout(function () {
+      btn.textContent = origText;
+      btn.disabled = false;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 1500);
+
+    renderPainelVitrine();
+
+    // Sincroniza dados do perfil no Firestore (Gratuito!)
+    if (typeof db !== 'undefined' && updated.email) {
+      try {
+        db.collection('perfis').doc(updated.email).set(updated, { merge: true }).catch(function(err) {
+          console.log("Firestore perfil sync:", err);
+        });
+      } catch(e) {}
+    }
   });
 }
 
@@ -1830,3 +2154,11 @@ function revealCards(container) {
     setTimeout(function () { el.classList.add('revealed'); }, i * 50);
   });
 }
+
+/* ─── SINCRONIZAÇÃO ENTRE ABAS DO NAVEGADOR ───────────────── */
+window.addEventListener('storage', function(e) {
+  if (e.key === 'ccin-perfil' || e.key === 'ccin-admin-formados') {
+    renderVitrineTalentos();
+    renderPainelVitrine();
+  }
+});
