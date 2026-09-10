@@ -1,68 +1,66 @@
-# Design System — Faculdade Inspirar
+# Design System — Conexão Inspirar
 
-Documento de referência para construir novas páginas mantendo consistência visual com o site atual. Todos os valores abaixo foram extraídos diretamente do CSS em produção (`public/css/style.css`).
+Documento de referência para construir novas páginas mantendo consistência visual com a plataforma. Todos os valores abaixo foram alinhados diretamente no CSS (`css/design-system.css` e `css/portal.css`).
 
-Stack do projeto: HTML + CSS puro + JavaScript vanilla (sem framework, sem bundler). Servidor Express estático (`server.js`). Não há React, Vue ou similar — os componentes interativos são implementados como IIFEs em `public/js/main.js`.
+Stack do projeto: HTML + CSS puro + JavaScript vanilla (sem framework, sem bundler). Os componentes interativos são implementados como IIFEs em `js/design-system.js`.
 
 ---
 
 ## 1. Princípios
 
-- **Dark-first**: o tema escuro é o padrão. Existe um tema claro alternável via `[data-theme="light"]` no `<html>`, com paleta paralela para cada token.
-- **Glassmorphism sóbrio**: cards e navbar usam fundo semitransparente + `backdrop-filter: blur()`, nunca opaco.
-- **Verde como único acento**: um único hue de acento (verde-lima) carrega toda a marca. Não introduzir outras cores de destaque (azul, roxo, laranja) sem alinhar antes.
-- **Tipografia mista**: sans-serif (Inter) para o corpo e para a maior parte dos títulos; serif itálico (Cormorant Garamond) só para palavras de destaque dentro de títulos (`<em>`).
-- **Sem travessão, sem clichê de IA no texto**: ver seção 9 (Voz e tom).
-- **Motion sutil**: transições de 0.2–0.6s, easing suave, sem exageros. Respeitar `prefers-reduced-motion`.
+- **Light-first**: o modo claro é o padrão institucional (`data-theme="light"` como padrão na tag `<html>`). O tema escuro é alternável via botão de tema (`#themeToggle`) e persiste no `localStorage` via `[data-theme="dark"]`.
+- **Cores Oficiais (Azul & Roxo)**:
+  - **Azul Primário**: `#6998ff`
+  - **Roxo Primário**: `#7c3aed`
+  - **Gradiente da Marca**: `linear-gradient(135deg, #6998ff 0%, #7c3aed 100%)`
+- **Uso das Logos**:
+  - `Logo-Preta.png`: utilizada em fundos claros (Modo Claro).
+  - `Logo-Branca.png`: utilizada em fundos escuros (Modo Escuro).
+  - Implementação via classes responsivas: `.logo-img--light` (exibida no modo claro) e `.logo-img--dark` (exibida no `[data-theme="dark"]`).
+- **Glassmorphism sóbrio**: cards e navbar usam fundo translúcido suave + `backdrop-filter: blur()`, garantindo leveza e modernidade.
+- **Tipografia mista**: sans-serif (Inter) para corpo e UI; serif itálico (Cormorant Garamond) para palavras de destaque dentro de títulos (`<em>`).
+- **Motion sutil**: transições de 0.2–0.4s com easing suave. Respeitar `prefers-reduced-motion`.
 
 ---
 
 ## 2. Cores
 
-### Tema escuro (padrão)
+### Tema Claro (Padrão Institucional)
 
 | Token | Valor | Uso |
 |---|---|---|
-| `--bg` | `#080808` | Fundo geral da página |
-| `--bg-card` | `rgba(8,10,8,0.55)` | Fundo de cards translúcidos |
-| `--bg-card-alt` | `rgba(8,14,8,0.60)` | Variante de fundo de card |
-| `--bg-footer` | `#080808` | Fundo do rodapé (card interno) |
-| `--green` | `#9be15d` | Cor de marca / acento principal |
-| `--green-dark` | `#06140a` | Texto sobre fundo verde (botões primários) |
-| `--green-glow` | `rgba(155,225,93,0.6)` | Sombras/glow do acento |
-| `--green-subtle` | `rgba(155,225,93,0.08)` | Fundo sutil com tom de marca |
-| `--green-border` | `rgba(155,225,93,0.25)` | Bordas com tom de marca |
-| `--green-text` | `#b7e89a` | Texto em tom de marca (eyebrows, links) |
-| `--text-primary` | `#f7f9f6` | Texto principal |
-| `--text-secondary` | `#9aa39a` | Texto secundário / parágrafos |
-| `--text-muted` | `#8b928b` | Texto apagado |
-| `--text-dim` | `#7d847d` | Texto mais apagado ainda (labels, legendas) |
-| `--text-nav` | `#b8beb8` | Links de navegação |
-| `--text-card` | `#c9cfc9` | Texto dentro de cards |
-| `--text-heading` | `#f2f5f0` | Títulos |
-| `--border-subtle` | `rgba(255,255,255,0.08)` | Borda padrão de card |
-| `--border-mid` | `rgba(255,255,255,0.10)` | Borda média (inputs, botões outline) |
-| `--border-strong` | `rgba(255,255,255,0.14)` | Borda forte (botão ghost) |
+| `--primary-blue` | `#6998ff` | Azul principal de destaque |
+| `--primary-purple` | `#7c3aed` | Roxo complementar de destaque |
+| `--brand-gradient` | `linear-gradient(135deg, #6998ff 0%, #7c3aed 100%)` | Gradiente dos botões primários e detalhes |
+| `--bg` | `#f8fafc` | Fundo principal da página |
+| `--bg-card` | `rgba(255, 255, 255, 0.95)` | Fundo de cards em vidro claro |
+| `--bg-card-alt` | `rgba(241, 245, 255, 0.90)` | Variante de card com leve tom azulado |
+| `--bg-footer` | `#f1f5f9` | Fundo do rodapé |
+| `--text-primary` | `#0f172a` | Texto principal (Slate 900) |
+| `--text-secondary` | `#475569` | Texto secundário / parágrafos (Slate 600) |
+| `--text-muted` | `#64748b` | Texto atenuado |
+| `--text-dim` | `#94a3b8` | Texto para legendas e metadados |
+| `--text-heading` | `#0f172a` | Títulos e ênfases |
+| `--border-subtle` | `rgba(105, 152, 255, 0.12)` | Borda padrão de card |
+| `--border-mid` | `rgba(105, 152, 255, 0.22)` | Borda média (inputs, foco) |
+| `--border-strong` | `rgba(124, 58, 237, 0.30)` | Borda destacada |
 
-### Tema claro (`[data-theme="light"]`)
+### Tema Escuro (`[data-theme="dark"]`)
 
 | Token | Valor |
 |---|---|
-| `--bg` | `#f5f7f4` |
-| `--bg-card` | `rgba(255,255,255,0.88)` |
-| `--bg-card-alt` | `rgba(240,248,232,0.95)` |
-| `--bg-footer` | `#e4eae4` |
-| `--green-text` | `#4a8010` |
-| `--text-primary` | `#0b160b` |
-| `--text-secondary` | `#4a5c4a` |
-| `--text-muted` | `#6a7a6a` |
-| `--text-dim` | `#7a8a7a` |
-| `--text-nav` | `#2a3a2a` |
-| `--text-card` | `#2a3a2a` |
-| `--text-heading` | `#091209` |
-| `--border-subtle` | `rgba(0,0,0,0.07)` |
-| `--border-mid` | `rgba(0,0,0,0.10)` |
-| `--border-strong` | `rgba(0,0,0,0.15)` |
+| `--bg` | `#090b11` |
+| `--bg-card` | `rgba(15, 18, 28, 0.75)` |
+| `--bg-card-alt` | `rgba(20, 24, 38, 0.85)` |
+| `--bg-footer` | `#06070a` |
+| `--text-primary` | `#f1f5f9` |
+| `--text-secondary` | `#94a3b8` |
+| `--text-muted` | `#64748b` |
+| `--text-dim` | `#475569` |
+| `--text-heading` | `#f8fafc` |
+| `--border-subtle` | `rgba(255, 255, 255, 0.08)` |
+| `--border-mid` | `rgba(105, 152, 255, 0.25)` |
+| `--border-strong` | `rgba(124, 58, 237, 0.35)` |
 
 `--green` (`#9be15d`) e `--green-dark` (`#06140a`) **não mudam** entre temas — o verde de marca é fixo.
 
@@ -160,26 +158,26 @@ Stack do projeto: HTML + CSS puro + JavaScript vanilla (sem framework, sem bundl
 
 Quatro variantes, todas `border-radius: var(--radius-pill)`, `display: inline-flex; align-items:center; gap:9px`:
 
-**Primário** (`.btn-primary`) — CTA principal, fundo verde sólido:
+**Primário** (`.btn-primary`) — CTA principal, com o gradiente da marca e texto branco:
 ```css
-padding: 15px 26px; color: var(--green-dark); font-weight: 700; font-size: 15.5px;
-background: var(--green); box-shadow: 0 12px 36px -10px rgba(155,225,93,0.7);
+padding: 15px 26px; color: #ffffff; font-weight: 700; font-size: 15.5px;
+background: var(--brand-gradient); box-shadow: 0 10px 28px -6px rgba(105, 152, 255, 0.45);
 ```
-Hover: `box-shadow: 0 16px 50px -6px rgba(155,225,93,1); transform: translateY(-2px);`
+Hover: `box-shadow: 0 14px 36px -4px rgba(124, 58, 237, 0.55); transform: translateY(-2px);`
 
 **Ghost** (`.btn-ghost`) — CTA secundário, contorno + fundo translúcido:
 ```css
-padding: 15px 26px; color: #e8ece8; font-weight: 600; font-size: 15.5px;
-border: 1px solid var(--border-strong); background: rgba(255,255,255,0.04); backdrop-filter: blur(8px);
+padding: 15px 26px; color: var(--text-primary); font-weight: 600; font-size: 15.5px;
+border: 1px solid var(--border-strong); background: var(--bg-card); backdrop-filter: blur(8px);
 ```
-Hover: borda e fundo ficam mais opacos.
+Hover: borda e fundo ganham tom azul translúcido.
 
 **Outline** (`.btn-outline`) — ação terciária ("ver mais"):
 ```css
-padding: 13px 26px; color: #e8ece8; font-weight: 600; font-size: 15px;
-border: 1px solid var(--border-strong); background: rgba(255,255,255,0.02);
+padding: 13px 26px; color: var(--text-primary); font-weight: 600; font-size: 15px;
+border: 1px solid var(--border-mid); background: transparent;
 ```
-Hover: borda/fundo ganham tom verde (`rgba(155,225,93,0.4)` / `rgba(155,225,93,0.05)`).
+Hover: borda e texto ganham tom azul (`var(--primary-blue)`).
 
 **Link** (`.btn-link`) — link com seta, sem fundo/borda, usado em cabeçalhos de seção ("Ver todos →").
 

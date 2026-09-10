@@ -1,15 +1,21 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Conexão Inspirar — O ecossistema de carreiras, vagas e conexões</title>
   <meta name="description" content="Portal exclusivo que conecta alunos e formados da Faculdade Inspirar às melhores oportunidades no Brasil, EAD e Polo Luanda (Angola).">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('inspirar-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/design-system.css?v=3.2.0">
-  <link rel="stylesheet" href="css/portal.css?v=3.2.0">
+  <link rel="stylesheet" href="css/design-system.css?v=4.0.0">
+  <link rel="stylesheet" href="css/portal.css?v=4.2.0">
 </head>
 <body>
 
@@ -17,8 +23,9 @@
 <div class="navbar" id="navbar">
   <div class="navbar__inner">
     <a href="index.html" class="navbar__logo">
-      <span class="navbar__logo-dot"></span>
-      Conexão Inspirar
+      <img src="Logo-Preta.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+      <img src="Logo-Branca.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+      <span>Conexão Inspirar</span>
     </a>
     <nav class="navbar__links">
       <a href="#como-funciona">Como funciona</a>
@@ -374,8 +381,9 @@
     <div class="footer-top">
       <div class="footer-brand">
         <div class="footer-brand__name">
-          <span class="navbar__logo-dot"></span>
-          Conexão Inspirar
+          <img src="Logo-Preta.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+          <img src="Logo-Branca.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+          <span>Conexão Inspirar</span>
         </div>
         <p class="footer-brand__desc">O ecossistema oficial de carreiras, vagas e empregabilidade para alunos e formados da Faculdade Inspirar no Brasil e no mundo.</p>
       </div>
@@ -402,8 +410,8 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=3.2.0"></script>
-<script src="js/design-system.js?v=3.2.0"></script>
-<script src="js/portal.js?v=3.2.0"></script>
+<script src="js/firebase-config.js?v=4.0.0"></script>
+<script src="js/design-system.js?v=4.0.0"></script>
+<script src="js/portal.js?v=4.0.0"></script>
 </body>
 </html>

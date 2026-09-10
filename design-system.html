@@ -1,13 +1,19 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Design System — Faculdade Inspirar</title>
+<script>
+  (function() {
+    var saved = localStorage.getItem('inspirar-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/design-system.css?v=4.0.0">
 <style>
   /* Estilos só desta página de showcase (não fazem parte do design system) */
   .ds-block { position: relative; z-index: 1; padding: 64px 32px; max-width: var(--max-w); margin: 0 auto; }
@@ -41,7 +47,11 @@
 <!-- ========== NAVBAR ========== -->
 <div class="navbar">
   <div class="navbar__inner">
-    <div class="navbar__logo">Faculdade Inspirar</div>
+    <div class="navbar__logo">
+      <img src="Logo-Preta.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+      <img src="Logo-Branca.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+      <span>Conexão Inspirar</span>
+    </div>
     <nav class="navbar__links">
       <a href="#cores">Cores</a>
       <a href="#tipografia">Tipografia</a>
@@ -51,10 +61,8 @@
       <a href="#stack">Timeline</a>
     </nav>
     <div class="navbar__actions">
-      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-      <a href="#" class="btn-primary" style="padding:10px 18px;font-size:13.5px">Matricular-se</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
+      <a href="#" class="btn-primary" style="padding:10px 18px;font-size:13.5px">Área do Aluno →</a>
     </div>
   </div>
 </div>
@@ -66,8 +74,8 @@
   </div>
   <div class="ds-hero__inner">
     <span class="ds-block__label">Design System</span>
-    <h1 class="hero-title">Página genérica<br>com o design <em>system</em> aplicado</h1>
-    <p class="hero-sub">Use esta página como referência viva de todos os componentes, tokens e padrões de interação do site da Faculdade Inspirar. Copie o HTML/CSS direto daqui.</p>
+    <h1 class="hero-title">Conexão Inspirar<br><em>Design System</em> Oficial</h1>
+    <p class="hero-sub">Padrões de interface, componentes acessíveis e tokens visuais com cores oficiais: Azul <code>#6998ff</code> e Roxo <code>#7c3aed</code>.</p>
     <div class="ds-row">
       <a href="#cores" class="btn-primary">Ver componentes →</a>
       <a href="#formulario" class="btn-ghost">Ir para o formulário</a>
@@ -80,17 +88,17 @@
 <!-- ========== CORES ========== -->
 <section class="ds-block" id="cores">
   <span class="ds-block__label">01 · Cores</span>
-  <h2 class="ds-block__title">Paleta</h2>
-  <p class="ds-block__desc">Tokens em <code>:root</code> (tema escuro, padrão) — os mesmos nomes existem no tema claro via <code>[data-theme="light"]</code>, com valores diferentes. Nunca usar hex direto num componente.</p>
+  <h2 class="ds-block__title">Paleta de Cores</h2>
+  <p class="ds-block__desc">Tokens em <code>:root</code> com <strong>Modo Claro como padrão</strong> e suporte instantâneo ao Modo Escuro via <code>[data-theme="dark"]</code>.</p>
   <div class="ds-grid-4">
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#9be15d"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green</div><div class="ds-swatch__hex">#9be15d</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#06140a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-dark</div><div class="ds-swatch__hex">#06140a</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#080808"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--bg</div><div class="ds-swatch__hex">#080808</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#f7f9f6"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--text-primary</div><div class="ds-swatch__hex">#f7f9f6</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#9aa39a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--text-secondary</div><div class="ds-swatch__hex">#9aa39a</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#b7e89a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-text</div><div class="ds-swatch__hex">#b7e89a</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(155,225,93,0.25);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--green-border</div><div class="ds-swatch__hex">25% opacidade</div></div></div>
-    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(255,255,255,0.08);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--border-subtle</div><div class="ds-swatch__hex">8% opacidade</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#6998ff"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--primary-blue</div><div class="ds-swatch__hex">#6998ff</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#7c3aed"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--primary-purple</div><div class="ds-swatch__hex">#7c3aed</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:linear-gradient(135deg, #6998ff 0%, #7c3aed 100%)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--brand-gradient</div><div class="ds-swatch__hex">Azul → Roxo</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#f8fafc;border:1px solid #cbd5e1"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--bg (Claro)</div><div class="ds-swatch__hex">#f8fafc</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#090b11"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--bg (Escuro)</div><div class="ds-swatch__hex">#090b11</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:#0f172a"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--text-primary (Claro)</div><div class="ds-swatch__hex">#0f172a</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(105,152,255,0.25);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--border-mid</div><div class="ds-swatch__hex">25% opacidade</div></div></div>
+    <div class="ds-swatch"><div class="ds-swatch__color" style="background:rgba(105,152,255,0.08);border:1px dashed var(--border-mid)"></div><div class="ds-swatch__meta"><div class="ds-swatch__name">--border-subtle</div><div class="ds-swatch__hex">8% opacidade</div></div></div>
   </div>
 </section>
 
@@ -329,6 +337,6 @@
   </div>
 </div>
 
-<script src="js/design-system.js"></script>
+<script src="js/design-system.js?v=4.0.0"></script>
 </body>
 </html>

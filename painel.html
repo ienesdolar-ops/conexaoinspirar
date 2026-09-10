@@ -1,15 +1,21 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meu Painel — Conexão Inspirar</title>
   <meta name="description" content="Painel exclusivo do aluno e formado da Faculdade Inspirar. Vagas, candidaturas e conexões profissionais.">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('inspirar-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/design-system.css?v=3.2.0">
-  <link rel="stylesheet" href="css/portal.css?v=3.2.0">
+  <link rel="stylesheet" href="css/design-system.css?v=4.0.0">
+  <link rel="stylesheet" href="css/portal.css?v=4.2.0">
 </head>
 <body id="painelApp">
 
@@ -17,8 +23,9 @@
 <aside class="painel__sidebar" id="painelSidebar">
   <div class="painel__sidebar-header">
     <a href="index.html" class="painel__sidebar-logo">
-      <span class="navbar__logo-dot"></span>
-      Conexão Inspirar
+      <img src="Logo-Preta.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+      <img src="Logo-Branca.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+      <span>Conexão Inspirar</span>
     </a>
 
     <!-- Card do Usuário -->
@@ -86,10 +93,11 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="painel__mobile-logo">
-      <span style="display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px">
-        <span class="navbar__logo-dot"></span>
-        Conexão Inspirar
-      </span>
+      <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text-heading);text-decoration:none">
+        <img src="Logo-Preta.png" alt="Conexão Inspirar" class="logo-img logo-img--light" style="width:28px;height:28px">
+        <img src="Logo-Branca.png" alt="Conexão Inspirar" class="logo-img logo-img--dark" style="width:28px;height:28px">
+        <span>Conexão Inspirar</span>
+      </a>
     </div>
   </div>
 
@@ -462,8 +470,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-<script src="js/firebase-config.js?v=3.2.0"></script>
-<script src="js/design-system.js?v=3.2.0"></script>
-<script src="js/portal.js?v=3.2.0"></script>
+<script src="js/firebase-config.js?v=4.0.0"></script>
+<script src="js/design-system.js?v=4.0.0"></script>
+<script src="js/portal.js?v=4.0.0"></script>
 </body>
 </html>
