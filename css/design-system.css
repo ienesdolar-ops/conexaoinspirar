@@ -303,14 +303,15 @@ code {
   line-height: 1;
 }
 .logo-img {
-  height: 36px;
-  width: 36px;
+  height: 38px;
+  width: auto;
+  max-width: 175px;
   object-fit: contain;
   flex-shrink: 0;
   transition: transform 0.25s ease;
 }
 .navbar__logo:hover .logo-img {
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 /* Modo Claro (padrão): Exibe Logo Preta */
 .logo-img--light { display: block; }
