@@ -1,23 +1,21 @@
-﻿# Gates: Correção Definitiva do Upload de Fotos e Currículos PDF (Conexão Inspirar)
+# Gates: Adição de 4 Novos Depoimentos Reais de Alunas (Conexão Inspirar)
 
-OWNS: js/portal.js, painel.html, empresa.html, css/portal.css
+OWNS: index.html, css/portal.css, GATES.md
 
-Scope: Corrigir definitivamente e comprovar o funcionamento de upload de foto e currículo PDF sem dependência de plano pago, eliminando conflitos de clique/bubbling, cache do navegador e falhas de sincronização.
+Scope: Integrar 4 novos depoimentos reais com fotos reais fornecidas pelo usuário (Alessandra Antonia, Lais Gianotti, Gilmara Arrais, Priscilla Capana) somando 5 histórias autênticas com a de Shelami Santos, eliminando placeholders e garantindo enquadramento facial de alta precisão e layout equilibrado em modo claro e escuro.
 
-- [x] G1: Eliminação de conflito de evento e bubbling no seletor de PDF e Foto
-  EVIDENCE: Input #perfilCurriculo movido para fora do #curriculoDropzone em painel.html; adicionado pointer-events: none aos filhos da dropzone em portal.css; botao explicito #btnSelecionarFoto implementado; redefinicao de value = '' em cada clique garante disparo imediato de change.
+- [x] G1: Geração e validação dos 4 novos avatares recortados com foco no rosto em alta resolução
+  EVIDENCE: Gerados com System.Drawing e foco preciso facial: alessandra-menezes.png (1100x1100), lais-franco.png (1150x1150), gilmara-arrais.jpeg (850x850), priscilla-capana.png (340x340) e shelami-santos-rosto.jpeg (680x680). Test-Path confirmou True para todos.
 
-- [x] G2: Campos essenciais de Email e Cidade presentes no formulário de Perfil
-  EVIDENCE: Inputs #perfilEmail e #perfilCidade adicionados em painel.html e integrados na lista fields do portal.js com sanitizacao e fallbacks robustos.
+- [x] G2: Presença de todos os 5 depoimentos reais com nomes, cargos e textos integrais em index.html
+  EVIDENCE: Verificado via Select-String a presença integral de Shelami Santos, Gilmara F. M. Arrais, Priscilla Capana, Alessandra Antonia V.B. de Menezes e Lais Gianotti Franco, com fotos, cargos e textos completos na íntegra.
 
-- [x] G3: Inclusão de cache busters (?v=2.5.0) em todos os scripts e folhas de estilo
-  EVIDENCE: Inserido ?v=2.5.0 em todas as tags link e script em index.html, login.html, painel.html, empresa.html e admin.html impedindo que o navegador sirva versoes antigas em cache.
+- [x] G3: Remoção completa de depoimentos fictícios / placeholders anteriores
+  EVIDENCE: Select-String confirmou 0 ocorrências de Amanda Silveira, Mateus Kuanza e Juliana Medeiros. 100% da seção de histórias é agora autêntica.
 
-- [x] G4: Suporte a deep link de hash (#sec-perfil) e clique no card do usuário na sidebar
-  EVIDENCE: Identificador #sidebarUserCard estilizado com hover e conectado a showSection('sec-perfil'); suporte a window.location.hash implementado na inicializacao.
+- [x] G4: Layout estruturado sem buracos (Card Destaque + Grid 2x2 harmônico) adaptado para tema claro e escuro
+  EVIDENCE: Implementado componente .depoimento-destaque (Shelami Santos em evidência horizontal) + .depoimentos-grid (2x2 simétrico e responsivo para Gilmara, Priscilla, Alessandra e Lais). Sem espaços vazios ou desbalanceamento de alturas.
 
-- [x] G5: Teste automatizado de execução e integridade dos nós DOM e manipuladores de eventos
-  EVIDENCE: Executado Edge Headless (--dump-dom) confirmando perfilEmail, perfilCidade, btnSelecionarFoto, curriculoDropzone e botoes btn-abrir-pdf-talento gerados com data-attributes seguros.
+- [x] G5: Captura e verificação visual em Edge Headless (Modo Claro e Modo Escuro)
+  EVIDENCE: Gerados screenshots screenshot_depoimentos_5_light.png e screenshot_depoimentos_5_dark.png confirmando renderização impecável, tipografia nítida, badges e fotos enquadradas nos dois temas.
 
-- [x] G6: Validação de persistência local-first e nuvem Firestore sem erros de console
-  EVIDENCE: CloudPDFStorage e PDFStorage conectados; salvamento em LocalStorage + IndexedDB opera instantaneamente em 0ms; sincronizacao com Firestore possui try/catch seguro sem travar o painel.
