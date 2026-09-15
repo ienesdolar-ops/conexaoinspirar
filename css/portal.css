@@ -497,18 +497,21 @@
 }
 
 /* â”€â”€â”€ LOGIN PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.login-page {
-  min-height: 100vh;
+.login-page,
+.login-section {
+  min-height: calc(100vh - 120px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px;
+  padding: 100px 24px 60px;
   position: relative;
+  width: 100%;
 }
 .login-card {
   width: 100%;
-  max-width: 440px;
-  padding: 52px 44px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 44px 40px;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
   background: var(--bg-card);
@@ -516,7 +519,7 @@
   -webkit-backdrop-filter: var(--blur-card);
   box-shadow: 0 20px 50px -16px rgba(105,152,255,0.15), 0 0 0 1px rgba(105,152,255,0.1);
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 [data-theme="dark"] .login-card {
   box-shadow: 0 24px 60px -20px rgba(0,0,0,0.75), 0 0 0 1px rgba(105,152,255,0.12);
@@ -543,8 +546,19 @@
   margin-bottom: 32px;
   line-height: 1.55;
 }
-.password-field { position: relative; }
-.password-field .form-input { padding-right: 44px; }
+.pwd-input-wrap,
+.password-field {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.pwd-input-wrap .form-input,
+.password-field .form-input {
+  width: 100%;
+  padding-right: 44px;
+}
+.pwd-toggle-btn,
 .password-toggle {
   position: absolute;
   right: 12px;
@@ -555,10 +569,17 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
   transition: color 0.2s;
-  padding: 4px;
+  z-index: 2;
 }
-.password-toggle:hover { color: var(--text-secondary); }
+.pwd-toggle-btn:hover,
+.password-toggle:hover {
+  color: var(--primary-blue);
+}
 .login-demo {
   margin-top: 20px;
   padding: 14px 16px;
@@ -582,6 +603,117 @@
 }
 .login-back:hover { color: var(--text-primary); }
 .login-back svg { flex-shrink: 0; }
+
+/* Abas e Componentes de Autenticação na Nuvem */
+.login-tabs {
+  display: flex;
+  background: var(--bg-card-alt);
+  padding: 5px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+  gap: 4px;
+}
+.login-tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.login-tab-btn:hover {
+  color: var(--text-heading);
+}
+.login-tab-btn.active {
+  background: var(--brand-gradient);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(105, 152, 255, 0.35);
+}
+.login-pane {
+  display: none;
+  animation: fadeInPane 0.25s ease forwards;
+}
+.login-pane.active {
+  display: block;
+}
+@keyframes fadeInPane {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.auth-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.auth-alert--error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+[data-theme="dark"] .auth-alert--error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+.auth-alert--success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #059669;
+}
+[data-theme="dark"] .auth-alert--success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+.cloud-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  margin-top: 18px;
+}
+.cloud-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+}
+.demo-fill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--primary-blue);
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.demo-fill-btn:hover {
+  color: var(--primary-purple);
+}
 
 /* â”€â”€â”€ PAINEL LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .painel-layout {

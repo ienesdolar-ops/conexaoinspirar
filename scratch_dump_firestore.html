@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dump Firestore</title>
+</head>
+<body>
+  <pre id="output">Consultando Firestore...</pre>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script>
+    var out = document.getElementById('output');
+    function log(m) { out.textContent += '\n' + m; }
+
+    async function run() {
+      try {
+        log('=== USUARIOS ===');
+        var uSnap = await db.collection('usuarios').get();
+        log('Total usuarios: ' + uSnap.size);
+        uSnap.forEach(function(d) {
+          var data = d.data();
+          log('User [' + d.id + ']: nome=' + data.nome + ', senha=' + data.senha);
+        });
+
+        log('\n=== PERFIS ===');
+        var pSnap = await db.collection('perfis').get();
+        log('Total perfis: ' + pSnap.size);
+        pSnap.forEach(function(d) {
+          var data = d.data();
+          log('Perfil [' + d.id + ']: nome=' + data.nome + ', fotoUrl=' + (data.fotoUrl ? (data.fotoUrl.startsWith('data:') ? 'base64 (' + data.fotoUrl.length + ' chars)' : data.fotoUrl) : 'VAZIO') + ', curriculoNome=' + data.curriculoNome + ', updatedAt=' + data.updatedAt);
+        });
+
+        log('\n=== CURRICULOS_PDF ===');
+        var cSnap = await db.collection('curriculos_pdf').get();
+        log('Total curriculos_pdf: ' + cSnap.size);
+        cSnap.forEach(function(d) {
+          var data = d.data();
+          log('PDF [' + d.id + ']: nome=' + data.nome + ', tamanho=' + data.tamanho + ', isChunked=' + data.isChunked + ', dataUri length=' + (data.dataUri ? data.dataUri.length : 0));
+        });
+
+        log('\n=== FIM DO DUMP ===');
+      } catch (err) {
+        log('ERRO: ' + err.message);
+      }
+    }
+    run();
+  </script>
+</body>
+</html>
