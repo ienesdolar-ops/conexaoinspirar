@@ -34,10 +34,10 @@
     <div class="navbar__actions">
       <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
       <a href="login.html" class="btn-primary" style="padding:10px 20px;font-size:13.5px">Área do Aluno →</a>
+      <button class="navbar__hamburger" id="navHamburger" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <button class="navbar__hamburger" id="navHamburger" aria-label="Abrir menu">
-      <span></span><span></span><span></span>
-    </button>
   </div>
 </div>
 <div class="navbar__mobile-menu" id="mobileMenu">
@@ -281,150 +281,150 @@
       <p class="section__sub" style="margin-top:12px">Depoimentos de quem conquistou estágios e posições de liderança através do ecossistema Conexão Inspirar.</p>
     </div>
 
-    <!-- Depoimento em Destaque: Shelami Santos -->
-    <div class="depoimento-destaque" data-reveal>
-      <div class="depoimento-destaque__autor">
-        <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;padding:4px 12px;border-radius:20px;background:rgba(105,152,255,0.15);color:var(--primary-blue);border:1px solid rgba(105,152,255,0.3)">
-          ★ História em Destaque
-        </span>
-        <img src="shelami-santos-rosto.jpeg" style="width:76px;height:76px;border-radius:50%;object-fit:cover;object-position:center;border:3px solid var(--primary-blue);box-shadow:0 6px 20px rgba(105,152,255,0.35)" alt="Shelami Santos">
-        <div>
-          <div style="font-size:16px;font-weight:700;color:var(--text-heading);display:flex;align-items:center;justify-content:center;gap:6px">
-            Shelami Santos
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          </div>
-          <div style="font-size:13px;color:var(--primary-blue);font-weight:600;margin-top:2px">Coordenadora no Hospital Vita Batel</div>
-          <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Fisioterapeuta Intensivista · Pós Inspirar</div>
+    <!-- Carrossel de Depoimentos Reais -->
+    <div class="depoimentos-carousel" data-reveal>
+      
+      <!-- Barra Superior com Controles e Contador -->
+      <div class="depoimentos-header-bar">
+        <div class="depoimentos-counter">
+          <span style="color:var(--primary-blue);display:inline-flex;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          <span>5 Histórias Reais Verificadas</span>
         </div>
-        <div style="display:flex;align-items:center;gap:4px;color:#ffc107;font-size:15px">
-          ★ ★ ★ ★ ★
-        </div>
-      </div>
-      <div>
-        <p style="font-size:16px;font-weight:700;color:var(--text-heading);line-height:1.45;margin-bottom:12px">
-          "De técnica de enfermagem a coordenadora no Hospital Vita Batel, a Inspirar e a Profisio foi o divisor de águas na minha vida."
-        </p>
-        <p class="feature-card__text" style="font-style:italic;font-size:14px;line-height:1.7;color:var(--text-primary)">
-          "A Pós em Terapia Intensiva Treinamento em Serviço foi a base de tudo: em plena pandemia, passei por hospitais como o de Reabilitação, HT, Osvaldo Cruz e Vita, aprendendo na prática a ser a fisioterapeuta intensivista que sou hoje. Mais do que abrir portas no mercado, a Inspirar e a Profisio acreditaram no meu potencial em cada etapa, oferecendo capacitação contínua e um suporte humano incrível das lideranças. Hoje, assumir essa posição de liderança junto à empresa que me formou é a realização de um ciclo de muita dedicação e gratidão. Que orgulho imenso de ser Inspirar e Profisiana!"
-        </p>
-      </div>
-    </div>
-
-    <!-- Grid com os 4 Novos Depoimentos Reais -->
-    <div class="depoimentos-grid">
-
-      <!-- Card 1: Gilmara F. M. Arrais -->
-      <div class="feature-card" data-reveal data-delay="0" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:4px;color:#ffc107;font-size:14px">
-              ★ ★ ★ ★ ★
-            </div>
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;background:rgba(105,152,255,0.12);color:var(--primary-blue);border:1px solid rgba(105,152,255,0.28)">
-              Linha de Frente UTI
-            </span>
-          </div>
-          <p class="feature-card__text" style="font-style:italic;font-size:13.5px;line-height:1.68;color:var(--text-primary)">
-            "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A Pós-Graduação em Terapia Intensiva me ensinou muito mais do que técnica, me ensinou propósito.</strong> Minha trajetória na UTI ganhou um significado ainda mais profundo durante meu treinamento em serviço pela Inspirar, um período que abriu portas para um universo de conhecimento, prática e crescimento profissional. Foi ali que deixei de apenas estudar a fisioterapia intensiva e passei a vivê-la de forma real, intensa e transformadora.<br><br>Atuar na UTI em meio à pandemia de COVID-19 foi um dos maiores desafios da minha vida e também um dos maiores aprendizados. Estar na linha de frente me trouxe experiência, maturidade e um olhar ainda mais humano sobre cada paciente. Aprendi a lidar com a imprevisibilidade, a valorizar cada pequena evolução e, acima de tudo, a entender o verdadeiro impacto do nosso trabalho.<br><br>Hoje, carrego comigo não apenas um currículo fortalecido, mas histórias, vivências e a certeza de que cada atendimento pode transformar uma vida. E quando falamos de terapia intensiva, muitas vezes estamos falando de devolver o bem mais precioso: a chance de respirar, de viver, de recomeçar. Tenho orgulho da profissional que me tornei, construída com dedicação, resiliência e amor pelo que faço."
-          </p>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-subtle)">
-          <img src="gilmara-arrais.jpeg" style="width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center;border:2px solid var(--primary-blue);box-shadow:0 3px 12px rgba(105,152,255,0.28);flex-shrink:0" alt="Gilmara F. M. Arrais">
-          <div style="min-width:0">
-            <div style="font-size:14px;font-weight:700;color:var(--text-heading);display:flex;align-items:center;gap:6px">
-              Gilmara F. M. Arrais
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div style="font-size:12px;color:var(--primary-blue);font-weight:600">Fisioterapeuta Intensivista</div>
-            <div style="font-size:11px;color:var(--text-muted)">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
-          </div>
+        <div class="depoimentos-controls">
+          <button class="depoimentos-btn depoimentos-btn--prev" id="depoimentosPrev" aria-label="Depoimento anterior">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="depoimentos-dots" id="depoimentosDots"></div>
+          <button class="depoimentos-btn depoimentos-btn--next" id="depoimentosNext" aria-label="Próximo depoimento">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
         </div>
       </div>
 
-      <!-- Card 2: Priscilla Capana -->
-      <div class="feature-card" data-reveal data-delay="100" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:4px;color:#ffc107;font-size:14px">
-              ★ ★ ★ ★ ★
-            </div>
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;background:rgba(105,152,255,0.12);color:var(--primary-blue);border:1px solid rgba(105,152,255,0.28)">
-              Liderança & Gestão
-            </span>
-          </div>
-          <p class="feature-card__text" style="font-style:italic;font-size:13.5px;line-height:1.68;color:var(--text-primary)">
-            "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">Escolher a Pós-Graduação na Faculdade Inspirar foi uma escolha que transformou profundamente minha trajetória</strong>, ampliando meu olhar clínico, fortalecendo minha segurança profissional e abrindo inúmeras portas ao longo do caminho.<br><br>A formação também expandiu minhas possibilidades de atuação, permitindo vivências não só na UTI, mas também na enfermaria hospitalar e no atendimento home care, o que trouxe ainda mais versatilidade e maturidade para a minha prática. Hoje, iniciando na coordenação, tenho ainda mais clareza do quanto essa especialização foi essencial para a profissional que me tornei.<br><br>Após toda a vivência prática e os desafios enfrentados na rotina clínica, compreendi a real necessidade de buscar uma especialização. Foi nesse momento que encontrei uma formação que me proporcionou não apenas conhecimento técnico, mas também pensamento crítico, segurança e autonomia. Essa especialização me deu todas as ferramentas necessárias para uma atuação mais completa e segura como fisioterapeuta, impactando diretamente na qualidade do cuidado que entrego aos meus pacientes. Gratidão por todo o aprendizado!"
-          </p>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-subtle)">
-          <img src="priscilla-capana.png" style="width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center;border:2px solid var(--primary-blue);box-shadow:0 3px 12px rgba(105,152,255,0.28);flex-shrink:0" alt="Priscilla Capana">
-          <div style="min-width:0">
-            <div style="font-size:14px;font-weight:700;color:var(--text-heading);display:flex;align-items:center;gap:6px">
-              Priscilla Capana
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div style="font-size:12px;color:var(--primary-blue);font-weight:600">Fisioterapeuta Intensivista e Coordenadora</div>
-            <div style="font-size:11px;color:var(--text-muted)">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
-          </div>
-        </div>
-      </div>
+      <!-- Trilha Deslizante do Carrossel (Scroll Snap Horizontal) -->
+      <div class="depoimentos-track" id="depoimentosTrack">
 
-      <!-- Card 3: Alessandra Antonia V.B. de Menezes -->
-      <div class="feature-card" data-reveal data-delay="150" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:4px;color:#ffc107;font-size:14px">
-              ★ ★ ★ ★ ★
+        <!-- Card 1: Shelami Santos (Destaque) -->
+        <div class="depoimento-card depoimento-card--destaque">
+          <div class="depoimento-card__header">
+            <img src="shelami-santos-rosto.jpeg" class="depoimento-card__avatar" alt="Shelami Santos">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Shelami Santos
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Coordenadora no Hospital Vita Batel</div>
+              <div class="depoimento-card__sub">Fisioterapeuta Intensivista · Pós Inspirar</div>
             </div>
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;background:rgba(105,152,255,0.12);color:var(--primary-blue);border:1px solid rgba(105,152,255,0.28)">
-              Fonoaudiologia Especializada
-            </span>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag" style="background:rgba(105,152,255,0.18);border-color:rgba(105,152,255,0.4)">★ Destaque</span>
+            </div>
           </div>
-          <p class="feature-card__text" style="font-style:italic;font-size:13.5px;line-height:1.68;color:var(--text-primary)">
-            "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A especialização oferecida pela Faculdade Inspirar, em parceria com a Fonoaudiálogo, representa uma oportunidade valiosa para o crescimento profissional na Fonoaudiologia.</strong><br><br>Essa união traz um ensino de qualidade, alinhado às demandas atuais do mercado, com professores experientes e uma abordagem atualizada com estudo de vários casos clínicos. Em um campo que evolui constantemente, manter-se atualizada é essencial para oferecer o melhor atendimento, conquistar novos espaços de atuação e se destacar na carreira. Investir em conhecimento é investir no futuro! Já estou finalizando a minha segunda especialização com a Faculdade!"
-          </p>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-subtle)">
-          <img src="alessandra-menezes.png" style="width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center;border:2px solid var(--primary-blue);box-shadow:0 3px 12px rgba(105,152,255,0.28);flex-shrink:0" alt="Alessandra Antonia V.B. de Menezes">
-          <div style="min-width:0">
-            <div style="font-size:14px;font-weight:700;color:var(--text-heading);display:flex;align-items:center;gap:6px">
-              Alessandra Antonia V.B. de Menezes
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div style="font-size:12px;color:var(--primary-blue);font-weight:600">Pós-Graduação em Otoneurologia</div>
-            <div style="font-size:11px;color:var(--text-muted)">Parceria Faculdade Inspirar & Fonoaudiálogo</div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">De técnica de enfermagem a coordenadora no Hospital Vita Batel, a Inspirar e a Profisio foi o divisor de águas na minha vida.</strong><br><br>A Pós em Terapia Intensiva Treinamento em Serviço foi a base de tudo: em plena pandemia, passei por hospitais como o de Reabilitação, HT, Osvaldo Cruz e Vita, aprendendo na prática a ser a fisioterapeuta intensivista que sou hoje. Mais do que abrir portas no mercado, a Inspirar e a Profisio acreditaram no meu potencial em cada etapa, oferecendo capacitação contínua e um suporte humano incrível das lideranças. Hoje, assumir essa posição de liderança junto à empresa que me formou é a realização de um ciclo de muita dedicação e gratidão. Que orgulho imenso de ser Inspirar e Profisiana!"
+            </p>
           </div>
         </div>
-      </div>
 
-      <!-- Card 4: Lais Gianotti Franco -->
-      <div class="feature-card" data-reveal data-delay="200" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:4px;color:#ffc107;font-size:14px">
-              ★ ★ ★ ★ ★
+        <!-- Card 2: Gilmara F. M. Arrais -->
+        <div class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="gilmara-arrais.jpeg" class="depoimento-card__avatar" alt="Gilmara F. M. Arrais">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Gilmara F. M. Arrais
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Fisioterapeuta Intensivista</div>
+              <div class="depoimento-card__sub">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
             </div>
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;background:rgba(105,152,255,0.12);color:var(--primary-blue);border:1px solid rgba(105,152,255,0.28)">
-              Pós Digital Online
-            </span>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Linha de Frente UTI</span>
+            </div>
           </div>
-          <p class="feature-card__text" style="font-style:italic;font-size:13.5px;line-height:1.68;color:var(--text-primary)">
-            "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A pós de Gerontologia on-line da Faculdade Inspirar me fez adquirir muito conhecimento durante esses meses.</strong><br><br>Sou mais apaixonada ainda pela área da gerontologia e pude descobrir com clareza minha área de atuação! A formação abriu as portas do mercado de trabalho e me senti extremamente preparada para os desafios profissionais. Escolher uma pós online facilitou muito a minha rotina e organização de tempo."
-          </p>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-subtle)">
-          <img src="lais-franco.png" style="width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center;border:2px solid var(--primary-blue);box-shadow:0 3px 12px rgba(105,152,255,0.28);flex-shrink:0" alt="Lais Gianotti Franco">
-          <div style="min-width:0">
-            <div style="font-size:14px;font-weight:700;color:var(--text-heading);display:flex;align-items:center;gap:6px">
-              Lais Gianotti Franco
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div style="font-size:12px;color:var(--primary-blue);font-weight:600">Pós-Graduação em Gerontologia</div>
-            <div style="font-size:11px;color:var(--text-muted)">Modalidade On-line · Faculdade Inspirar</div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A Pós-Graduação em Terapia Intensiva me ensinou muito mais do que técnica, me ensinou propósito.</strong> Minha trajetória na UTI ganhou um significado ainda mais profundo durante meu treinamento em serviço pela Inspirar, um período que abriu portas para um universo de conhecimento, prática e crescimento profissional. Foi ali que deixei de apenas estudar a fisioterapia intensiva e passei a vivê-la de forma real, intensa e transformadora.<br><br>Atuar na UTI em meio à pandemia de COVID-19 foi um dos maiores desafios da minha vida e também um dos maiores aprendizados. Estar na linha de frente me trouxe experiência, maturidade e um olhar ainda mais humano sobre cada paciente. Aprendi a lidar com a imprevisibilidade, a valorizar cada pequena evolução e, acima de tudo, a entender o verdadeiro impacto do nosso trabalho.<br><br>Hoje, carrego comigo não apenas um currículo fortalecido, mas histórias, vivências e a certeza de que cada atendimento pode transformar uma vida. E quando falamos de terapia intensiva, muitas vezes estamos falando de devolver o bem mais precioso: a chance de respirar, de viver, de recomeçar. Tenho orgulho da profissional que me tornei, construída com dedicação, resiliência e amor pelo que faço."
+            </p>
           </div>
         </div>
-      </div>
 
+        <!-- Card 3: Priscilla Capana -->
+        <div class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="priscilla-capana.png" class="depoimento-card__avatar" alt="Priscilla Capana">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Priscilla Capana
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Fisioterapeuta Intensivista e Coordenadora</div>
+              <div class="depoimento-card__sub">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Liderança & Gestão</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">Escolher a Pós-Graduação na Faculdade Inspirar foi uma escolha que transformou profundamente minha trajetória</strong>, ampliando meu olhar clínico, fortalecendo minha segurança profissional e abrindo inúmeras portas ao longo do caminho.<br><br>A formação também expandiu minhas possibilidades de atuação, permitindo vivências não só na UTI, mas também na enfermaria hospitalar e no atendimento home care, o que trouxe ainda mais versatilidade e maturidade para a minha prática. Hoje, iniciando na coordenação, tenho ainda mais clareza do quanto essa especialização foi essencial para a profissional que me tornei.<br><br>Após toda a vivência prática e os desafios enfrentados na rotina clínica, compreendi a real necessidade de buscar uma especialização. Foi nesse momento que encontrei uma formação que me proporcionou não apenas conhecimento técnico, mas também pensamento crítico, segurança e autonomia. Essa especialização me deu todas as ferramentas necessárias para uma atuação mais completa e segura como fisioterapeuta, impactando diretamente na qualidade do cuidado que entrego aos meus pacientes. Gratidão por todo o aprendizado!"
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 4: Alessandra Antonia V.B. de Menezes -->
+        <div class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="alessandra-menezes.png" class="depoimento-card__avatar" alt="Alessandra Antonia V.B. de Menezes">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Alessandra Antonia V.B. de Menezes
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Pós-Graduação em Otoneurologia</div>
+              <div class="depoimento-card__sub">Parceria Faculdade Inspirar & Fonoaudiálogo</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Fonoaudiologia Especializada</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A especialização oferecida pela Faculdade Inspirar, em parceria com a Fonoaudiálogo, representa uma oportunidade valiosa para o crescimento profissional na Fonoaudiologia.</strong><br><br>Essa união traz um ensino de qualidade, alinhado às demandas atuais do mercado, com professores experientes e uma abordagem atualizada com estudo de vários casos clínicos. Em um campo que evolui constantemente, manter-se atualizada é essencial para oferecer o melhor atendimento, conquistar novos espaços de atuação e se destacar na carreira. Investir em conhecimento é investir no futuro! Já estou finalizando a minha segunda especialização com a Faculdade!"
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 5: Lais Gianotti Franco -->
+        <div class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="lais-franco.png" class="depoimento-card__avatar" alt="Lais Gianotti Franco">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Lais Gianotti Franco
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Pós-Graduação em Gerontologia</div>
+              <div class="depoimento-card__sub">Modalidade On-line · Faculdade Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Pós Digital Online</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A pós de Gerontologia on-line da Faculdade Inspirar me fez adquirir muito conhecimento durante esses meses.</strong><br><br>Sou mais apaixonada ainda pela área da gerontologia e pude descobrir com clareza minha área de atuação! A formação abriu as portas do mercado de trabalho e me senti extremamente preparada para os desafios profissionais. Escolher uma pós online facilitou muito a minha rotina e organização de tempo."
+            </p>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>

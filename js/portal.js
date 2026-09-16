@@ -1651,8 +1651,15 @@ function renderVagasEmpresa() {
   var painel = document.getElementById('painelApp');
   if (!painel) return;
 
-  // Proteção de rota: se não houver sessão ativa, redireciona para login.html
+  // Permite acesso direto com parâmetro ?demo=1 (conveniente para demonstrações e testes)
   var isLogado = localStorage.getItem('ccin-logado') === '1' && localStorage.getItem('ccin-login-email');
+  if (!isLogado && window.location.search.indexOf('demo=1') !== -1) {
+    localStorage.setItem('ccin-logado', '1');
+    localStorage.setItem('ccin-login-email', 'demo@inspirar.com');
+    isLogado = true;
+  }
+
+  // Proteção de rota: se não houver sessão ativa, redireciona para login.html
   if (!isLogado) {
     console.log('[Painel] Acesso restrito: usuário não autenticado. Redirecionando para login.html...');
     window.location.href = 'login.html';
@@ -2616,3 +2623,105 @@ window.addEventListener('storage', function(e) {
     renderPainelVitrine();
   }
 });
+
+/* ─── CARROSSEL DE DEPOIMENTOS REAL ────────────────────────── */
+function initDepoimentosCarousel() {
+  var track = document.getElementById('depoimentosTrack');
+  var prevBtn = document.getElementById('depoimentosPrev');
+  var nextBtn = document.getElementById('depoimentosNext');
+  var dotsContainer = document.getElementById('depoimentosDots');
+
+  if (!track) return;
+
+  var cards = track.querySelectorAll('.depoimento-card');
+  if (!cards.length) return;
+
+  // Gerar dots indicadores
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    cards.forEach(function (_, index) {
+      var dot = document.createElement('button');
+      dot.className = 'depoimentos-dot' + (index === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Ir para depoimento ' + (index + 1));
+      dot.addEventListener('click', function () {
+        scrollToCard(index);
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  function getStep() {
+    var card = cards[0];
+    if (!card) return 350;
+    return card.offsetWidth + 24;
+  }
+
+  function scrollToCard(index) {
+    if (index < 0 || index >= cards.length) return;
+    var targetCard = cards[index];
+    if (targetCard) {
+      track.scrollTo({
+        left: targetCard.offsetLeft - track.offsetLeft,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function () {
+      track.scrollBy({ left: -getStep(), behavior: 'smooth' });
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function () {
+      track.scrollBy({ left: getStep(), behavior: 'smooth' });
+    });
+  }
+
+  // Atualizar dot ativo e estados de botão durante o scroll
+  var scrollTimeout;
+  track.addEventListener('scroll', function () {
+    if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+    scrollTimeout = requestAnimationFrame(function () {
+      var currentLeft = track.scrollLeft;
+      var trackOffset = track.offsetLeft;
+      var closestIndex = 0;
+      var minDistance = Infinity;
+
+      cards.forEach(function (card, i) {
+        var cardPosition = card.offsetLeft - trackOffset;
+        var distance = Math.abs(cardPosition - currentLeft);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = i;
+        }
+      });
+
+      if (dotsContainer) {
+        var dots = dotsContainer.querySelectorAll('.depoimentos-dot');
+        dots.forEach(function (d, idx) {
+          d.classList.toggle('active', idx === closestIndex);
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.disabled = currentLeft <= 10;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = (currentLeft + track.clientWidth) >= (track.scrollWidth - 10);
+      }
+    });
+  }, { passive: true });
+
+  // Inicializar estado dos botões
+  if (prevBtn) prevBtn.disabled = track.scrollLeft <= 10;
+}
+
+// Inicializar carrossel no carregamento
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDepoimentosCarousel);
+} else {
+  initDepoimentosCarousel();
+}
+

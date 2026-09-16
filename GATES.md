@@ -1,25 +1,29 @@
-# Gates: Isolamento Completo entre Contas (Demo vs Novo Usuário)
+# Gates: Mobile Responsiveness & Carrossel de Depoimentos
 
-OWNS: js/portal.js, painel.html, login.html, GATES.md
+OWNS: index.html, login.html, painel.html, empresa.html, css/portal.css, css/design-system.css, js/portal.js, GATES.md
 
-Scope: Garantir isolamento estrito de dados entre a conta Demo e novos usuários cadastrados. Novos usuários jamais devem herdar ou exibir a foto e currículo da conta demo. Cada conta deve ter seus próprios dados independentes na nuvem, no painel e na vitrine de talentos.
+Scope: Garantir experiência mobile de altíssimo nível (especialmente no iPhone) sem nenhuma quebra de layout, overflow horizontal ou elementos cortados em todas as telas (index, login, painel, empresa). Implementar carrossel horizontal de depoimentos com fotos no topo do card e textos abaixo para eliminar a rolagem infinita.
 
-- [x] G1: Limpeza dos dados indevidamente propagados para leandrodimarco3@gmail.com
-  CHECK: Executar script de inspeção no Firestore para perfis/leandrodimarco3@gmail.com e curriculos_pdf/leandrodimarco3@gmail.com
-  EXPECT: fotoUrl e curriculoNome vazios em leandrodimarco3, documento removido de curriculos_pdf
+- [x] G1: Reestruturação dos cards de depoimento (Foto no topo, texto abaixo)
+  CHECK: powershell -ExecutionPolicy Bypass -Command "Get-Content index.html | Select-String -Pattern 'depoimento-card__header' | Measure-Object | Select-Object -ExpandProperty Count"
+  EXPECT: 5
 
-- [x] G2: Remoção de herança indevida no formulário de cadastro (Primeiro Acesso)
-  CHECK: Inspecionar signupForm em js/portal.js
-  EXPECT: Novos cadastros inicializam com fotoUrl e curriculoNome vazios, sem clonagem de curriculos_pdf de outras contas
+- [x] G2: Implementação do carrossel horizontal com controles (Track, Setas Anterior/Próximo, Indicadores de Dots)
+  CHECK: powershell -ExecutionPolicy Bypass -Command "$c = Get-Content index.html -Raw; if ($c -match 'depoimentos-carousel' -and $c -match 'depoimentos-track' -and $c -match 'depoimentos-btn--prev' -and $c -match 'depoimentos-btn--next' -and $c -match 'depoimentos-dots') { 'CAROUSEL_OK' } else { 'MISSING' }"
+  EXPECT: CAROUSEL_OK
 
-- [x] G3: Renderização condicional correta na Vitrine de Talentos (Rede de Colegas)
-  CHECK: Verificar renderização de cards de talentos em js/portal.js
-  EXPECT: Alunos sem foto usam inicial do nome; alunos sem currículo não mostram botão de currículo PDF
+- [x] G3: Script de controle do carrossel em js/portal.js (Scroll snap, navegação por botões, drag/touch swipe e dots ativos)
+  CHECK: powershell -ExecutionPolicy Bypass -Command "$js = Get-Content js/portal.js -Raw; if ($js -match 'initDepoimentosCarousel' -or $js -match 'depoimentos-track') { 'CAROUSEL_JS_OK' } else { 'MISSING' }"
+  EXPECT: CAROUSEL_JS_OK
 
-- [x] G4: Verificação do login demo em guia anônima vs login de novo usuário
-  CHECK: Testar login demo (carrega foto e PDF do demo) e login de novo usuário (carrega dados limpos próprios)
-  EXPECT: demo@inspirar.com com foto e PDF preservados; leandrodimarco3@gmail.com sem dados do demo
+- [x] G4: Prevenção de zoom forçado no iOS Safari (inputs com font-size >= 16px em telas mobile) e overflow horizontal zero
+  CHECK: powershell -ExecutionPolicy Bypass -Command "$css = (Get-Content css/portal.css -Raw) + (Get-Content css/design-system.css -Raw); if ($css -match 'overflow-x:\s*hidden' -and $css -match 'font-size:\s*16px') { 'IOS_AUDIT_OK' } else { 'MISSING' }"
+  EXPECT: IOS_AUDIT_OK
 
-- [x] G5: Verificação visual com captura de tela (Screenshot)
-  CHECK: Capturar screenshot da vitrine e do painel para o perfil leandrinho caos
-  EXPECT: Card sem foto do demo e sem currículo do demo
+- [x] G5: Verificação de responsividade mobile de index.html no viewport de iPhone (390x844) via Headless Browser
+  CHECK: powershell -ExecutionPolicy Bypass -Command "if ((Test-Path 'C:\Users\Usuario\.gemini\antigravity\brain\b03f838c-d0ac-42b6-82f7-8d0d0cea44c7\screenshot_mobile_index_hero.png') -and (Test-Path 'C:\Users\Usuario\.gemini\antigravity\brain\b03f838c-d0ac-42b6-82f7-8d0d0cea44c7\screenshot_mobile_depoimentos.png')) { 'INDEX_MOBILE_OK' } else { 'ERROR' }"
+  EXPECT: INDEX_MOBILE_OK
+
+- [x] G6: Verificação de responsividade mobile de login.html, painel.html e empresa.html no viewport de iPhone (390x844)
+  CHECK: powershell -ExecutionPolicy Bypass -Command "if ((Test-Path 'C:\Users\Usuario\.gemini\antigravity\brain\b03f838c-d0ac-42b6-82f7-8d0d0cea44c7\screenshot_mobile_login.png') -and (Test-Path 'C:\Users\Usuario\.gemini\antigravity\brain\b03f838c-d0ac-42b6-82f7-8d0d0cea44c7\screenshot_mobile_painel.png') -and (Test-Path 'C:\Users\Usuario\.gemini\antigravity\brain\b03f838c-d0ac-42b6-82f7-8d0d0cea44c7\screenshot_mobile_empresa.png')) { 'ALL_PAGES_MOBILE_OK' } else { 'ERROR' }"
+  EXPECT: ALL_PAGES_MOBILE_OK

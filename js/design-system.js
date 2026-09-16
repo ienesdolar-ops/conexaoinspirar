@@ -109,6 +109,11 @@
   }, { threshold: 0.10, rootMargin: '0px 0px -36px 0px' });
 
   els.forEach(function (el) { observer.observe(el); });
+
+  // Fallback de garantia: se algum elemento não foi revelado após 1.2s, revela
+  setTimeout(function () {
+    els.forEach(function (el) { el.classList.add('revealed'); });
+  }, 1200);
 })();
 
 /* ─── COUNTERS ANIMADOS ──────────────────────────────────── */
