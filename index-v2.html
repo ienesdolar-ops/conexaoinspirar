@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexão Inspirar — O Portal de Carreiras e Oportunidades em Saúde</title>
+  <meta name="description" content="Plataforma oficial da Faculdade Inspirar conectando alunos e graduados em saúde às melhores oportunidades hospitalares e clínicas no Brasil e exterior.">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('inspirar-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css?v=4.0.0">
+  <link rel="stylesheet" href="css/portal.css?v=4.2.0">
+  <link rel="stylesheet" href="css/portal-v2.css?v=1.1.0">
+</head>
+<body>
+
+<!-- ========== BANNER DE VERSÃO ========== -->
+<aside class="version-banner" aria-label="Aviso de Versão">
+  <span>✨ Você está navegando na <strong>Versão 2 (Editorial & Fluida)</strong>.</span>
+  <a href="index-v1.html">← Abrir a Versão 1 Anterior</a>
+</aside>
+
+<!-- ========== NAVBAR ========== -->
+<div class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__logo" aria-label="Conexão Inspirar">
+      <img src="logo-preta-horizontal.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+      <img src="logo-branca-horizontal.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+    </a>
+    <nav class="navbar__links">
+      <a href="#jornada">Para Você</a>
+      <a href="#vagas">Vagas Abertas</a>
+      <a href="#depoimentos">Histórias Reais</a>
+      <a href="empresa.html">Para Empresas</a>
+    </nav>
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema"></button>
+      <a href="login.html" class="btn-primary" style="padding:10px 20px;font-size:13.5px">Área do Aluno →</a>
+      <button class="navbar__hamburger" id="navHamburger" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="navbar__mobile-menu" id="mobileMenu">
+  <a href="#jornada">Para Você</a>
+  <a href="#vagas">Vagas Abertas</a>
+  <a href="#depoimentos">Histórias Reais</a>
+  <a href="login.html" class="btn-primary">Área do Aluno →</a>
+  <a href="empresa.html" class="btn-ghost">Sou uma Empresa / Hospital</a>
+</div>
+
+<!-- ========== HERO SECTION V2 ========== -->
+<section class="hero-v2">
+  <div class="hero-v2__grid">
+    <div class="hero-v2__content" data-reveal>
+      <div class="hero-v2__pre-badge">
+        <span>Faculdade Inspirar · 29 anos de tradição em saúde</span>
+      </div>
+      <h1 class="hero-v2__title">
+        O ponto de encontro entre quem <em>cura, lidera e transforma</em> e as melhores oportunidades.
+      </h1>
+      <p class="hero-v2__description">
+        Acesso exclusivo para a comunidade Inspirar. Conectamos estudantes a estágios e trainees de excelência, e profissionais pós-graduados a posições de liderança e contratações diretas em hospitais e clínicas.
+      </p>
+      <div class="hero-v2__ctas">
+        <a href="#vagas" class="btn-primary">
+          Ver Vagas Abertas
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="empresa.html" class="btn-ghost">Sou uma Empresa ou Hospital</a>
+      </div>
+      <div class="hero-v2__trust-strip">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Parcerias ativas em Curitiba (PR), polos nacionais, EAD e Luanda (Angola).</span>
+      </div>
+    </div>
+
+    <div class="hero-v2__visual" data-reveal data-delay="100">
+      <div class="hero-v2__frame">
+        <img src="hero.jpg" class="hero-v2__photo" alt="Equipe e alunos da Faculdade Inspirar">
+        <div class="hero-v2__caption">
+          <img src="shelami-santos-rosto.jpeg" class="hero-v2__caption-avatar" alt="Shelami Santos">
+          <div class="hero-v2__caption-text">
+            <div class="hero-v2__caption-name">
+              Shelami Santos
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div class="hero-v2__caption-role">De aluna Inspirar a Coordenadora no Hospital Vita Batel</div>
+          </div>
+          <span class="hero-v2__caption-tag">Caso Real</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FAIXA DE AUTORIDADE INSTITUCIONAL ========== -->
+<section class="authority-strip" aria-label="Credenciais Institucionais">
+  <div class="authority-strip__inner">
+    <div class="authority-item" data-reveal>
+      <div class="authority-item__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
+      <div class="authority-item__text">
+        <strong>29 Anos de Ensino</strong>
+        <span>Pioneirismo em Fisioterapia, Enfermagem e Gestão em Saúde.</span>
+      </div>
+    </div>
+    <div class="authority-item" data-reveal data-delay="60">
+      <div class="authority-item__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="authority-item__text">
+        <strong>99.000+ Formados</strong>
+        <span>Comunidade ativa com forte inserção e liderança no mercado.</span>
+      </div>
+    </div>
+    <div class="authority-item" data-reveal data-delay="120">
+      <div class="authority-item__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div class="authority-item__text">
+        <strong>41+ Unidades & Polos</strong>
+        <span>Presença consolidada no Brasil e Polo Internacional em Luanda.</span>
+      </div>
+    </div>
+    <div class="authority-item" data-reveal data-delay="180">
+      <div class="authority-item__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div class="authority-item__text">
+        <strong>Nota Máxima no MEC</strong>
+        <span>Reconhecimento oficial e alta taxa de empregabilidade prática.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SELETOR DE JORNADA TÁTIL ========== -->
+<section class="jornada-section" id="jornada">
+  <div class="jornada-header" data-reveal>
+    <h2 class="jornada-title">Construído sob medida para a sua <em>trajetória</em></h2>
+    <p class="jornada-sub">Seja conquistando o primeiro estágio ou recrutando os melhores profissionais de saúde, o Conexão Inspirar é o caminho mais direto e confiável.</p>
+    
+    <div class="segmented-control" role="tablist" style="margin-top:24px">
+      <button class="segmented-btn active" role="tab" aria-selected="true" data-target="panelAlunos">
+        🎓 Para Alunos & Formados
+      </button>
+      <button class="segmented-btn" role="tab" aria-selected="false" data-target="panelEmpresas">
+        🏥 Para Hospitais & Empresas
+      </button>
+    </div>
+  </div>
+
+  <!-- Painel 1: Alunos & Formados -->
+  <div class="jornada-panel active" id="panelAlunos">
+    <div class="jornada-grid">
+      <div class="jornada-card" data-reveal>
+        <span class="jornada-card__tag">Graduação & Início</span>
+        <h3 class="jornada-card__title">Estágios & Treinamento em Serviço</h3>
+        <p class="jornada-card__desc">Acesso a vagas de estágio curricular e extracurricular nos principais hospitais e clínicas parceiras de Curitiba e região desde os primeiros períodos.</p>
+        <div class="jornada-card__footer">
+          <span>Oportunidades em enfermarias e UTIs</span> →
+        </div>
+      </div>
+      <div class="jornada-card" data-reveal data-delay="80">
+        <span class="jornada-card__tag">Especialização</span>
+        <h3 class="jornada-card__title">Pós-Graduação & Posições Clínicas</h3>
+        <p class="jornada-card__desc">Para quem já concluiu a graduação ou está na pós: contratações efetivas (CLT/PJ), vagas especializadas em UTI, Gerontologia, Fonoaudiologia e liderança.</p>
+        <div class="jornada-card__footer">
+          <span>Ascensão a coordenações hospitalares</span> →
+        </div>
+      </div>
+      <div class="jornada-card" data-reveal data-delay="160">
+        <span class="jornada-card__tag">Agilidade Real</span>
+        <h3 class="jornada-card__title">Contato Direto com Recrutadores</h3>
+        <p class="jornada-card__desc">Sem etapas ocultas ou formulários intermináveis. Envie sua candidatura diretamente para o WhatsApp ou e-mail do RH com o respaldo oficial da Inspirar.</p>
+        <div class="jornada-card__footer">
+          <span>Candidatura em 1 clique</span> →
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel 2: Hospitais & Empresas -->
+  <div class="jornada-panel" id="panelEmpresas">
+    <div class="jornada-grid">
+      <div class="jornada-card">
+        <span class="jornada-card__tag">Seleção Técnica</span>
+        <h3 class="jornada-card__title">Profissionais Prontos para a Prática</h3>
+        <p class="jornada-card__desc">Receba candidatos com vivência real de estágio e pós-graduação nos maiores centros de saúde do Paraná e do país, com formação prática comprovada.</p>
+        <div class="jornada-card__footer">
+          <a href="empresa.html" style="color:inherit;text-decoration:none">Publicar vaga gratuitamente →</a>
+        </div>
+      </div>
+      <div class="jornada-card">
+        <span class="jornada-card__tag">Simplicidade</span>
+        <h3 class="jornada-card__title">Divulgue em Menos de 2 Minutos</h3>
+        <p class="jornada-card__desc">Sem burocracia de plataformas pesadas. Crie sua oportunidade e defina se prefere receber candidatos diretamente no seu WhatsApp ou e-mail corporativo.</p>
+        <div class="jornada-card__footer">
+          <a href="empresa.html" style="color:inherit;text-decoration:none">Ir para Área da Empresa →</a>
+        </div>
+      </div>
+      <div class="jornada-card">
+        <span class="jornada-card__tag">Alcance Amplo</span>
+        <h3 class="jornada-card__title">Cobertura Nacional & Angola</h3>
+        <p class="jornada-card__desc">Conecte-se com mais de 99.000 profissionais em Curitiba, polos de ensino em diversos estados e estudantes do Polo Luanda para vagas presenciais ou remotas.</p>
+        <div class="jornada-card__footer">
+          <a href="empresa.html#vitrineTalentos" style="color:inherit;text-decoration:none">Ver vitrine de talentos →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== VITRINE DE VAGAS REAIS ========== -->
+<section class="vagas-showcase" id="vagas">
+  <div class="vagas-showcase__inner">
+    <div class="vagas-showcase__header" data-reveal>
+      <div>
+        <h2 style="font-size:clamp(24px,3.2vw,36px);font-weight:700;color:var(--text-heading);letter-spacing:-0.025em;margin-bottom:8px">
+          Oportunidades em <em>destaque esta semana</em>
+        </h2>
+        <p style="font-size:15px;color:var(--text-secondary)">
+          Exemplos reais de vagas publicadas por parceiros que contratam na comunidade Inspirar.
+        </p>
+      </div>
+      <div class="vagas-filter-tabs">
+        <button class="vagas-pill-filter active" data-filter="todas">Todas</button>
+        <button class="vagas-pill-filter" data-filter="hospitalar">Hospitalar & UTI</button>
+        <button class="vagas-pill-filter" data-filter="fisioterapia">Fisioterapia</button>
+        <button class="vagas-pill-filter" data-filter="fono">Fonoaudiologia</button>
+        <button class="vagas-pill-filter" data-filter="estagio">Estágios</button>
+      </div>
+    </div>
+
+    <div class="vagas-showcase__grid">
+      <!-- Vaga 1 -->
+      <article class="vaga-preview-card" data-category="hospitalar" data-reveal>
+        <div class="vaga-preview-header">
+          <div>
+            <div class="vaga-preview-company">Hospital Santa Cruz</div>
+            <h3 class="vaga-preview-title">Fisioterapeuta Pélvico / Hospitalar</h3>
+          </div>
+          <span class="vaga-badge vaga-badge--green">Aberta</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.55">
+          Atendimento ambulatorial e hospitalar multidisciplinar com carga horária de 30h semanais.
+        </p>
+        <div class="vaga-preview-pills">
+          <span class="vaga-badge">Graduado / Pós</span>
+          <span class="vaga-badge">CLT</span>
+          <span class="vaga-badge">Curitiba - PR</span>
+        </div>
+        <div class="vaga-preview-footer">
+          <span class="vaga-preview-location">Presencial · Curitiba</span>
+          <a href="login.html" class="btn-vaga-action">Candidatar-se →</a>
+        </div>
+      </article>
+
+      <!-- Vaga 2 -->
+      <article class="vaga-preview-card" data-category="hospitalar" data-reveal data-delay="60">
+        <div class="vaga-preview-header">
+          <div>
+            <div class="vaga-preview-company">Hospital Vita Batel</div>
+            <h3 class="vaga-preview-title">Fisioterapeuta Intensivista (UTI Adulto)</h3>
+          </div>
+          <span class="vaga-badge vaga-badge--green">Aberta</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.55">
+          Atuação em Unidade de Terapia Intensiva com pacientes de alta complexidade. Escala 12x36.
+        </p>
+        <div class="vaga-preview-pills">
+          <span class="vaga-badge">Especialista / Pós</span>
+          <span class="vaga-badge">CLT</span>
+          <span class="vaga-badge">Hospitalar</span>
+        </div>
+        <div class="vaga-preview-footer">
+          <span class="vaga-preview-location">Presencial · Curitiba</span>
+          <a href="login.html" class="btn-vaga-action">Candidatar-se →</a>
+        </div>
+      </article>
+
+      <!-- Vaga 3 -->
+      <article class="vaga-preview-card" data-category="fono" data-reveal data-delay="120">
+        <div class="vaga-preview-header">
+          <div>
+            <div class="vaga-preview-company">Centro de Fonoaudiologia & Audiologia</div>
+            <h3 class="vaga-preview-title">Fonoaudiólogo Clínico (Otoneurologia)</h3>
+          </div>
+          <span class="vaga-badge vaga-badge--green">Aberta</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.55">
+          Avaliação e reabilitação vestibular de pacientes com queixas de tontura e vertigem.
+        </p>
+        <div class="vaga-preview-pills">
+          <span class="vaga-badge">Pós-Graduação</span>
+          <span class="vaga-badge">PJ / Honorários</span>
+          <span class="vaga-badge">Clínico</span>
+        </div>
+        <div class="vaga-preview-footer">
+          <span class="vaga-preview-location">Ambulatório Especializado</span>
+          <a href="login.html" class="btn-vaga-action">Candidatar-se →</a>
+        </div>
+      </article>
+
+      <!-- Vaga 4 -->
+      <article class="vaga-preview-card" data-category="estagio" data-reveal data-delay="180">
+        <div class="vaga-preview-header">
+          <div>
+            <div class="vaga-preview-company">Carvalho & Associados Advocacia</div>
+            <h3 class="vaga-preview-title">Estágio em Direito Médico e da Saúde</h3>
+          </div>
+          <span class="vaga-badge vaga-badge--green">Aberta</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.55">
+          Suporte consultivo a instituições médicas, conformidade LGPD e contratos hospitalares.
+        </p>
+        <div class="vaga-preview-pills">
+          <span class="vaga-badge">Aluno em Curso</span>
+          <span class="vaga-badge">Estágio Remunerado</span>
+          <span class="vaga-badge">Bolsa + Auxílio</span>
+        </div>
+        <div class="vaga-preview-footer">
+          <span class="vaga-preview-location">Híbrido · Curitiba</span>
+          <a href="login.html" class="btn-vaga-action">Candidatar-se →</a>
+        </div>
+      </article>
+    </div>
+
+    <div style="text-align:center">
+      <a href="login.html" class="btn-primary" style="padding:14px 32px">
+        Ver Todas as Mais de 500 Vagas no Painel →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HISTÓRIAS REAIS & DEPOIMENTOS ========== -->
+<section class="section" id="depoimentos" style="padding-top:60px;padding-bottom:70px">
+  <div class="container">
+    <div class="section__header" data-reveal style="text-align:center">
+      <h2 class="section__title">
+        Histórias de quem <em>conquistou</em> seu espaço
+      </h2>
+      <p class="section__sub" style="margin-top:12px">
+        Relatos reais de alunos e formados que aceleraram a carreira e assumiram posições de destaque através da formação Inspirar.
+      </p>
+    </div>
+
+    <!-- Carrossel de Depoimentos Reais -->
+    <div class="depoimentos-carousel" data-reveal>
+      
+      <div class="depoimentos-header-bar">
+        <div class="depoimentos-counter">
+          <span style="color:var(--primary-blue);display:inline-flex;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          <span>5 Trajetórias Inspiradoras Verificadas</span>
+        </div>
+        <div class="depoimentos-controls">
+          <button class="depoimentos-btn depoimentos-btn--prev" id="depoimentosPrev" aria-label="Depoimento anterior">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="depoimentos-dots" id="depoimentosDots"></div>
+          <button class="depoimentos-btn depoimentos-btn--next" id="depoimentosNext" aria-label="Próximo depoimento">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Trilha Deslizante -->
+      <div class="depoimentos-track" id="depoimentosTrack" tabindex="0" aria-label="Carrossel de Histórias Reais">
+
+        <!-- Card 1: Shelami Santos -->
+        <article class="depoimento-card depoimento-card--destaque">
+          <div class="depoimento-card__header">
+            <img src="shelami-santos-rosto.jpeg" class="depoimento-card__avatar" alt="Shelami Santos">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Shelami Santos
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Coordenadora no Hospital Vita Batel</div>
+              <div class="depoimento-card__sub">Fisioterapeuta Intensivista · Pós Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag" style="background:rgba(105,152,255,0.18);border-color:rgba(105,152,255,0.4)">★ Destaque</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">De técnica de enfermagem a coordenadora no Hospital Vita Batel, a Inspirar e a Profisio foi o divisor de águas na minha vida.</strong><br><br>A Pós em Terapia Intensiva Treinamento em Serviço foi a base de tudo: em plena pandemia, passei por hospitais como o de Reabilitação, HT, Osvaldo Cruz e Vita, aprendendo na prática a ser a fisioterapeuta intensivista que sou hoje. Mais do que abrir portas no mercado, a Inspirar e a Profisio acreditaram no meu potencial em cada etapa, oferecendo capacitação contínua e um suporte humano incrível das lideranças. Hoje, assumir essa posição de liderança junto à empresa que me formou é a realização de um ciclo de muita dedicação e gratidão. Que orgulho imenso de ser Inspirar e Profisiana!"
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 2: Gilmara F. M. Arrais -->
+        <article class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="gilmara-arrais.jpeg" class="depoimento-card__avatar" alt="Gilmara F. M. Arrais">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Gilmara F. M. Arrais
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Fisioterapeuta Intensivista</div>
+              <div class="depoimento-card__sub">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Linha de Frente UTI</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A Pós-Graduação em Terapia Intensiva me ensinou muito mais do que técnica, me ensinou propósito.</strong> Minha trajetória na UTI ganhou um significado ainda mais profundo durante meu treinamento em serviço pela Inspirar, um período que abriu portas para um universo de conhecimento, prática e crescimento profissional. Foi ali que deixei de apenas estudar a fisioterapia intensiva e passei a vivê-la de forma real, intensa e transformadora.<br><br>Atuar na UTI em meio à pandemia de COVID-19 foi um dos maiores desafios da minha vida e também um dos maiores aprendizados. Estar na linha de frente me trouxe experiência, maturidade e um olhar ainda mais humano sobre cada paciente. Aprendi a lidar com a imprevisibilidade, a valorizar cada pequena evolução e, acima de tudo, a entender o verdadeiro impacto do nosso trabalho.<br><br>Hoje, carrego comigo não apenas um currículo fortalecido, mas histórias, vivências e a certeza de que cada atendimento pode transformar uma vida. E quando falamos de terapia intensiva, muitas vezes estamos falando de devolver o bem mais precioso: a chance de respirar, de viver, de recomeçar. Tenho orgulho da profissional que me tornei, construída com dedicação, resiliência e amor pelo que faço."
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 3: Priscilla Capana -->
+        <article class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="priscilla-capana.png" class="depoimento-card__avatar" alt="Priscilla Capana">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Priscilla Capana
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Fisioterapeuta Intensivista e Coordenadora</div>
+              <div class="depoimento-card__sub">Atuação Hospitalar, Home Care e Clínica · Pós Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Liderança & Gestão</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">Escolher a Pós-Graduação na Faculdade Inspirar foi uma escolha que transformou profundamente minha trajetória</strong>, ampliando meu olhar clínico, fortalecendo minha segurança profissional e abrindo inúmeras portas ao longo do caminho.<br><br>A formação também expandiu minhas possibilidades de atuação, permitindo vivências não só na UTI, mas também na enfermaria hospitalar e no atendimento home care, o que trouxe ainda mais versatilidade e maturidade para a minha prática. Hoje, iniciando na coordenação, tenho ainda mais clareza do quanto essa especialização foi essencial para a profissional que me tornei.<br><br>Após toda a vivência prática e os desafios enfrentados na rotina clínica, compreendi a real necessidade de buscar uma especialização. Foi nesse momento que encontrei uma formação que me proporcionou não apenas conhecimento técnico, mas também pensamento crítico, segurança e autonomia. Essa especialização me deu todas as ferramentas necessárias para uma atuação mais completa e segura como fisioterapeuta, impactando diretamente na qualidade do cuidado que entrego aos meus pacientes. Gratidão por todo o aprendizado!"
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 4: Alessandra Antonia V.B. de Menezes -->
+        <article class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="alessandra-menezes.png" class="depoimento-card__avatar" alt="Alessandra Antonia V.B. de Menezes">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Alessandra Antonia V.B. de Menezes
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Pós-Graduação em Otoneurologia</div>
+              <div class="depoimento-card__sub">Parceria Faculdade Inspirar & Fonoaudiálogo</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Fonoaudiologia Especializada</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A especialização oferecida pela Faculdade Inspirar, em parceria com a Fonoaudiálogo, representa uma oportunidade valiosa para o crescimento profissional na Fonoaudiologia.</strong><br><br>Essa união traz um ensino de qualidade, alinhado às demandas atuais do mercado, com professores experientes e uma abordagem atualizada com estudo de vários casos clínicos. Em um campo que evolui constantemente, manter-se atualizada é essencial para oferecer o melhor atendimento, conquistar novos espaços de atuação e se destacar na carreira. Investir em conhecimento é investir no futuro! Já estou finalizando a minha segunda especialização com a Faculdade!"
+            </p>
+          </div>
+        </article>
+
+        <!-- Card 5: Lais Gianotti Franco -->
+        <article class="depoimento-card">
+          <div class="depoimento-card__header">
+            <img src="lais-franco.png" class="depoimento-card__avatar" alt="Lais Gianotti Franco">
+            <div class="depoimento-card__info">
+              <div class="depoimento-card__name">
+                Lais Gianotti Franco
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2.5" title="História Verificada"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="depoimento-card__role">Pós-Graduação em Gerontologia</div>
+              <div class="depoimento-card__sub">Modalidade On-line · Faculdade Inspirar</div>
+            </div>
+            <div class="depoimento-card__meta">
+              <div class="depoimento-card__stars">★ ★ ★ ★ ★</div>
+              <span class="depoimento-card__tag">Pós Digital Online</span>
+            </div>
+          </div>
+          <div class="depoimento-card__body">
+            <p class="depoimento-card__quote">
+              "<strong style="color:var(--text-heading);font-weight:600;font-style:normal">A pós de Gerontologia on-line da Faculdade Inspirar me fez adquirir muito conhecimento durante esses meses.</strong><br><br>Sou mais apaixonada ainda pela área da gerontologia e pude descobrir com clareza minha área de atuação! A formação abriu as portas do mercado de trabalho e me senti extremamente preparada para os desafios profissionais. Escolher uma pós online facilitou muito a minha rotina e organização de tempo."
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== REDE DE PARCEIROS HOSPITALARES (GRID ESTÁTICO) ========== -->
+<section class="partners-section" id="parceiros">
+  <div class="partners-section__inner">
+    <div class="partners-header" data-reveal>
+      <h3>Hospitais & Clínicas Credenciadas</h3>
+      <p>Centros de excelência médica onde atuam alunos e formados da Faculdade Inspirar</p>
+    </div>
+    <div class="partners-grid" data-reveal>
+      <div class="partner-card">Hospital Vita Batel</div>
+      <div class="partner-card">Hospital Santa Cruz</div>
+      <div class="partner-card">Hospital do Trabalhador (HT)</div>
+      <div class="partner-card">Hospital Oswaldo Cruz</div>
+      <div class="partner-card">Clínica Luanda Saúde (Angola)</div>
+      <div class="partner-card">Rede Mater Dei</div>
+      <div class="partner-card">Carvalho & Associados</div>
+      <div class="partner-card">Hospital Albert Einstein</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer-outer">
+  <div class="footer-card">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand__name">
+          <img src="logo-preta-horizontal.png" alt="Conexão Inspirar" class="logo-img logo-img--light">
+          <img src="logo-branca-horizontal.png" alt="Conexão Inspirar" class="logo-img logo-img--dark">
+        </div>
+        <p class="footer-brand__desc">O ecossistema oficial de carreiras, vagas e empregabilidade para alunos e graduados da Faculdade Inspirar no Brasil e no mundo.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links__col">
+          <div class="footer-links__title">Portal</div>
+          <a href="login.html">Área do Aluno</a>
+          <a href="empresa.html">Área da Empresa</a>
+          <a href="#vagas">Vagas Abertas</a>
+          <a href="#depoimentos">Histórias Reais</a>
+        </div>
+        <div class="footer-links__col">
+          <div class="footer-links__title">Faculdade Inspirar</div>
+          <a href="https://inspirar.com.br" target="_blank" rel="noopener">Site Oficial Inspirar</a>
+          <a href="admin.html">Painel Administrativo</a>
+          <a href="index-v1.html">Versão Anterior (v1)</a>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--text-dim)">© 2026 Faculdade Inspirar. Move a Sua Vida.</span>
+      <span style="font-size:12.5px;color:var(--text-dim)">Plataforma Conexão Inspirar — Presencial Curitiba, EAD e Polo Luanda (Angola)</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=4.0.0"></script>
+<script src="js/design-system.js?v=4.0.0"></script>
+<script src="js/portal-v2.js?v=1.1.0"></script>
+</body>
+</html>
