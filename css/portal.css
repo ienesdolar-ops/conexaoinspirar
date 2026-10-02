@@ -88,6 +88,40 @@
   border-radius: 14px;
 }
 
+/* ─── JORNADA (JSTACK) COM FOTOS REAIS ────────────────────────── */
+.jstep__media {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.jstep__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(105, 152, 255, 0.22), rgba(124, 58, 237, 0.08));
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.35s ease;
+}
+.jstep__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  z-index: 1;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .jstep__card:hover .jstep__img {
+    transform: scale(1.08);
+  }
+  .jstep__card:hover .jstep__media::after {
+    opacity: 0.5;
+  }
+}
+
+
 
 /* ─── CARROSSEL DE DEPOIMENTOS REAL ─────────────────────────── */
 .depoimentos-carousel {
