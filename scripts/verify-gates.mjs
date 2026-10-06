@@ -88,6 +88,19 @@ function checkG6() {
   }
 }
 
+function checkG7() {
+  const html = fs.readFileSync('index.html', 'utf8');
+  const css = fs.readFileSync('css/portal.css', 'utf8');
+  const barNotInHtml = !html.includes('hero-features-bar') && !html.includes('hero-feature-item');
+  const barNotInCss = !css.includes('.hero-features-bar {') && !css.includes('.hero-feature-item {');
+  if (barNotInHtml && barNotInCss) {
+    console.log('HERO_FEATURES_BAR_REMOVED_OK');
+  } else {
+    console.error('FAIL G7: hero-features-bar still found in index.html or css/portal.css');
+    process.exit(1);
+  }
+}
+
 switch (gate) {
   case 'G1': checkG1(); break;
   case 'G2': checkG2(); break;
@@ -95,6 +108,7 @@ switch (gate) {
   case 'G4': checkG4(); break;
   case 'G5': checkG5(); break;
   case 'G6': checkG6(); break;
+  case 'G7': checkG7(); break;
   default:
     console.error('UNKNOWN GATE');
     process.exit(1);

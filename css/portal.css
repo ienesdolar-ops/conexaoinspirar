@@ -3,14 +3,14 @@
    Layouts e componentes específicos do portal.
    ============================================================ */
 
-/* ─── HERO (index.html) — Organic Split & Barra Flutuante ──────── */
+/* ─── HERO (index.html) — Organic Split ──────── */
 .hero-section {
   position: relative;
   min-height: calc(100vh - 72px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 36px 32px 36px;
+  padding: 50px 32px;
   overflow: hidden;
   background: var(--bg);
   box-sizing: border-box;
@@ -226,89 +226,10 @@
   opacity: 0.6;
 }
 
-/* ─── BARRA FLUTUANTE DE DESTAQUES (Mockup Exact Match) ────────────────── */
-.hero-features-bar {
-  margin-top: 36px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  box-shadow: 0 14px 40px -12px rgba(105, 152, 255, 0.12),
-              0 4px 16px -4px rgba(15, 23, 42, 0.04);
-  backdrop-filter: var(--blur-card);
-  -webkit-backdrop-filter: var(--blur-card);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 16px 20px;
-  position: relative;
-  z-index: 6;
-}
-[data-theme="dark"] .hero-features-bar {
-  background: rgba(18, 24, 38, 0.88);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6);
-}
-
-.hero-feature-item {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 6px 16px;
-  border-right: 1px solid var(--border-subtle);
-  transition: transform 0.25s ease;
-}
-.hero-feature-item:last-child {
-  border-right: none;
-}
-
-.hero-feature-item__icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.16);
-  color: #6366f1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
-}
-[data-theme="dark"] .hero-feature-item__icon {
-  background: rgba(99, 102, 241, 0.14);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
-}
-.hero-feature-item:hover .hero-feature-item__icon {
-  transform: scale(1.08) translateY(-2px);
-  background: rgba(99, 102, 241, 0.16);
-  box-shadow: 0 6px 18px -2px rgba(99, 102, 241, 0.28);
-}
-
-.hero-feature-item__text {
-  min-width: 0;
-}
-.hero-feature-item__title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--text-heading);
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.hero-feature-item__desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* Responsividade da Hero */
 @media (max-width: 1024px) {
   .hero-section {
-    padding: 100px 24px 40px;
+    padding: 100px 24px 50px;
     min-height: auto;
   }
   .hero-main-row {
@@ -354,20 +275,11 @@
     right: -10px;
     bottom: -15px;
   }
-  .hero-features-bar {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 18px;
-    margin-top: 32px;
-  }
-  .hero-feature-item:nth-child(2) {
-    border-right: none;
-  }
 }
 
 @media (max-width: 640px) {
   .hero-section {
-    padding: 90px 20px 36px;
+    padding: 90px 20px 40px;
   }
   .hero-title {
     font-size: 29px;
@@ -383,22 +295,6 @@
   }
   .hero-media__frame {
     border-radius: 22px;
-  }
-  .hero-features-bar {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 28px;
-  }
-  .hero-feature-item {
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 12px;
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-  .hero-feature-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
   }
 }
 

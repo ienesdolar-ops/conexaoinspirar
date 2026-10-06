@@ -33,3 +33,9 @@ Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura o
   CHECK: node scripts/verify-gates.mjs G6
   EXPECT: ENCODING_CLEAN
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=91a7c059384e08fd77fbe86285e578a9706e3ad4c67488713d7290b6f39ed66b; output-bytes=15
+
+- [x] G7: Remocao completa da barra flutuante de pilares da hero (hero-features-bar) de index.html e css/portal.css
+  CHECK: node scripts/verify-gates.mjs G7
+  EXPECT: HERO_FEATURES_BAR_REMOVED_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=67572356938ca5a9533ff7e98943a844d55da8e800d52fe0c6027d5fd20dc3ee; output-bytes=29
+
