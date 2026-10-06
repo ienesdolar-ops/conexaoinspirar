@@ -43,3 +43,9 @@ Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura o
   CHECK: node scripts/verify-gates.mjs G8
   EXPECT: PURPLE_GLOW_CONFINED_TO_PHOTO_OK
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=7682ac1cff1567528dc1956967ac161b2dd0a3a85704c87dcc86ba34f927d800; output-bytes=33
+
+- [x] G9: Alinhamento tipografico do titulo da hero com o Design System Oficial (Inter 700 + Cormorant Garamond italico com gradiente oficial da marca)
+  CHECK: node scripts/verify-gates.mjs G9
+  EXPECT: HERO_TITLE_DESIGN_SYSTEM_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=90f64c26cab463755839c60d449faeb18a72a63bbb74011c28d4ed5029a2ee78; output-bytes=28
+

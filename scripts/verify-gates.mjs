@@ -115,6 +115,19 @@ function checkG8() {
   }
 }
 
+function checkG9() {
+  const css = fs.readFileSync('css/portal.css', 'utf8');
+  const usesSerif = css.includes('.hero-title em') && (css.includes('var(--font-serif)') && !css.includes('font-family: inherit'));
+  const usesItalic = css.includes('.hero-title em') && (css.includes('font-style: italic') && !css.includes('font-style: normal'));
+  const usesBrandGradient = css.includes('.hero-title em') && (css.includes('var(--brand-gradient)') && !css.includes('#4f46e5'));
+  if (usesSerif && usesItalic && usesBrandGradient) {
+    console.log('HERO_TITLE_DESIGN_SYSTEM_OK');
+  } else {
+    console.error('FAIL G9: Hero title em not conforming to design system (must use var(--font-serif), italic, and var(--brand-gradient))');
+    process.exit(1);
+  }
+}
+
 switch (gate) {
   case 'G1': checkG1(); break;
   case 'G2': checkG2(); break;
@@ -124,6 +137,7 @@ switch (gate) {
   case 'G6': checkG6(); break;
   case 'G7': checkG7(); break;
   case 'G8': checkG8(); break;
+  case 'G9': checkG9(); break;
   default:
     console.error('UNKNOWN GATE');
     process.exit(1);
