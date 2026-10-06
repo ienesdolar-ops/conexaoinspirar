@@ -11,14 +11,24 @@
   align-items: center;
   padding: 120px 32px 80px;
   overflow: hidden;
-  background: linear-gradient(to bottom, rgba(248, 250, 252, 0.15) 0%, transparent 45%, rgba(248, 250, 252, 0.75) 85%, var(--bg) 100%),
-              linear-gradient(to right, rgba(248, 250, 252, 0.97) 0%, rgba(248, 250, 252, 0.90) 38%, rgba(248, 250, 252, 0.35) 65%, rgba(248, 250, 252, 0.10) 100%),
-              url('../hero.jpg') center 0% / cover no-repeat;
+  background: linear-gradient(to bottom, transparent 0%, transparent 75%, var(--bg) 100%),
+              linear-gradient(to right, var(--bg) 0%, var(--bg) 48%, rgba(248, 250, 252, 0.96) 53%, rgba(248, 250, 252, 0.45) 68%, transparent 85%),
+              url('../hero.jpg') right 0% / cover no-repeat;
 }
 [data-theme="dark"] .hero-section {
-  background: linear-gradient(to bottom, rgba(8, 8, 8, 0.75), rgba(8, 8, 8, 0.95)),
-              linear-gradient(to right, rgba(8, 8, 8, 0.85) 35%, rgba(8, 8, 8, 0.3)),
-              url('../hero.jpg') center 0% / cover no-repeat;
+  background: linear-gradient(to bottom, transparent 0%, transparent 75%, var(--bg) 100%),
+              linear-gradient(to right, #080808 0%, #080808 48%, rgba(8, 8, 8, 0.95) 53%, rgba(8, 8, 8, 0.40) 68%, transparent 85%),
+              url('../hero.jpg') right 0% / cover no-repeat;
+}
+@media (max-width: 768px) {
+  .hero-section {
+    background: linear-gradient(to bottom, var(--bg) 0%, var(--bg) 55%, rgba(248, 250, 252, 0.88) 72%, transparent 100%),
+                url('../hero.jpg') center top / cover no-repeat;
+  }
+  [data-theme="dark"] .hero-section {
+    background: linear-gradient(to bottom, #080808 0%, #080808 55%, rgba(8, 8, 8, 0.88) 72%, transparent 100%),
+                url('../hero.jpg') center top / cover no-repeat;
+  }
 }
 .hero-inner {
   position: relative;
@@ -52,7 +62,7 @@
 .hero-badge svg { color: var(--green); flex-shrink: 0; }
 .hero-badge span { white-space: normal; line-height: 1.4; }
 
-/* â”€â”€â”€ FEATURES GRID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- FEATURES GRID ------------------------------------------------------------------------------------------------------------------------ */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -93,6 +103,12 @@
   position: relative;
   overflow: hidden;
   background: var(--bg-card);
+  flex-basis: 200px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  min-height: 160px;
+  align-self: stretch;
 }
 .jstep__media::after {
   content: '';
@@ -113,11 +129,28 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
 }
 @media (hover: hover) and (pointer: fine) {
+  .jstep__card:hover .jstep__media {
+    flex-basis: 200px;
+    width: 200px;
+  }
   .jstep__card:hover .jstep__img {
     transform: scale(1.08);
   }
   .jstep__card:hover .jstep__media::after {
     opacity: 0.5;
+  }
+}
+@media (max-width: 768px) {
+  .jstep__media {
+    flex-basis: 110px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+    min-height: 130px;
+  }
+  .jstep__card:hover .jstep__media {
+    flex-basis: 110px;
+    width: 110px;
   }
 }
 
@@ -412,7 +445,7 @@
   }
 }
 
-/* â”€â”€â”€ EMPRESA CTA BLOCK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- EMPRESA CTA BLOCK ------------------------------------------------------------------------------------------------------------ */
 .empresa-cta {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -498,7 +531,7 @@
   gap: 4px;
 }
 
-/* â”€â”€â”€ LOGO LOOP LABEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- LOGO LOOP LABEL ------------------------------------------------------------------------------------------------------------------ */
 .logoloop-label {
   text-align: center;
   font-size: 11px;
@@ -509,7 +542,7 @@
   margin-bottom: 24px;
 }
 
-/* â”€â”€â”€ FOOTER LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- FOOTER LAYOUT ------------------------------------------------------------------------------------------------------------------------ */
 .footer-top {
   display: flex;
   justify-content: space-between;
@@ -552,7 +585,7 @@
 }
 .footer-links__col a:hover { color: var(--green-text); }
 
-/* â”€â”€â”€ PROTECTION BANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- PROTECTION BANNER ------------------------------------------------------------------------------------------------------------ */
 .protection-banner {
   display: flex;
   align-items: flex-start;
@@ -680,7 +713,7 @@
   gap: 20px;
 }
 
-/* â”€â”€â”€ VAGA CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- VAGA CARD ------------------------------------------------------------------------------------------------------------------------------------ */
 .vaga-card {
   padding: 24px;
   border-radius: var(--radius-lg);
@@ -771,7 +804,7 @@
   font-size: 13.5px;
 }
 
-/* â”€â”€â”€ SUCCESS / ERROR MESSAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- SUCCESS / ERROR MESSAGES --------------------------------------------------------------------------------------- */
 .success-msg, .error-msg {
   display: none;
   align-items: flex-start;
@@ -793,7 +826,7 @@
   color: #ff9090;
 }
 
-/* â”€â”€â”€ LOGIN PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- LOGIN PAGE --------------------------------------------------------------------------------------------------------------------------------- */
 .login-page,
 .login-section {
   min-height: calc(100vh - 120px);
@@ -1012,7 +1045,7 @@
   color: var(--primary-purple);
 }
 
-/* â”€â”€â”€ PAINEL LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- PAINEL LAYOUT ------------------------------------------------------------------------------------------------------------------------ */
 .painel-layout {
   display: flex;
   min-height: 100vh;
@@ -1209,7 +1242,7 @@
   gap: 18px;
 }
 
-/* â”€â”€â”€ FILTER BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- FILTER BAR --------------------------------------------------------------------------------------------------------------------------------- */
 .filter-bar {
   display: flex;
   gap: 12px;
@@ -1225,7 +1258,7 @@
 .filter-bar__label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
 .filter-bar select { flex: 1; }
 
-/* â”€â”€â”€ EMPTY STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- EMPTY STATE ------------------------------------------------------------------------------------------------------------------------------ */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -1261,7 +1294,7 @@
   line-height: 1.6;
 }
 
-/* â”€â”€â”€ PERFIL FORM & UPLOADS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- PERFIL FORM & UPLOADS ------------------------------------------------------------------------------------------------ */
 .perfil-form-card {
   max-width: 580px;
 }
@@ -1302,7 +1335,7 @@
   transform: translateX(2px);
 }
 
-/* â”€â”€â”€ AVATAR UPLOAD COMPONENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- AVATAR UPLOAD COMPONENT ------------------------------------------------------------------------------------------ */
 .avatar-upload-box {
   display: flex;
   align-items: center;
@@ -1364,7 +1397,7 @@
   flex-wrap: wrap;
 }
 
-/* â”€â”€â”€ CURRÃCULO PDF CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- CURRÃCULO PDF CARD --------------------------------------------------------------------------------------------------------- */
 .curriculo-card {
   display: flex;
   align-items: center;
@@ -1440,7 +1473,7 @@
   border-color: rgba(255, 100, 100, 0.45);
 }
 
-/* â”€â”€â”€ RESPONSIVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- RESPONSIVE --------------------------------------------------------------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
   .empresa-form-cols { grid-template-columns: 1fr; gap: 32px; }
   .form-section-info { position: static; }
@@ -1534,7 +1567,7 @@
   }
 }
 
-/* â”€â”€â”€ NOVOS COMPONENTES: CONEXÃƒO INSPIRAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- NOVOS COMPONENTES: CONEXAO INSPIRAR ------------------------------------------------------ */
 
 /* Badges de Status de Vagas */
 .tag--aberta {
@@ -1598,20 +1631,57 @@
   font-size: 11px;
 }
 
-/* Selo de ContrataÃ§Ã£o Oficial */
+/* Status Padronizado: Disponível para Contratação */
+.tag--disponivel,
+.badge-disponivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+[data-theme="dark"] .tag--disponivel,
+[data-theme="dark"] .badge-disponivel {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+}
+.tag--disponivel::before,
+.badge-disponivel::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  display: inline-block;
+}
+
+/* Selo de Contratação Oficial (Alto Contraste) */
 .badge-contratado {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 11px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(155,225,93,0.15));
-  border: 1px solid rgba(255,215,0,0.4);
-  color: #ffd700;
+  background: #fde047;
+  border: 1px solid #eab308;
+  color: #713f12;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  box-shadow: 0 0 14px rgba(255,215,0,0.2);
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.28);
+}
+[data-theme="dark"] .badge-contratado {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  border: 1px solid #facc15;
+  color: #1a1202;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.35);
 }
 
 /* Bio e Redes Sociais nos Cards */
@@ -1652,7 +1722,7 @@
   transform: translateY(-2px);
 }
 
-/* Grupo de BotÃµes de Contato */
+/* Grupo de Botoes de Contato */
 .vaga-contact-group {
   display: flex;
   align-items: center;
@@ -1664,6 +1734,50 @@
   flex: 1;
   min-width: 120px;
   justify-content: center;
+}
+
+/* ─── VAGAS EXPANSÍVEIS (Compactas por padrão) ───────────────── */
+.vaga-card__desc-wrap {
+  margin: 10px 0 14px;
+}
+.vaga-card__toggle-desc {
+  background: rgba(105, 152, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.vaga-card__toggle-desc:hover {
+  background: rgba(105, 152, 255, 0.12);
+  border-color: var(--primary-blue);
+}
+.vaga-card__toggle-icon {
+  transition: transform 0.25s ease;
+}
+.vaga-card__toggle-desc.is-open .vaga-card__toggle-icon {
+  transform: rotate(180deg);
+}
+.vaga-card__desc {
+  display: none;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-card);
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  white-space: pre-line;
+}
+.vaga-card__desc.is-visible {
+  display: block;
 }
 
 /* Cards de Candidaturas */
@@ -1710,7 +1824,7 @@
   flex-wrap: wrap;
 }
 
-/* Banner de CelebraÃ§Ã£o de Emprego */
+/* Banner de Celebracao de Emprego */
 .celebration-banner {
   padding: 20px 24px;
   border-radius: var(--radius-lg);
@@ -1734,7 +1848,7 @@
   line-height: 1.5;
 }
 
-/* â”€â”€â”€ MODAL DE VISUALIZAÃ‡ÃƒO DE CURRÃCULO PDF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* --------- MODAL DE VISUALIZAÃ‡ÃƒO DE CURRÃCULO PDF --------------------------------------------- */
 .pdf-modal {
   position: fixed;
   inset: 0;
@@ -1843,5 +1957,31 @@
   border: none;
   display: block;
 }
+
+/* ─── FOOTER BRAND LOGO (Aumento de Presença de Marca) ──────── */
+.footer-brand__name .logo-img {
+  height: 52px;
+  max-width: 230px;
+  width: auto;
+  object-fit: contain;
+  transform: none;
+  transition: transform 0.25s ease;
+}
+.footer-brand__name .logo-img:hover {
+  transform: scale(1.03);
+}
+.footer-brand__desc {
+  margin-top: 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  max-width: 320px;
+}
+@media (max-width: 768px) {
+  .footer-brand__name .logo-img {
+    height: 44px;
+    max-width: 190px;
+  }
+}
+
 
 

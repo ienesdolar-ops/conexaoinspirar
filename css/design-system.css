@@ -795,9 +795,7 @@ code {
   z-index: 1;
   color: rgba(105, 152, 255, 0.4);
 }
-@media (hover: hover) and (pointer: fine) {
-  .jstep__card:hover .jstep__media { flex-basis: 38%; }
-}
+/* Sem expansão dimensional no hover para manter layout padronizado */
 .jstep__body {
   padding: 28px 32px;
   display: flex;

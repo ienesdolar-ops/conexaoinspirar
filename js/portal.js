@@ -895,13 +895,40 @@ function vagaCardHTML(vaga) {
       '<span class="tag">' + vaga.tipo + '</span>' +
       '<span class="tag">' + vaga.modalidade + '</span>' +
     '</div>' +
-    '<p class="vaga-card__desc">' + vaga.descricao + '</p>' +
+    '<div class="vaga-card__desc-wrap">' +
+      '<button type="button" class="vaga-card__toggle-desc" onclick="toggleVagaDesc(this)" aria-expanded="false">' +
+        '<span class="vaga-card__toggle-text">Ver detalhes da vaga</span>' +
+        '<svg class="vaga-card__toggle-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</button>' +
+      '<div class="vaga-card__desc">' + (vaga.descricao || '') + '</div>' +
+    '</div>' +
     '<div class="vaga-card__footer">' +
       '<span class="vaga-card__date">' + formatDate(vaga.data) + '</span>' +
       '<div style="display:flex;align-items:center">' + botoesContatoHTML + '</div>' +
     '</div>' +
   '</div>';
 }
+
+function toggleVagaDesc(btn) {
+  var wrap = btn.closest('.vaga-card__desc-wrap') || btn.parentElement;
+  if (!wrap) return;
+  var desc = wrap.querySelector('.vaga-card__desc');
+  var textSpan = btn.querySelector('.vaga-card__toggle-text');
+  var isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+  if (isExpanded) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.remove('is-open');
+    if (desc) desc.classList.remove('is-visible');
+    if (textSpan) textSpan.textContent = 'Ver detalhes da vaga';
+  } else {
+    btn.setAttribute('aria-expanded', 'true');
+    btn.classList.add('is-open');
+    if (desc) desc.classList.add('is-visible');
+    if (textSpan) textSpan.textContent = 'Ocultar detalhes';
+  }
+}
+window.toggleVagaDesc = toggleVagaDesc;
 
 /* ─── LOGIN & CADASTRO NA NUVEM FIRESTORE (login.html) ───── */
 (function initLogin() {
@@ -2033,7 +2060,7 @@ function renderPainelVitrine() {
 
       var hasCurriculo = !!(t.curriculoNome && t.curriculoNome.trim() && !t.curriculoRemoved);
       var curriculoBtn = hasCurriculo
-        ? '<button type="button" class="btn-outline btn-sm btn-abrir-pdf-talento" data-email="' + safeEmail + '" data-nome="' + safeNomeCurriculo + '" data-url="' + safeUrl + '" style="font-size:11px;padding:6px 11px;cursor:pointer">📄 Currículo PDF</button>'
+        ? '<button type="button" class="btn-outline btn-sm btn-abrir-pdf-talento" data-email="' + safeEmail + '" data-nome="' + safeNomeCurriculo + '" data-url="' + safeUrl + '" style="font-size:11px;padding:6px 11px;cursor:pointer">📄 Currículo</button>'
         : '';
 
       var whatsMsg = encodeURIComponent('Olá ' + t.nome + ', sou colega na Inspirar e vi seu perfil no Conexão Inspirar!');
@@ -2154,8 +2181,8 @@ function initPerfilForm() {
     if (currentCurriculo.nome && !currentCurriculo.removed) {
       if (curriculoCard) curriculoCard.style.display = 'flex';
       if (curriculoDropzone) curriculoDropzone.style.display = 'none';
-      if (curriculoCardName) curriculoCardName.textContent = currentCurriculo.nome;
-      if (curriculoCardSize) curriculoCardSize.textContent = currentCurriculo.tamanho || 'PDF Anexado';
+      if (curriculoCardName) curriculoCardName.textContent = 'Currículo';
+      if (curriculoCardSize) curriculoCardSize.textContent = currentCurriculo.tamanho ? (currentCurriculo.tamanho + ' · Documento Anexado') : 'Currículo Anexado';
     } else {
       if (curriculoCard) curriculoCard.style.display = 'none';
       if (curriculoDropzone) curriculoDropzone.style.display = 'block';
