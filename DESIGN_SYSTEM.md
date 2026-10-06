@@ -73,10 +73,16 @@ Stack do projeto: HTML + CSS puro + JavaScript vanilla (sem framework, sem bundl
 ### Fontes
 
 ```html
+<!-- Fontes do Google (itálico editorial de destaque e fallback sans-serif) -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 ```
 
-- `--font-sans: 'Inter', sans-serif` — corpo do texto, UI, maioria dos títulos.
+```css
+/* Fonte institucional proprietária registrada via @font-face local em design-system.css:
+   fonts/ample-soft-pro/ (pesos 100, 200, 300, 400, 500, 600, 700) */
+```
+
+- `--font-sans: 'AmpleSoft Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` — **Tipografia institucional oficial** da marca Inspirar: corpo do texto, botões, UI, cabeçalhos e títulos. Possui fallback seguro em Inter e fontes do sistema.
 - `--font-serif: 'Cormorant Garamond', Georgia, serif` — **apenas** itálico, **apenas** para palavras de destaque dentro de um título (via `<em>`). Nunca usar em parágrafos ou botões.
 
 ### Escala

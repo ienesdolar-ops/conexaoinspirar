@@ -1,8 +1,8 @@
 # Gates: Enfase na Foto da Hero, Fotos Quadradas na Jornada e Ajustes do Curriculo
 
-OWNS: index.html, painel.html, css/portal.css, js/portal.js, scripts/verify-gates.mjs, GATES.md
+OWNS: index.html, painel.html, css/portal.css, js/portal.js, scripts/verify-gates.mjs, GATES.md, css/design-system.css, DESIGN_SYSTEM.md, fonts/ample-soft-pro/
 
-Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura organica e sem veu sobre rostos), padronizar fotos da jornada em formato quadrado uniforme de 170px sem variacao de altura, e ajustar card de curriculo removendo tamanho e tag de disponibilidade mantendo a lixeira e acoes perfeitamente contidas.
+Scope: Implementar hero com enfase total na foto, padronizar fotos da jornada em formato quadrado uniforme de 170px, ajustar card de curriculo, alinhar titulo da hero com o design system, e integrar a tipografia institucional oficial AmpleSoft Pro no design system e projeto.
 
 - [x] G1: Hero em 2 colunas com hero-media contendo hero.jpg, enquadramento organico e visibilidade total da foto
   CHECK: node scripts/verify-gates.mjs G1
@@ -48,4 +48,24 @@ Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura o
   CHECK: node scripts/verify-gates.mjs G9
   EXPECT: HERO_TITLE_DESIGN_SYSTEM_OK
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=90f64c26cab463755839c60d449faeb18a72a63bbb74011c28d4ed5029a2ee78; output-bytes=28
+
+- [x] G10: Arquivos de fonte fisica da AmpleSoft Pro (.woff2, .woff, .ttf) copiados para fonts/ample-soft-pro/
+  CHECK: node scripts/verify-gates.mjs G10
+  EXPECT: AMPLESOFT_FILES_PRESENT_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=61e080ddc77e3a119167db3c96173c3b2bbccd300046a05e37fa75035ca1fdaf; output-bytes=27
+
+- [x] G11: Regras @font-face para AmpleSoft Pro declaradas com font-display swap em css/design-system.css
+  CHECK: node scripts/verify-gates.mjs G11
+  EXPECT: AMPLESOFT_FONT_FACE_DECLARED_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=f5018b944e7b8507a4cb2b2720aed329a51a78412f819e8065fddf5a4865aae4; output-bytes=32
+
+- [x] G12: Variavel --font-sans configurada com AmpleSoft Pro como fonte institucional primaria no design system
+  CHECK: node scripts/verify-gates.mjs G12
+  EXPECT: AMPLESOFT_TOKEN_VAR_SANS_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=c9a8d3aca523eec31b87c2f4f06bd08c75d942bb6548b907c0b88890051ca559; output-bytes=28
+
+- [x] G13: Documentacao oficial da tipografia no DESIGN_SYSTEM.md atualizada com AmpleSoft Pro
+  CHECK: node scripts/verify-gates.mjs G13
+  EXPECT: AMPLESOFT_DOCUMENTED_IN_DS_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=2439ece951964710a1122937be17865c474738a77746012f4aacbff618e20ff6; output-bytes=30
 

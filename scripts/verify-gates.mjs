@@ -70,7 +70,7 @@ function checkG5() {
 }
 
 function checkG6() {
-  const files = ['index.html', 'painel.html', 'css/portal.css', 'js/portal.js'];
+  const files = ['index.html', 'painel.html', 'css/portal.css', 'js/portal.js', 'css/design-system.css', 'DESIGN_SYSTEM.md'];
   let clean = true;
   for (const f of files) {
     const c = fs.readFileSync(f, 'utf8');
@@ -128,6 +128,58 @@ function checkG9() {
   }
 }
 
+function checkG10() {
+  const fontDir = 'fonts/ample-soft-pro';
+  if (!fs.existsSync(fontDir)) {
+    console.error('FAIL G10: fonts/ample-soft-pro directory does not exist');
+    process.exit(1);
+  }
+  const files = fs.readdirSync(fontDir);
+  const hasWoff2 = files.some(f => f.includes('AmpleSoftPro-Bold.woff2')) && files.some(f => f.includes('AmpleSoftPro-Regular.woff2'));
+  const hasTtf = files.some(f => f.includes('AmpleSoftPro-Bold.ttf')) && files.some(f => f.includes('AmpleSoftPro-Regular.ttf'));
+  if (hasWoff2 && hasTtf) {
+    console.log('AMPLESOFT_FILES_PRESENT_OK');
+  } else {
+    console.error('FAIL G10: Key AmpleSoft Pro font files missing in fonts/ample-soft-pro');
+    process.exit(1);
+  }
+}
+
+function checkG11() {
+  const css = fs.readFileSync('css/design-system.css', 'utf8');
+  const hasFontFace = css.includes('@font-face') && css.includes("font-family: 'AmpleSoft Pro'");
+  const hasSwap = css.includes('font-display: swap');
+  const hasBold = css.includes('AmpleSoftPro-Bold');
+  const hasRegular = css.includes('AmpleSoftPro-Regular');
+  if (hasFontFace && hasSwap && hasBold && hasRegular) {
+    console.log('AMPLESOFT_FONT_FACE_DECLARED_OK');
+  } else {
+    console.error('FAIL G11: @font-face declarations for AmpleSoft Pro incomplete in css/design-system.css');
+    process.exit(1);
+  }
+}
+
+function checkG12() {
+  const css = fs.readFileSync('css/design-system.css', 'utf8');
+  const hasVarSans = css.includes("--font-sans:") && css.includes("'AmpleSoft Pro'");
+  if (hasVarSans) {
+    console.log('AMPLESOFT_TOKEN_VAR_SANS_OK');
+  } else {
+    console.error('FAIL G12: --font-sans does not include AmpleSoft Pro in css/design-system.css');
+    process.exit(1);
+  }
+}
+
+function checkG13() {
+  const md = fs.readFileSync('DESIGN_SYSTEM.md', 'utf8');
+  if (md.includes('AmpleSoft Pro') && md.includes('--font-sans')) {
+    console.log('AMPLESOFT_DOCUMENTED_IN_DS_OK');
+  } else {
+    console.error('FAIL G13: DESIGN_SYSTEM.md not updated with AmpleSoft Pro');
+    process.exit(1);
+  }
+}
+
 switch (gate) {
   case 'G1': checkG1(); break;
   case 'G2': checkG2(); break;
@@ -138,6 +190,10 @@ switch (gate) {
   case 'G7': checkG7(); break;
   case 'G8': checkG8(); break;
   case 'G9': checkG9(); break;
+  case 'G10': checkG10(); break;
+  case 'G11': checkG11(); break;
+  case 'G12': checkG12(); break;
+  case 'G13': checkG13(); break;
   default:
     console.error('UNKNOWN GATE');
     process.exit(1);
