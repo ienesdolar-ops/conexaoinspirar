@@ -39,3 +39,7 @@ Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura o
   EXPECT: HERO_FEATURES_BAR_REMOVED_OK
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=67572356938ca5a9533ff7e98943a844d55da8e800d52fe0c6027d5fd20dc3ee; output-bytes=29
 
+- [x] G8: Efeito roxo atmosferico confinado estritamente dentro da moldura da foto sem vazar para o fundo branco
+  CHECK: node scripts/verify-gates.mjs G8
+  EXPECT: PURPLE_GLOW_CONFINED_TO_PHOTO_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=7682ac1cff1567528dc1956967ac161b2dd0a3a85704c87dcc86ba34f927d800; output-bytes=33

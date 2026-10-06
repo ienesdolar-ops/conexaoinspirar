@@ -101,6 +101,20 @@ function checkG7() {
   }
 }
 
+function checkG8() {
+  const html = fs.readFileSync('index.html', 'utf8');
+  const css = fs.readFileSync('css/portal.css', 'utf8');
+  const frameClipped = css.includes('clip-path: url(#heroOrganicMask)') || css.includes('-webkit-clip-path: url(#heroOrganicMask)');
+  const hasGlowInFrame = html.includes('hero-photo-glow') && (html.indexOf('hero-photo-glow') > html.indexOf('class="hero-media__frame"'));
+  const noOuterShapes = !html.includes('hero-shape hero-shape--bottom-left');
+  if (frameClipped && hasGlowInFrame && noOuterShapes) {
+    console.log('PURPLE_GLOW_CONFINED_TO_PHOTO_OK');
+  } else {
+    console.error('FAIL G8: Purple glow not confined strictly inside hero-media__frame');
+    process.exit(1);
+  }
+}
+
 switch (gate) {
   case 'G1': checkG1(); break;
   case 'G2': checkG2(); break;
@@ -109,6 +123,7 @@ switch (gate) {
   case 'G5': checkG5(); break;
   case 'G6': checkG6(); break;
   case 'G7': checkG7(); break;
+  case 'G8': checkG8(); break;
   default:
     console.error('UNKNOWN GATE');
     process.exit(1);

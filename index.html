@@ -50,20 +50,14 @@
 
 <!-- ========== HERO ========== -->
 <section class="hero-section">
-  <!-- Organic SVG ClipPath Definition -->
+  <!-- Organic SVG ClipPath Definition (Exatamente nas proporções do print) -->
   <svg width="0" height="0" class="hero-svg-defs" aria-hidden="true" style="position:absolute;pointer-events:none">
     <defs>
       <clipPath id="heroOrganicMask" clipPathUnits="objectBoundingBox">
-        <path d="M 0.11,0 C 0.04,0.18 0,0.36 0.05,0.55 C 0.1,0.74 0.18,0.88 0.26,1 L 1,1 L 1,0 Z" />
+        <path d="M 0.12,0 C 0.05,0.12 0.00,0.22 0.01,0.34 C 0.02,0.48 0.14,0.76 0.22,1 L 1,1 L 1,0 Z" />
       </clipPath>
     </defs>
   </svg>
-
-  <!-- Subtle Ambient Glows -->
-  <div class="hero-ambient" aria-hidden="true">
-    <div class="hero-ambient__glow hero-ambient__glow--left"></div>
-    <div class="hero-ambient__glow hero-ambient__glow--right"></div>
-  </div>
 
   <div class="hero-container">
     <div class="hero-main-row">
@@ -76,7 +70,7 @@
 
         <h1 class="hero-title" data-reveal data-delay="80">
           O portal que conecta<br>
-          <em>estudantes e formados</em><br>
+          <em>estudantes e<br>formados</em><br>
           às melhores oportunidades
         </h1>
 
@@ -103,11 +97,11 @@
         <div class="hero-media hero-media--canvas">
           <div class="hero-media__frame">
             <img src="hero.jpg" alt="Estudantes e Formados da Faculdade Inspirar" class="hero-media__img" width="1440" height="1440" fetchpriority="high">
+            <!-- Efeito roxo atmosférico estritamente interno à foto (cortado pelo path orgânico) -->
+            <div class="hero-photo-glow hero-photo-glow--bottom" aria-hidden="true"></div>
+            <div class="hero-photo-glow hero-photo-glow--left" aria-hidden="true"></div>
+            <div class="hero-photo-glow hero-photo-glow--right" aria-hidden="true"></div>
           </div>
-          <!-- Luminous Brand Fluid Blobs -->
-          <div class="hero-shape hero-shape--bottom-left" aria-hidden="true"></div>
-          <div class="hero-shape hero-shape--bottom-right" aria-hidden="true"></div>
-          <div class="hero-shape hero-shape--top-ambient" aria-hidden="true"></div>
         </div>
       </div>
     </div>
