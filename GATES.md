@@ -1,45 +1,35 @@
-# Gates: Ajustes do Audio (Hero, Jornada, Vagas e Painel)
+# Gates: Enfase na Foto da Hero, Fotos Quadradas na Jornada e Ajustes do Curriculo
 
-OWNS: index.html, css/portal.css, css/design-system.css, painel.html, js/portal.js, scripts/verify-gates.mjs, GATES.md
+OWNS: index.html, painel.html, css/portal.css, js/portal.js, scripts/verify-gates.mjs, GATES.md
 
-Scope: Implementar integralmente os 7 direcionamentos da revisao em audio dos gestores: Hero com split-gradient (metade esquerda solida para texto e metade direita com foto e degradê), padronizacao das fotos da Jornada sem expansao de container e zoom suave, troca do destaque da etapa 3 para a etapa 4 (seja contratado), badges de recrutadores com alto contraste em contratado e padrao unico para disponivel, expansao do logo no rodape, vagas no painel com descricao compacta e expansivel sob demanda, alinhamento do label WhatsApp e substituicao da nomenclatura PDF por Curriculo com remocao do nome do anexo.
+Scope: Implementar hero com enfase total na foto (layout 2 colunas com moldura organica e sem veu sobre rostos), padronizar fotos da jornada em formato quadrado uniforme de 170px sem variacao de altura, e ajustar card de curriculo removendo tamanho e tag de disponibilidade mantendo a lixeira e acoes perfeitamente contidas.
 
-- [x] G1: Hero Split Gradient com metade esquerda solida e transicao suave para a foto na direita
+- [x] G1: Hero em 2 colunas com hero-media contendo hero.jpg, enquadramento organico e visibilidade total da foto
   CHECK: node scripts/verify-gates.mjs G1
-  EXPECT: HERO_GRADIENT_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=ddbca44d5273d9ae05765e513549ed7720b5256012935369083eaf88885fe8a1; output-bytes=17
+  EXPECT: HERO_PHOTO_EMPHASIS_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=5dfd2b9af717bad89985a928d1ae316b4a747dd5f8f5ce2088bf7bebdb7b5930; output-bytes=23
 
-- [x] G2: Padronizacao do container da Jornada com tamanho uniforme e remocao da expansao no hover
+- [x] G2: Fotos da Jornada padronizadas em formato quadrado uniforme sem variacao de altura
   CHECK: node scripts/verify-gates.mjs G2
-  EXPECT: JSTEP_SIZE_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=d2b53fe80cd09d2c2bae1454eb5a951cc69c385ab0382029346dbf1bc832c5a4; output-bytes=14
+  EXPECT: JSTEP_SQUARE_PHOTOS_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=6a0f2f4a739ddcc2a6d56a3ba880853e6dc08c71892fbe1d7bef8fd95cfbe320; output-bytes=23
 
-- [x] G3: Inversao de destaque da Jornada da Etapa 3 para a Etapa 4 (Seja Contratado)
+- [x] G3: Remocao da exibicao do tamanho do arquivo no card de curriculo no painel
   CHECK: node scripts/verify-gates.mjs G3
-  EXPECT: FEATURED_SWAP_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=6072ea85cecda418463bb4441fb60da74d911cc52ec569fea76cde27a8046f3c; output-bytes=17
+  EXPECT: CURRICULO_NO_SIZE_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=502c00f4091672bde3b85e4ef5190a713e6562a08d13a6f176f7b1f33cf4f136; output-bytes=21
 
-- [x] G4: Badges de Recrutadores com alto contraste para Contratado e estilo unico para Disponivel
+- [x] G4: Remocao da tag Disponivel para Empresas no card de curriculo do painel
   CHECK: node scripts/verify-gates.mjs G4
-  EXPECT: BADGES_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=b525d859783133c9cbf9b54d9c2d86b90aa0af832962203a40b189d238545789; output-bytes=10
+  EXPECT: CURRICULO_NO_DISPONIVEL_TAG_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=93477cbd4065d7687bdde52d0bd1555a631e10e3f69706e4a7caaa4f628a91c8; output-bytes=31
 
-- [x] G5: Ampliacao do logo Conexao Inspirar no rodape para maior autoridade e presenca de marca
+- [x] G5: Botao de lixeira e acoes de curriculo contidos perfeitamente dentro do card sem transbordamento
   CHECK: node scripts/verify-gates.mjs G5
-  EXPECT: FOOTER_LOGO_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=4a589202690dff2f3f2357a2f4cfc61480e3aefcafb13a655097f3bf24af5740; output-bytes=15
+  EXPECT: CURRICULO_CONTAINED_OK
+  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=c94aa065ef9bd850cf87529ea6a523613aaeefee6268fd5544a6f1437781c16f; output-bytes=23
 
-- [x] G6: Vagas no Painel com descricao compacta e botao expansivel (Ver detalhes / Ocultar)
+- [x] G6: Integridade de codificacao UTF-8 sem caracteres corrompidos
   CHECK: node scripts/verify-gates.mjs G6
-  EXPECT: VACANCY_EXPAND_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=481670bfb28b5087fa23b8b7eb3b69f99ada8aae067437383a68e80b1b593b2a; output-bytes=18
-
-- [x] G7: Alinhamento do campo WhatsApp e adocao da nomenclatura Curriculo (sem PDF e sem nome de anexo)
-  CHECK: node scripts/verify-gates.mjs G7
-  EXPECT: PAINEL_LABELS_OK
-  EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=5a0dd865d62ee026154f674efc0a1e29d6c062f63eee8a4b3f7f9e584c12bb70; output-bytes=17
-
-- [x] G8: Integridade de codificacao UTF-8 sem caracteres corrompidos no projeto
-  CHECK: node scripts/verify-gates.mjs G8
   EXPECT: ENCODING_CLEAN
   EVIDENCE: exit=0; shell=C:\WINDOWS\system32\cmd.exe; cwd=C:\Users\Usuario\Downloads\Carreiras Inspirar; path=679a989839ae/18 entries; EXPECT=matched; output-sha256=91a7c059384e08fd77fbe86285e578a9706e3ad4c67488713d7290b6f39ed66b; output-bytes=15

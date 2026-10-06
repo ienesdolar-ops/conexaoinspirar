@@ -2182,7 +2182,6 @@ function initPerfilForm() {
       if (curriculoCard) curriculoCard.style.display = 'flex';
       if (curriculoDropzone) curriculoDropzone.style.display = 'none';
       if (curriculoCardName) curriculoCardName.textContent = 'Currículo';
-      if (curriculoCardSize) curriculoCardSize.textContent = currentCurriculo.tamanho ? (currentCurriculo.tamanho + ' · Documento Anexado') : 'Currículo Anexado';
     } else {
       if (curriculoCard) curriculoCard.style.display = 'none';
       if (curriculoDropzone) curriculoDropzone.style.display = 'block';
