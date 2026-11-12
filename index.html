@@ -16,6 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=4.0.0">
   <link rel="stylesheet" href="css/portal.css?v=4.2.0">
+  <link rel="stylesheet" href="css/jornada-motion.css?v=1.0.0">
 </head>
 <body>
 
@@ -104,6 +105,115 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== JORNADA MOTION (guia interativo) ========== -->
+<section class="jm" id="jornadaMotion" aria-label="Como chegar às oportunidades">
+  <div class="jm__sticky">
+    <div class="jm__inner">
+
+      <div class="jm__guide">
+        <div class="jm__head">
+          <div class="section__eyebrow section__eyebrow--left">
+            <span class="section__eyebrow-dot"></span>
+            <span class="section__eyebrow-label">Seu caminho em 4 passos</span>
+          </div>
+          <h2 class="jm__title">Da inscrição à <em>sua vaga</em></h2>
+        </div>
+
+        <ol class="jm__steps" role="tablist" aria-orientation="vertical">
+          <span class="jm__rail" aria-hidden="true"></span>
+          <span class="jm__rail-fill" aria-hidden="true"></span>
+          <li class="jm__step" role="tab" tabindex="0">
+            <span class="jm__step-dot">1</span>
+            <div class="jm__step-title">Faça sua inscrição</div>
+            <p class="jm__step-text">Escolha o curso e preencha seus dados em poucos minutos.</p>
+          </li>
+          <li class="jm__step" role="tab" tabindex="0">
+            <span class="jm__step-dot">2</span>
+            <div class="jm__step-title">Entre na pós</div>
+            <p class="jm__step-text">Matrícula confirmada: você já faz parte da comunidade Inspirar — presencial, semipresencial ou EAD.</p>
+          </li>
+          <li class="jm__step" role="tab" tabindex="0">
+            <span class="jm__step-dot">3</span>
+            <div class="jm__step-title">Cadastre-se no Conexão Inspirar</div>
+            <p class="jm__step-text">Ative seu acesso, monte seu perfil com bio, redes e currículo e apareça para as empresas.</p>
+          </li>
+          <li class="jm__step" role="tab" tabindex="0">
+            <span class="jm__step-dot">4</span>
+            <div class="jm__step-title">Receba oportunidades</div>
+            <p class="jm__step-text">Vagas de estágio, emprego CLT/PJ e liderança — candidate-se com 1 clique.</p>
+          </li>
+        </ol>
+
+        <div class="jm__cta">
+          <a href="login.html" class="btn-primary">Quero começar agora →</a>
+        </div>
+        <div class="jm__hint">Role para ver cada etapa</div>
+      </div>
+
+      <div class="jm__stage-wrap">
+        <div class="jm__stage">
+          <div class="jm__chrome" aria-hidden="true"><i></i><i></i><i></i><div class="jm__url"><b>inspirar.com.br/inscricao</b></div></div>
+
+          <!-- Cena 1: Inscrição -->
+          <div class="jm__scene" aria-hidden="true">
+            <div class="jm__scene-label" data-a>Etapa 1 · Inscrição</div>
+            <h4 data-a style="--d:80">Crie sua inscrição</h4>
+            <div class="jm-field" data-a style="--d:160"><small>Nome completo</small><span style="--w:14ch;--d:160">Ana Carolina S.</span></div>
+            <div class="jm-field" data-a style="--d:900"><small>Curso de interesse</small><span style="--w:22ch;--d:900">Pós em Terapia Intensiva</span></div>
+            <div data-a style="--d:1500"><span class="jm-btn jm-btn--press">Enviar inscrição →</span></div>
+            <svg class="jm-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#0f172a" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+
+          <!-- Cena 2: Pós -->
+          <div class="jm__scene" aria-hidden="true">
+            <div class="jm__scene-label" data-a>Etapa 2 · Pós-graduação</div>
+            <h4 data-a style="--d:80">Bem-vinda à Inspirar!</h4>
+            <div class="jm-course" data-a style="--d:200">
+              <div class="jm-course__ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+              <div><b>Pós em Terapia Intensiva</b><small>Treinamento em serviço · Curitiba</small></div>
+            </div>
+            <div data-a style="--d:400">
+              <div class="jm-bar"><i></i></div>
+              <span class="jm-check">✓ Matrícula confirmada</span>
+            </div>
+            <div class="jm-chips" data-a style="--d:1200">
+              <span class="jm-chip">Presencial</span><span class="jm-chip">Semipresencial</span><span class="jm-chip">EAD</span><span class="jm-chip">Polo Luanda</span>
+            </div>
+          </div>
+
+          <!-- Cena 3: Conexão Inspirar -->
+          <div class="jm__scene" aria-hidden="true">
+            <div class="jm__scene-label" data-a>Etapa 3 · Conexão Inspirar</div>
+            <div class="jm-profile" data-a style="--d:120">
+              <div class="jm-avatar">AC</div>
+              <div style="flex:1">
+                <b style="color:var(--text-heading);font-size:16px">Ana Carolina S.</b>
+                <div class="jm-line" style="width:80%"></div><div class="jm-line" style="width:55%"></div>
+              </div>
+            </div>
+            <div class="jm-toggle" data-a style="--d:350">Currículo em PDF <span class="jm-switch" style="--d:350"></span></div>
+            <div class="jm-toggle" data-a style="--d:650">LinkedIn e redes <span class="jm-switch" style="--d:650"></span></div>
+            <div class="jm-toggle" data-a style="--d:950">Visível na Vitrine VIP <span class="jm-switch" style="--d:950"></span></div>
+          </div>
+
+          <!-- Cena 4: Oportunidades -->
+          <div class="jm__scene" aria-hidden="true">
+            <div class="jm__scene-label" data-a>Etapa 4 · Oportunidades</div>
+            <h4 data-a style="--d:80">Vagas para o seu perfil</h4>
+            <div class="jm-job" data-a style="--d:200"><div class="jm-job__logo">H</div><div><b>Fisioterapeuta UTI</b><small>Hospital · Curitiba, PR</small></div><span class="jm-tag jm-tag--clt">CLT</span></div>
+            <div class="jm-job" data-a style="--d:450"><div class="jm-job__logo">C</div><div><b>Estágio em Reabilitação</b><small>Clínica · Remoto/Híbrido</small></div><span class="jm-tag">Estágio</span></div>
+            <div class="jm-job" data-a style="--d:700"><div class="jm-job__logo">R</div><div><b>Coordenação Assistencial</b><small>Rede hospitalar · SP</small></div><span class="jm-tag jm-tag--clt">Liderança</span></div>
+            <div class="jm-toast"><span class="jm-toast__ico">✓</span>Candidatura enviada ao RH!</div>
+          </div>
+
+          <span class="jm__autobar" aria-hidden="true"></span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -541,5 +651,6 @@
 <script src="js/firebase-config.js?v=4.0.0"></script>
 <script src="js/design-system.js?v=4.0.0"></script>
 <script src="js/portal.js?v=4.0.0"></script>
+<script src="js/jornada-motion.js?v=1.0.0"></script>
 </body>
 </html>

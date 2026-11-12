@@ -1,0 +1,159 @@
+/* ==========================================================
+   JORNADA MOTION — guia interativo guiado por scroll
+   Inscrição → Pós → Conexão Inspirar → Oportunidades
+   ========================================================== */
+/* overflow-x:hidden no body vira scroll-container e quebra o sticky; clip mantém o corte sem isso */
+html, body { overflow-x: clip; }
+.jm { position: relative; height: 380vh; }
+.jm__sticky {
+  position: sticky; top: 0; height: 100vh; min-height: 620px;
+  display: flex; align-items: center; overflow: hidden;
+}
+.jm__inner {
+  width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 80px 32px 32px;
+  display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 56px; align-items: center;
+}
+.jm__head { margin-bottom: 28px; }
+.jm__title { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.08; color: var(--text-heading); margin: 14px 0 0; font-weight: 700; letter-spacing: -.02em; }
+.jm__title em { font-family: var(--font-serif); font-style: italic; font-weight: 600; background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Etapas (lista clicável) ---------- */
+.jm__steps { position: relative; list-style: none; margin: 0; padding: 0 0 0 34px; }
+.jm__rail, .jm__rail-fill { position: absolute; left: 11px; top: 14px; width: 2px; border-radius: 2px; }
+.jm__rail { bottom: 14px; background: var(--border-mid); }
+.jm__rail-fill { height: 0; background: var(--brand-gradient); box-shadow: 0 0 12px var(--green-glow); transition: height .15s linear; }
+.jm__step { position: relative; padding: 12px 0; cursor: pointer; outline: none; }
+.jm__step-dot {
+  position: absolute; left: -34px; top: 14px; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 11px; font-weight: 700;
+  background: var(--bg); border: 2px solid var(--border-strong); color: var(--text-dim);
+  transition: all .4s cubic-bezier(.2,.8,.2,1);
+}
+.jm__step-title { font-size: 17px; font-weight: 700; color: var(--text-dim); transition: color .35s; }
+.jm__step-text {
+  font-size: 14.5px; line-height: 1.55; color: var(--text-secondary); margin: 0;
+  max-height: 0; opacity: 0; overflow: hidden; transition: max-height .5s ease, opacity .4s ease, margin .4s;
+}
+.jm__step.is-done .jm__step-dot { background: var(--primary-blue); border-color: var(--primary-blue); color: #fff; }
+.jm__step.is-active .jm__step-dot { background: var(--brand-gradient); border-color: transparent; color: #fff; transform: scale(1.18); box-shadow: 0 0 0 6px var(--green-subtle), 0 6px 18px var(--accent-glow); }
+.jm__step.is-active .jm__step-title, .jm__step.is-done .jm__step-title { color: var(--text-heading); }
+.jm__step.is-active .jm__step-text { max-height: 90px; opacity: 1; margin-top: 6px; }
+.jm__step:focus-visible .jm__step-title { text-decoration: underline; text-underline-offset: 4px; }
+.jm__cta { margin-top: 26px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all .5s; }
+.jm.is-final .jm__cta { opacity: 1; transform: none; pointer-events: auto; }
+.jm__hint { margin-top: 22px; font-size: 12.5px; color: var(--text-dim); display: flex; align-items: center; gap: 8px; transition: opacity .4s; }
+.jm__hint::before { content: ""; width: 14px; height: 22px; border: 2px solid currentColor; border-radius: 8px; background: linear-gradient(currentColor, currentColor) center 4px / 2px 5px no-repeat; animation: jmMouse 1.6s infinite; }
+.jm.has-scrolled .jm__hint { opacity: 0; }
+@keyframes jmMouse { 50% { background-position: center 10px; } }
+
+/* ---------- Palco ---------- */
+.jm__stage-wrap { perspective: 1200px; }
+.jm__stage {
+  position: relative; aspect-ratio: 1 / 0.86; border-radius: var(--radius-xl);
+  background: var(--bg-card); border: 1px solid var(--border-mid);
+  box-shadow: 0 30px 80px -30px var(--accent-glow), 0 10px 30px -12px rgba(15,23,42,.18);
+  backdrop-filter: var(--blur-card); -webkit-backdrop-filter: var(--blur-card);
+  transform-style: preserve-3d; transition: transform .25s ease-out; overflow: hidden;
+}
+.jm__stage::before { /* brilho que segue a etapa */
+  content: ""; position: absolute; inset: -30%; z-index: 0; pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), var(--green-subtle), transparent 45%),
+              radial-gradient(circle at calc(100% - var(--gx, 30%)) 90%, var(--accent-subtle), transparent 40%);
+  transition: all 1s ease;
+}
+.jm__chrome { position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); }
+.jm__chrome i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+.jm__url { margin-left: 12px; flex: 1; font-size: 11.5px; color: var(--text-muted); background: var(--bg-card-alt); border-radius: var(--radius-pill); padding: 5px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jm__url b { color: var(--text-heading); font-weight: 600; transition: opacity .3s; }
+
+.jm__scene {
+  position: absolute; inset: 48px 0 0; z-index: 1; padding: 26px 28px; display: flex; flex-direction: column; justify-content: center;
+  opacity: 0; transform: translateY(24px) scale(.97); pointer-events: none;
+  transition: opacity .55s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+}
+.jm__scene.is-active { opacity: 1; transform: none; pointer-events: auto; }
+.jm__scene.is-past { transform: translateY(-24px) scale(.97); }
+.jm__scene-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--primary-purple); margin-bottom: 12px; }
+.jm__scene h4 { margin: 0 0 18px; font-size: 22px; color: var(--text-heading); font-weight: 700; }
+
+/* animação em cascata dentro da cena ativa */
+.jm__scene [data-a] { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); transition-delay: 0s; }
+.jm__scene.is-active [data-a] { opacity: 1; transform: none; transition-delay: calc(var(--d, 0) * 1ms); }
+
+/* Cena 1 — formulário */
+.jm-field { border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px; background: var(--bg-card-alt); }
+.jm-field small { display: block; font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+.jm-field span { display: inline-block; font-size: 15px; color: var(--text-heading); font-weight: 600; white-space: nowrap; overflow: hidden; width: 0; vertical-align: bottom; border-right: 2px solid var(--primary-blue); }
+.jm__scene.is-active .jm-field span { animation: jmType 1s steps(22) forwards, jmCaret .7s step-end 3 forwards; animation-delay: calc(var(--d, 0) * 1ms + 250ms); }
+@keyframes jmType { to { width: var(--w, 14ch); } }
+@keyframes jmCaret { 50% { border-color: transparent; } 100% { border-color: transparent; } }
+.jm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; padding: 12px 18px; border-radius: var(--radius-pill); background: var(--brand-gradient); color: #fff; font-weight: 700; font-size: 14px; position: relative; overflow: hidden; }
+.jm__scene.is-active .jm-btn--press { animation: jmPress .5s ease 2.1s; }
+@keyframes jmPress { 40% { transform: scale(.94); } }
+.jm-cursor { position: absolute; width: 22px; height: 22px; z-index: 5; pointer-events: none; opacity: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+.jm__scene.is-active .jm-cursor { animation: jmCursor 2.4s cubic-bezier(.6,.05,.3,1) .3s forwards; }
+@keyframes jmCursor { 0% { opacity: 0; left: 80%; top: 30%; } 20% { opacity: 1; } 75% { left: 22%; top: calc(100% - 64px); } 85% { transform: scale(.85); } 100% { opacity: 1; left: 22%; top: calc(100% - 64px); transform: none; } }
+
+/* Cena 2 — pós */
+.jm-course { display: flex; gap: 14px; align-items: center; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-mid); background: var(--bg-card-alt); margin-bottom: 10px; }
+.jm-course__ico { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; background: var(--brand-gradient); color: #fff; }
+.jm-course b { display: block; color: var(--text-heading); font-size: 15px; }
+.jm-course small { color: var(--text-muted); font-size: 12.5px; }
+.jm-bar { height: 8px; border-radius: 8px; background: var(--border-subtle); overflow: hidden; margin: 14px 0 6px; }
+.jm-bar i { display: block; height: 100%; width: 0; background: var(--brand-gradient); border-radius: 8px; }
+.jm__scene.is-active .jm-bar i { animation: jmFill 1.8s cubic-bezier(.3,.7,.2,1) .6s forwards; }
+@keyframes jmFill { to { width: 100%; } }
+.jm-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.jm-chip { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-pill); background: var(--green-subtle); border: 1px solid var(--green-border); color: var(--green-text); }
+.jm-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--green-text); }
+
+/* Cena 3 — Conexão Inspirar */
+.jm-profile { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+.jm-avatar { width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; background: var(--brand-gradient); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 22px; position: relative; }
+.jm-avatar::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--primary-blue); opacity: 0; }
+.jm__scene.is-active .jm-avatar::after { animation: jmRing 1.6s ease-out .8s 2; }
+@keyframes jmRing { 0% { opacity: .9; transform: scale(.9); } 100% { opacity: 0; transform: scale(1.35); } }
+.jm-line { height: 10px; border-radius: 6px; background: var(--border-mid); margin: 6px 0; }
+.jm-toggle { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-mid); background: var(--bg-card-alt); font-size: 14px; color: var(--text-card); font-weight: 600; margin-bottom: 8px; }
+.jm-switch { width: 38px; height: 22px; border-radius: 22px; background: var(--border-strong); position: relative; transition: background .3s; }
+.jm-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .35s cubic-bezier(.3,1.5,.5,1); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.jm__scene.is-active .jm-switch { background: var(--primary-blue); transition-delay: calc(var(--d, 0) * 1ms + 400ms); }
+.jm__scene.is-active .jm-switch::after { transform: translateX(16px); transition-delay: calc(var(--d, 0) * 1ms + 400ms); }
+
+/* Cena 4 — oportunidades */
+.jm-job { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--bg-card-alt); border: 1px solid var(--border-mid); margin-bottom: 9px; }
+.jm-job__logo { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; font-weight: 700; color: var(--primary-purple); background: var(--accent-subtle); }
+.jm-job b { display: block; font-size: 14.5px; color: var(--text-heading); }
+.jm-job small { font-size: 12px; color: var(--text-muted); }
+.jm-tag { margin-left: auto; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; padding: 5px 10px; border-radius: var(--radius-pill); white-space: nowrap; background: var(--green-subtle); color: var(--green-text); border: 1px solid var(--green-border); }
+.jm-tag--clt { background: var(--accent-subtle); color: var(--primary-purple); border-color: var(--accent-border); }
+.jm-toast {
+  position: absolute; right: 18px; bottom: 18px; z-index: 4; display: flex; gap: 10px; align-items: center;
+  padding: 12px 16px; border-radius: var(--radius-md); background: var(--text-heading); color: var(--bg);
+  font-size: 13px; font-weight: 600; box-shadow: 0 14px 34px -10px rgba(0,0,0,.4);
+  opacity: 0; transform: translateY(20px) scale(.9);
+}
+.jm__scene.is-active .jm-toast { animation: jmToast .6s cubic-bezier(.2,1.4,.4,1) 1.6s forwards; }
+@keyframes jmToast { to { opacity: 1; transform: none; } }
+.jm-toast__ico { width: 26px; height: 26px; border-radius: 50%; background: var(--brand-gradient); display: grid; place-items: center; color: #fff; }
+
+/* ---------- Mobile: sem pin, auto-avanço + toque ---------- */
+@media (max-width: 900px) {
+  .jm { height: auto; }
+  .jm__sticky { position: relative; height: auto; min-height: 0; }
+  .jm__inner { grid-template-columns: 1fr; gap: 26px; padding: 40px 16px 20px; }
+  .jm__stage-wrap { order: -1; }
+  .jm__stage { aspect-ratio: auto; height: 430px; }
+  .jm__scene { padding: 20px; }
+  .jm__hint { display: none; }
+  .jm__cta { opacity: 1; transform: none; pointer-events: auto; }
+  .jm__autobar { display: block; }
+}
+.jm__autobar { display: none; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; z-index: 6; background: var(--brand-gradient); }
+.jm__autobar.is-running { animation: jmAuto var(--auto-ms, 5000ms) linear forwards; }
+@keyframes jmAuto { to { width: 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .jm__scene, .jm__scene [data-a], .jm__step-dot, .jm__stage { transition: none !important; }
+  .jm__scene *, .jm__scene *::after { animation-duration: 1ms !important; animation-delay: 0s !important; }
+}
