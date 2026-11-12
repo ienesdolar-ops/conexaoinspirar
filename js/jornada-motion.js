@@ -9,7 +9,7 @@
   var urlB = root.querySelector('.jm__url b');
   var autobar = root.querySelector('.jm__autobar');
   var N = steps.length, current = -1;
-  var urls = ['inspirar.com.br/inscricao', 'inspirar.com.br/pos-graduacao', 'conexao.inspirar.com.br/perfil', 'conexao.inspirar.com.br/vagas'];
+  var urls = ['inspirar.com.br/inscricao', 'inspirar.com.br/meu-curso', 'conexao.inspirar.com.br/perfil', 'conexao.inspirar.com.br/vagas'];
   var glow = [['20%','15%'], ['75%','20%'], ['25%','70%'], ['70%','75%']];
   var mq = window.matchMedia('(max-width: 900px)');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
